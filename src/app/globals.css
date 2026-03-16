@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Interplay brand palette */
+  --color-brand-bg: #0d1410;
+  --color-brand-surface: #151f18;
+  --color-brand-border: rgba(255, 255, 255, 0.08);
+  --color-brand-green: #3ecf6e;
+  --color-brand-orange: #f4821f;
+  --color-brand-blue: #4a9ff5;
+  --color-brand-muted: #6b8c74;
+
+  --font-sans: 'Inter', 'system-ui', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-brand-bg);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Custom selection color */
+::selection {
+  background-color: var(--color-brand-green);
+  color: var(--color-brand-bg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-muted);
+}
