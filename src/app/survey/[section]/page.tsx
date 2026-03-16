@@ -82,8 +82,12 @@ export default function SectionPage({ params }: SectionPageProps) {
       })
 
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Submission failed')
+        let errMsg = 'Submission failed'
+        try {
+          const err = await res.json()
+          errMsg = err.error ?? errMsg
+        } catch { /* non-JSON error body */ }
+        throw new Error(errMsg)
       }
 
       if (isLastSection) {

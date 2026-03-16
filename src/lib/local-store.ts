@@ -45,20 +45,30 @@ function escapeCsv(value: string): string {
 /**
  * Appends a single response row to data/responses.csv.
  * Creates the file and writes the header row if the file doesn't exist yet.
+ * Throws a clear Error (rather than a raw fs exception) if the write fails —
+ * e.g. on Vercel where the filesystem is read-only.
  */
 export function appendLocalResponse(row: string[]): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true })
+    }
+
+    const needsHeader = !fs.existsSync(RESPONSES_PATH) || fs.statSync(RESPONSES_PATH).size === 0
+
+    if (needsHeader) {
+      fs.writeFileSync(RESPONSES_PATH, CSV_HEADERS.map(escapeCsv).join(',') + '\n', 'utf8')
+    }
+
+    const csvRow = row.map(escapeCsv).join(',') + '\n'
+    fs.appendFileSync(RESPONSES_PATH, csvRow, 'utf8')
+  } catch (err) {
+    throw new Error(
+      `CSV write failed — this usually means the filesystem is read-only (e.g. Vercel). ` +
+      `Configure POSTGRES_URL or GOOGLE_SERVICE_ACCOUNT_JSON instead. ` +
+      `Original error: ${err instanceof Error ? err.message : String(err)}`
+    )
   }
-
-  const needsHeader = !fs.existsSync(RESPONSES_PATH) || fs.statSync(RESPONSES_PATH).size === 0
-
-  if (needsHeader) {
-    fs.writeFileSync(RESPONSES_PATH, CSV_HEADERS.map(escapeCsv).join(',') + '\n', 'utf8')
-  }
-
-  const csvRow = row.map(escapeCsv).join(',') + '\n'
-  fs.appendFileSync(RESPONSES_PATH, csvRow, 'utf8')
 }
 
 /**

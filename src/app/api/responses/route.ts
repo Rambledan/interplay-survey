@@ -27,6 +27,18 @@ export async function POST(request: NextRequest) {
 
   const timestamp = submittedAt ?? new Date().toISOString()
 
+  // ── Guard: Vercel without any storage configured ───────────────────────
+  // Vercel has a read-only filesystem — CSV fallback won't work there.
+  // Detect early and return a clear error rather than a silent crash.
+  const onVercel = process.env.VERCEL === '1'
+  if (onVercel && !isPostgresConfigured() && !isGoogleSheetsConfigured()) {
+    console.error('[POST /api/responses] No storage configured on Vercel. Add POSTGRES_URL or GOOGLE_SERVICE_ACCOUNT_JSON.')
+    return NextResponse.json(
+      { error: 'Survey storage is not configured on this deployment. Please contact the administrator.' },
+      { status: 503 }
+    )
+  }
+
   try {
     // ── 1. Vercel Postgres (preferred) ─────────────────────────────────────
     if (isPostgresConfigured()) {
