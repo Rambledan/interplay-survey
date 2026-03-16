@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isPostgresConfigured, insertResponse } from '@/lib/db'
 import { isGoogleSheetsConfigured, appendLocalResponse } from '@/lib/local-store'
 import type { SurveyResponse } from '@/types/survey'
 
@@ -24,28 +25,50 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'sectionSlug is required' }, { status: 400 })
   }
 
-  const row = [
-    submittedAt ?? new Date().toISOString(),
-    respondent.name,
-    respondent.role,
-    respondent.token ?? '',
-    sectionSlug,
-    JSON.stringify(answers ?? {}),
-    JSON.stringify(followUps ?? {}),
-  ]
+  const timestamp = submittedAt ?? new Date().toISOString()
 
   try {
-    // ── Local fallback (no Google credentials) ─────────────────────────────
-    if (!isGoogleSheetsConfigured()) {
-      appendLocalResponse(row)
-      return NextResponse.json({ ok: true, storage: 'local-csv' })
+    // ── 1. Vercel Postgres (preferred) ─────────────────────────────────────
+    if (isPostgresConfigured()) {
+      await insertResponse(
+        timestamp,
+        respondent.name,
+        respondent.role,
+        respondent.token ?? '',
+        sectionSlug,
+        answers ?? {},
+        followUps ?? {}
+      )
+      return NextResponse.json({ ok: true, storage: 'postgres' })
     }
 
-    // ── Google Sheets ──────────────────────────────────────────────────────
-    const { appendResponseRow } = await import('@/lib/sheets')
-    await appendResponseRow(row)
+    // ── 2. Google Sheets ───────────────────────────────────────────────────
+    if (isGoogleSheetsConfigured()) {
+      const { appendResponseRow } = await import('@/lib/sheets')
+      await appendResponseRow([
+        timestamp,
+        respondent.name,
+        respondent.role,
+        respondent.token ?? '',
+        sectionSlug,
+        JSON.stringify(answers ?? {}),
+        JSON.stringify(followUps ?? {}),
+      ])
+      return NextResponse.json({ ok: true, storage: 'sheets' })
+    }
 
-    return NextResponse.json({ ok: true, storage: 'sheets' })
+    // ── 3. Local CSV fallback ──────────────────────────────────────────────
+    appendLocalResponse([
+      timestamp,
+      respondent.name,
+      respondent.role,
+      respondent.token ?? '',
+      sectionSlug,
+      JSON.stringify(answers ?? {}),
+      JSON.stringify(followUps ?? {}),
+    ])
+    return NextResponse.json({ ok: true, storage: 'local-csv' })
+
   } catch (error) {
     console.error('[POST /api/responses]', error)
     return NextResponse.json(
