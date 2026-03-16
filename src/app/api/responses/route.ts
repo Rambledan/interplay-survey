@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { appendResponseRow } from '@/lib/sheets'
+import { isGoogleSheetsConfigured, appendLocalResponse } from '@/lib/local-store'
 import type { SurveyResponse } from '@/types/survey'
 
 export async function POST(request: NextRequest) {
@@ -24,20 +24,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'sectionSlug is required' }, { status: 400 })
   }
 
-  try {
-    const row = [
-      submittedAt ?? new Date().toISOString(),
-      respondent.name,
-      respondent.role,
-      respondent.token ?? '',
-      sectionSlug,
-      JSON.stringify(answers ?? {}),
-      JSON.stringify(followUps ?? {}),
-    ]
+  const row = [
+    submittedAt ?? new Date().toISOString(),
+    respondent.name,
+    respondent.role,
+    respondent.token ?? '',
+    sectionSlug,
+    JSON.stringify(answers ?? {}),
+    JSON.stringify(followUps ?? {}),
+  ]
 
+  try {
+    // ── Local fallback (no Google credentials) ─────────────────────────────
+    if (!isGoogleSheetsConfigured()) {
+      appendLocalResponse(row)
+      return NextResponse.json({ ok: true, storage: 'local-csv' })
+    }
+
+    // ── Google Sheets ──────────────────────────────────────────────────────
+    const { appendResponseRow } = await import('@/lib/sheets')
     await appendResponseRow(row)
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, storage: 'sheets' })
   } catch (error) {
     console.error('[POST /api/responses]', error)
     return NextResponse.json(

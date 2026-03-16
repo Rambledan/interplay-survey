@@ -1,0 +1,289 @@
+[
+  {
+    "name": "Appetite",
+    "slug": "appetite",
+    "description": "Growth appetite versus cost",
+    "questions": [
+      {
+        "id": "appetite-q1",
+        "text": "To what extent do you believe sustainability contributes to commercial value and growth in your organization?",
+        "type": "text-options",
+        "options": ["Not at all", "Limited impact", "Moderate impact", "Significant impact", "Core driver of value"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "appetite-q2",
+        "text": "How much potential is there for sustainability to contribute to growth?",
+        "type": "percentage",
+        "options": ["0%", "25%", "50%", "75%", "100%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "appetite-q3",
+        "text": "To what extent is sustainability seen as a cost centre?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "appetite-q4",
+        "text": "How likely is sustainability to become a source of competitive advantage in your industry within the next 5 years?",
+        "type": "text-options",
+        "options": ["Very unlikely", "Unlikely", "Neutral", "Likely", "Very likely"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "appetite-q5",
+        "text": "Which area is most likely to drive this advantage?",
+        "type": "open-answer",
+        "options": [],
+        "followUpLabel": null
+      },
+      {
+        "id": "appetite-q6",
+        "text": "What are the biggest barriers to translating sustainability initiatives into commercial value?",
+        "type": "open-answer",
+        "options": [],
+        "followUpLabel": null
+      },
+      {
+        "id": "appetite-q7",
+        "text": "What is the single most compelling example in your organization where sustainability created measurable business value?",
+        "type": "open-answer",
+        "options": [],
+        "followUpLabel": null
+      }
+    ]
+  },
+  {
+    "name": "Scale & AI",
+    "slug": "scale-and-delivery",
+    "description": "Growth and impact through AI",
+    "questions": [
+      {
+        "id": "scale-q1",
+        "text": "To what extent do you think AI can unlock revenue and accelerate impact from sustainability?",
+        "type": "percentage",
+        "options": ["0%", "25%", "50%", "75%", "100%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "scale-q2",
+        "text": "How much access to AI do sustainability projects/teams have?",
+        "type": "text-options",
+        "options": ["Full public access to the latest models", "Some access to internal AI tools", "No access"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "scale-q3",
+        "text": "How well do your IT teams support sustainability project development?",
+        "type": "text-options",
+        "options": ["Well supported", "Partially supported", "Not well supported"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "scale-q4",
+        "text": "How many sustainability projects deliver their original objectives?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      }
+    ]
+  },
+  {
+    "name": "Sustainability Capability",
+    "slug": "capability-sustainability",
+    "description": "Sustainability (business and brand)",
+    "questions": [
+      {
+        "id": "sus-q1",
+        "text": "To what level is the company's sustainability vision and strategy known & understood across all teams?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q2",
+        "text": "If sustainability regulations disappeared tomorrow, how much of your company's sustainability activity would continue?",
+        "type": "text-options",
+        "options": ["None", "A small portion", "About half", "Most", "All of it"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q3",
+        "text": "To what extent do you consider sustainability issues as risks?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q4",
+        "text": "How much do you consider sustainability issues as opportunities in your business planning?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q5",
+        "text": "What is the level of involvement from brand in sustainability projects?",
+        "type": "text-options",
+        "options": ["High involvement", "Moderate involvement", "Low involvement"],
+        "followUpLabel": "Please provide some examples"
+      },
+      {
+        "id": "sus-q6",
+        "text": "What is the level of involvement from business in sustainability projects?",
+        "type": "text-options",
+        "options": ["High involvement", "Moderate involvement", "Low involvement"],
+        "followUpLabel": "Please provide some examples"
+      },
+      {
+        "id": "sus-q7",
+        "text": "To what extent are your sustainability strategic targets set up to deliver your business financial KPIs and performance?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q8",
+        "text": "To what extent are your sustainability strategic targets set up to deliver your brand KPIs?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      }
+    ]
+  },
+  {
+    "name": "Brand Capability",
+    "slug": "capability-brand",
+    "description": "Brand and sustainability",
+    "questions": [
+      {
+        "id": "brand-q1",
+        "text": "To what extent is your sustainability strategy aligned with your brand strategy?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q2",
+        "text": "Is your brand purpose aligned with your sustainability ambition?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q3",
+        "text": "How regular are meetings between brand and sustainability?",
+        "type": "text-options",
+        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
+        "followUpLabel": null
+      },
+      {
+        "id": "brand-q4",
+        "text": "What is the level of involvement from sustainability in brand projects?",
+        "type": "text-options",
+        "options": ["High involvement", "Moderate involvement", "Low involvement"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q5",
+        "text": "When are your sustainability teams consulted on sustainability communications or campaigns?",
+        "type": "text-options",
+        "options": ["At the start", "After research", "After design", "Just before launch", "Just after launch"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q6",
+        "text": "How successful are your sustainability campaigns?",
+        "type": "text-options",
+        "options": ["Very successful", "Quite successful", "Some success", "Not very successful", "Not at all successful"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q7",
+        "text": "What percentage of marketing spend is allocated to sustainability?",
+        "type": "text-options",
+        "options": ["0%", "20%", "50%", "More than 50%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q8",
+        "text": "How strong is the correlation between sustainability and sales in your business?",
+        "type": "text-options",
+        "options": ["Very weak", "Weak", "Moderate", "Strong", "Very strong"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q9",
+        "text": "When are your sustainability teams consulted on product and service innovation?",
+        "type": "text-options",
+        "options": ["At the start", "After research", "After design", "Just before launch"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      }
+    ]
+  },
+  {
+    "name": "Business Capability",
+    "slug": "capability-business",
+    "description": "Business investment and sustainability",
+    "questions": [
+      {
+        "id": "biz-q1",
+        "text": "To what extent is sustainability strategy aligned with your business strategy?",
+        "type": "text-options",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q2",
+        "text": "Is your sustainability strategy incorporated into your business model?",
+        "type": "text-options",
+        "options": ["Yes", "No", "Maybe"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q3",
+        "text": "Is your business vision and mission aligned with your sustainability ambition?",
+        "type": "text-options",
+        "options": ["Yes", "No", "A bit"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q4",
+        "text": "How regular are meetings between sustainability and business?",
+        "type": "text-options",
+        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
+        "followUpLabel": null
+      },
+      {
+        "id": "biz-q5",
+        "text": "What is the level of involvement from sustainability on business decisions?",
+        "type": "text-options",
+        "options": ["High involvement", "Moderate involvement", "Low involvement"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q6",
+        "text": "Do you measure sustainability financial performance?",
+        "type": "text-options",
+        "options": ["Yes", "No", "Maybe"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q7",
+        "text": "If sustainability initiatives were removed from your strategy, which area of performance would deteriorate first?",
+        "type": "text-options",
+        "options": ["Brand reputation", "Revenue growth", "Cost efficiency", "Regulatory exposure", "Investor confidence", "Talent attraction"],
+        "followUpLabel": null
+      },
+      {
+        "id": "biz-q8",
+        "text": "What percentage of capital allocation goes to sustainability?",
+        "type": "text-options",
+        "options": ["0%", "Up to 25%", "Up to 50%", "More than 50%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      }
+    ]
+  }
+]
