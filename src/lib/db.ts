@@ -1,52 +1,88 @@
 /**
  * db.ts
  *
- * Vercel Postgres storage layer.
- * Used when POSTGRES_URL is set; CSV is used as the local fallback.
+ * Postgres storage layer using the standard `pg` driver.
+ * Works with any Postgres provider (Supabase, Neon, Railway, etc.).
+ *
+ * Connection priority:
+ *   POSTGRES_URL  →  INTERPLAY_SURVEY_POSTGRES_URL_NON_POOLING  →  INTERPLAY_SURVEY_POSTGRES_URL
  *
  * Schema uses JSONB for answers so future analytics queries can filter
  * on individual question IDs without unpacking strings in application code.
  */
 
-import { sql } from '@vercel/postgres'
+import { Client } from 'pg'
 
-// ── Config check ────────────────────────────────────────────────────────────
+// ── Connection string ────────────────────────────────────────────────────────
+
+function getConnectionString(): string | undefined {
+  return (
+    process.env.POSTGRES_URL ||
+    process.env.INTERPLAY_SURVEY_POSTGRES_URL_NON_POOLING ||
+    process.env.INTERPLAY_SURVEY_POSTGRES_URL
+  )
+}
 
 export function isPostgresConfigured(): boolean {
-  return !!process.env.POSTGRES_URL
+  return !!getConnectionString()
 }
 
-// ── Schema ──────────────────────────────────────────────────────────────────
+// ── Client factory ────────────────────────────────────────────────────────────
+// Creates a fresh client per request — safe for serverless environments.
 
-/**
- * Creates the responses table and indexes if they don't already exist.
- * Safe to call on every request — Postgres no-ops when objects exist.
- */
+async function withClient<T>(fn: (client: Client) => Promise<T>): Promise<T> {
+  const raw = getConnectionString() ?? ''
+
+  // Strip sslmode from the URL — pg parses it and overrides the ssl option
+  // we set below. Supabase self-signs its cert so rejectUnauthorized must be false.
+  const connectionString = raw
+    .replace(/[?&]sslmode=[^&]+/, m => (m.startsWith('?') ? '?' : ''))
+    .replace(/\?&/, '?')
+    .replace(/[?&]$/, '')
+
+  const client = new Client({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+  })
+
+  await client.connect()
+
+  try {
+    return await fn(client)
+  } finally {
+    await client.end()
+  }
+}
+
+// ── Schema ───────────────────────────────────────────────────────────────────
+
 export async function ensureTable(): Promise<void> {
-  await sql`
-    CREATE TABLE IF NOT EXISTS responses (
-      id            SERIAL       PRIMARY KEY,
-      submitted_at  TIMESTAMPTZ  NOT NULL,
-      respondent_name TEXT       NOT NULL,
-      respondent_role TEXT       NOT NULL,
-      token         TEXT         NOT NULL DEFAULT '',
-      section_slug  TEXT         NOT NULL,
-      answers       JSONB        NOT NULL DEFAULT '{}',
-      follow_ups    JSONB        NOT NULL DEFAULT '{}',
-      created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
-    )
-  `
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_responses_submitted_at
-    ON responses (submitted_at DESC)
-  `
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_responses_section_slug
-    ON responses (section_slug)
-  `
+  await withClient(async (client) => {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS responses (
+        id              SERIAL       PRIMARY KEY,
+        submitted_at    TIMESTAMPTZ  NOT NULL,
+        respondent_name TEXT         NOT NULL,
+        respondent_role TEXT         NOT NULL,
+        token           TEXT         NOT NULL DEFAULT '',
+        section_slug    TEXT         NOT NULL,
+        answers         JSONB        NOT NULL DEFAULT '{}',
+        follow_ups      JSONB        NOT NULL DEFAULT '{}',
+        created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
+    `)
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_responses_submitted_at
+      ON responses (submitted_at DESC)
+    `)
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_responses_section_slug
+      ON responses (section_slug)
+    `)
+  })
 }
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface DbRow {
   id: number
@@ -59,9 +95,8 @@ export interface DbRow {
   follow_ups: Record<string, string>
 }
 
-// ── Queries ──────────────────────────────────────────────────────────────────
+// ── Queries ───────────────────────────────────────────────────────────────────
 
-/** Inserts one survey section submission into the responses table. */
 export async function insertResponse(
   submittedAt: string,
   respondentName: string,
@@ -73,53 +108,43 @@ export async function insertResponse(
 ): Promise<void> {
   await ensureTable()
 
-  const answersJson  = JSON.stringify(answers)
-  const followUpsJson = JSON.stringify(followUps)
-
-  await sql`
-    INSERT INTO responses
-      (submitted_at, respondent_name, respondent_role, token, section_slug, answers, follow_ups)
-    VALUES
-      (
-        ${submittedAt}::timestamptz,
-        ${respondentName},
-        ${respondentRole},
-        ${token},
-        ${sectionSlug},
-        ${answersJson}::jsonb,
-        ${followUpsJson}::jsonb
-      )
-  `
+  await withClient(async (client) => {
+    await client.query(
+      `INSERT INTO responses
+         (submitted_at, respondent_name, respondent_role, token, section_slug, answers, follow_ups)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb)`,
+      [
+        submittedAt,
+        respondentName,
+        respondentRole,
+        token,
+        sectionSlug,
+        JSON.stringify(answers),
+        JSON.stringify(followUps),
+      ]
+    )
+  })
 }
 
-/** Returns all response rows ordered newest-first. */
 export async function getAllResponses(): Promise<DbRow[]> {
   await ensureTable()
 
-  const result = await sql<DbRow>`
-    SELECT
-      id,
-      submitted_at,
-      respondent_name,
-      respondent_role,
-      token,
-      section_slug,
-      answers,
-      follow_ups
-    FROM responses
-    ORDER BY submitted_at DESC
-  `
-
-  return result.rows
+  return withClient(async (client) => {
+    const result = await client.query<DbRow>(`
+      SELECT id, submitted_at, respondent_name, respondent_role,
+             token, section_slug, answers, follow_ups
+      FROM responses
+      ORDER BY submitted_at DESC
+    `)
+    return result.rows
+  })
 }
 
-/**
- * Serialises DB rows to CSV text (matching the local responses.csv format)
- * so the export endpoint works regardless of storage backend.
- */
+// ── CSV export helper ─────────────────────────────────────────────────────────
+
 export function rowsToCsv(rows: DbRow[]): string {
   const escape = (v: string) => {
-    const s = String(v)
+    const s = String(v ?? '')
     return s.includes(',') || s.includes('"') || s.includes('\n')
       ? `"${s.replace(/"/g, '""')}"`
       : s
