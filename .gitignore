@@ -44,3 +44,4 @@ next-env.d.ts
 
 # local response storage (CSV fallback — do not commit real responses)
 /data/responses.csv
+.env*.local
