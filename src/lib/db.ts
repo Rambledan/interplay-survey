@@ -126,6 +126,18 @@ export async function insertResponse(
   })
 }
 
+export async function deleteResponsesByRespondent(name: string): Promise<number> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query(
+      `DELETE FROM responses WHERE LOWER(respondent_name) = LOWER($1)`,
+      [name]
+    )
+    return result.rowCount ?? 0
+  })
+}
+
 export async function getAllResponses(): Promise<DbRow[]> {
   await ensureTable()
 

@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import questionsData from '../../../../../data/questions.json'
 import { parseCsv } from '@/lib/parse-csv'
-import { isPostgresConfigured, getAllResponses } from '@/lib/db'
+import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent } from '@/lib/db'
 import type { SurveySection, Question } from '@/types/survey'
 import type { DbRow } from '@/lib/db'
 
@@ -136,6 +136,38 @@ function getResponsesFromCsv(): ResponseEntry[] {
 }
 
 // ── Route handler ──────────────────────────────────────────────────────────
+// ── CSV delete helper ───────────────────────────────────────────────────────
+function deleteFromCsv(name: string): number {
+  if (!fs.existsSync(RESPONSES_PATH)) return 0
+  const raw = fs.readFileSync(RESPONSES_PATH, 'utf8')
+  const rows = parseCsv(raw)
+  if (rows.length === 0) return 0
+
+  const hasHeader = rows[0][0] === 'timestamp'
+  const header = hasHeader ? rows[0] : null
+  const dataRows = hasHeader ? rows.slice(1) : rows
+
+  const before = dataRows.length
+  const kept = dataRows.filter(row => (row[1] ?? '').toLowerCase() !== name.toLowerCase())
+  const deleted = before - kept.length
+
+  if (deleted > 0) {
+    const toWrite = header ? [header, ...kept] : kept
+    const escape = (v: string) => {
+      const s = String(v ?? '')
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    fs.writeFileSync(
+      RESPONSES_PATH,
+      toWrite.map(r => r.map(escape).join(',')).join('\n') + '\n',
+      'utf8'
+    )
+  }
+
+  return deleted
+}
+
 export async function GET(request: NextRequest) {
   if (!isAuthorised(request)) {
     return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
@@ -163,5 +195,29 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[GET /api/admin/responses]', error)
     return NextResponse.json({ error: 'Failed to load responses' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  if (!isAuthorised(request)) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(request.url)
+  const respondent = searchParams.get('respondent')
+
+  if (!respondent?.trim()) {
+    return NextResponse.json({ error: 'Missing respondent parameter' }, { status: 400 })
+  }
+
+  try {
+    const deleted = isPostgresConfigured()
+      ? await deleteResponsesByRespondent(respondent)
+      : deleteFromCsv(respondent)
+
+    return NextResponse.json({ ok: true, deleted })
+  } catch (error) {
+    console.error('[DELETE /api/admin/responses]', error)
+    return NextResponse.json({ error: 'Failed to delete responses' }, { status: 500 })
   }
 }

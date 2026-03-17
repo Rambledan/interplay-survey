@@ -30,6 +30,40 @@ function formatDate(iso: string) {
   }
 }
 
+// ── Types ──────────────────────────────────────────────────────────────────
+
+interface RespondentGroup {
+  name: string
+  role: string
+  sections: ResponseEntry[]
+}
+
+// ── Group responses by respondent ─────────────────────────────────────────
+
+function groupByRespondent(responses: ResponseEntry[]): RespondentGroup[] {
+  const map = new Map<string, RespondentGroup>()
+
+  for (const r of responses) {
+    const key = r.respondentName.toLowerCase()
+    if (!map.has(key)) {
+      map.set(key, { name: r.respondentName, role: r.respondentRole, sections: [] })
+    }
+    map.get(key)!.sections.push(r)
+  }
+
+  // Sort sections within each respondent by submission time ascending
+  for (const group of map.values()) {
+    group.sections.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+  }
+
+  // Sort respondents by their earliest submission descending
+  return Array.from(map.values()).sort((a, b) => {
+    const aTime = a.sections[0]?.timestamp ?? ''
+    const bTime = b.sections[0]?.timestamp ?? ''
+    return bTime.localeCompare(aTime)
+  })
+}
+
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
@@ -41,7 +75,7 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
   )
 }
 
-function ResponseCard({
+function SectionRow({
   response,
   expanded,
   onToggle,
@@ -53,44 +87,34 @@ function ResponseCard({
   const { badge, dot } = sectionStyle(response.sectionSlug)
 
   return (
-    <div className="border border-white/8 bg-brand-surface">
-      {/* Header row */}
+    <div className="border-t border-white/5">
       <button
         onClick={onToggle}
-        className="w-full text-left px-5 py-4 flex items-center gap-4 hover:bg-white/3 transition-colors"
+        className="w-full text-left px-5 py-3 flex items-center gap-3 hover:bg-white/3 transition-colors"
       >
-        <span className={`w-2 h-2 rounded-full shrink-0 ${dot}`} />
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="font-semibold text-white text-sm">{response.respondentName || '—'}</span>
-            {response.respondentRole && (
-              <span className="text-brand-muted text-xs">{response.respondentRole}</span>
-            )}
-          </div>
-          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-            <span className={`text-xs font-mono px-2 py-0.5 border rounded-sm ${badge}`}>
-              {response.sectionName}
-            </span>
-            <span className="text-xs text-brand-muted font-mono">{formatDate(response.timestamp)}</span>
-          </div>
-        </div>
-
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+        <span className={`text-xs font-mono px-2 py-0.5 border rounded-sm ${badge}`}>
+          {response.sectionName}
+        </span>
+        <span className="text-xs text-brand-muted font-mono ml-auto">
+          {formatDate(response.timestamp)}
+        </span>
         <span className="text-brand-muted text-xs font-mono shrink-0">
-          {response.answers.length} answers {expanded ? '▲' : '▼'}
+          {response.answers.length}q {expanded ? '▲' : '▼'}
         </span>
       </button>
 
-      {/* Expanded Q&A */}
       {expanded && (
-        <div className="border-t border-white/5 divide-y divide-white/5">
+        <div className="divide-y divide-white/5 bg-black/20">
           {response.answers.length === 0 ? (
-            <p className="px-5 py-4 text-sm text-brand-muted italic">No answers recorded.</p>
+            <p className="px-6 py-4 text-sm text-brand-muted italic">No answers recorded.</p>
           ) : (
             response.answers.map((a) => (
-              <div key={a.questionId} className="px-5 py-4">
+              <div key={a.questionId} className="px-6 py-3">
                 <p className="text-xs text-brand-muted mb-1">{a.questionText}</p>
-                <p className="text-sm text-white font-medium">{a.answer || <span className="italic text-white/30">No answer</span>}</p>
+                <p className="text-sm text-white font-medium">
+                  {a.answer || <span className="italic text-white/30">No answer</span>}
+                </p>
                 {a.followUp && (
                   <p className="text-xs text-white/50 mt-1 pl-3 border-l border-white/10 italic">
                     {a.followUp}
@@ -101,6 +125,102 @@ function ResponseCard({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function RespondentCard({
+  group,
+  activeSection,
+  expandedSectionId,
+  onToggleSection,
+  onDelete,
+  deleting,
+}: {
+  group: RespondentGroup
+  activeSection: string
+  expandedSectionId: string | null
+  onToggleSection: (id: string) => void
+  onDelete: (name: string) => void
+  deleting: boolean
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const visibleSections =
+    activeSection === 'all'
+      ? group.sections
+      : group.sections.filter(s => s.sectionSlug === activeSection)
+
+  if (visibleSections.length === 0) return null
+
+  const latest = group.sections.reduce((a, b) =>
+    a.timestamp > b.timestamp ? a : b
+  )
+
+  return (
+    <div className="border border-white/8 bg-brand-surface">
+      {/* Respondent header */}
+      <div className="px-5 py-4 flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="font-bold text-white">{group.name}</span>
+            {group.role && (
+              <span className="text-brand-muted text-xs">{group.role}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            <span className="text-xs text-brand-muted font-mono">
+              {group.sections.length} section{group.sections.length !== 1 ? 's' : ''} completed
+            </span>
+            <span className="text-white/15 text-xs">·</span>
+            <span className="text-xs text-brand-muted font-mono">
+              Last: {formatDate(latest.timestamp)}
+            </span>
+          </div>
+        </div>
+
+        {/* Delete control */}
+        <div className="shrink-0 flex items-center gap-2">
+          {confirmDelete ? (
+            <>
+              <span className="text-xs text-white/50 font-mono">Delete all responses?</span>
+              <button
+                onClick={() => {
+                  setConfirmDelete(false)
+                  onDelete(group.name)
+                }}
+                disabled={deleting}
+                className="text-xs font-mono px-3 py-1.5 border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+              >
+                {deleting ? 'Deleting…' : 'Confirm'}
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-xs font-mono px-2 py-1.5 text-brand-muted hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs font-mono px-3 py-1.5 border border-white/10 text-brand-muted hover:border-red-500/40 hover:text-red-400 transition-colors"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Section rows */}
+      {visibleSections.map(r => (
+        <SectionRow
+          key={r.id}
+          response={r}
+          expanded={expandedSectionId === r.id}
+          onToggle={() => onToggleSection(r.id)}
+        />
+      ))}
     </div>
   )
 }
@@ -184,9 +304,9 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('all')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedSectionId, setExpandedSectionId] = useState<string | null>(null)
+  const [deletingRespondent, setDeletingRespondent] = useState<string | null>(null)
 
-  // Fetch data with the stored password
   const fetchData = useCallback(async (pw: string) => {
     setLoading(true)
     try {
@@ -207,7 +327,6 @@ export default function AdminPage() {
     }
   }, [])
 
-  // On mount — check for saved session
   useEffect(() => {
     const saved = sessionStorage.getItem('admin-auth')
     if (saved) {
@@ -231,13 +350,26 @@ export default function AdminPage() {
     setStats(null)
   }
 
-  // Export CSV — opens data/responses.csv via a simple download endpoint
   function handleExport() {
     const url = `/api/admin/export?token=${encodeURIComponent(password)}`
     window.open(url, '_blank')
   }
 
-  // ── Auth check ───────────────────────────────────────────────────────────
+  async function handleDelete(respondentName: string) {
+    setDeletingRespondent(respondentName)
+    try {
+      const res = await fetch(
+        `/api/admin/responses?respondent=${encodeURIComponent(respondentName)}`,
+        { method: 'DELETE', headers: { Authorization: `Bearer ${password}` } }
+      )
+      if (res.ok) {
+        await fetchData(password)
+      }
+    } finally {
+      setDeletingRespondent(null)
+    }
+  }
+
   if (authState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -255,10 +387,11 @@ export default function AdminPage() {
     new Map(responses.map(r => [r.sectionSlug, r.sectionName])).entries()
   ).sort()
 
-  const filtered =
-    activeSection === 'all'
-      ? responses
-      : responses.filter(r => r.sectionSlug === activeSection)
+  const respondentGroups = groupByRespondent(responses)
+
+  const visibleGroups = activeSection === 'all'
+    ? respondentGroups
+    : respondentGroups.filter(g => g.sections.some(s => s.sectionSlug === activeSection))
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
   return (
@@ -316,7 +449,7 @@ export default function AdminPage() {
                   : 'border-white/10 text-brand-muted hover:border-white/30 hover:text-white'
               }`}
             >
-              All ({responses.length})
+              All ({respondentGroups.length} respondents)
             </button>
 
             {sections.map(([slug, name]) => {
@@ -346,10 +479,10 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Response list */}
+        {/* Respondent list */}
         {loading ? (
           <p className="text-brand-muted text-sm font-mono animate-pulse">Loading responses…</p>
-        ) : filtered.length === 0 ? (
+        ) : visibleGroups.length === 0 ? (
           <div className="border border-white/5 bg-brand-surface px-6 py-12 text-center">
             <p className="text-brand-muted text-sm">No responses yet.</p>
             <p className="text-white/30 text-xs mt-1 font-mono">
@@ -357,13 +490,16 @@ export default function AdminPage() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {filtered.map(r => (
-              <ResponseCard
-                key={r.id}
-                response={r}
-                expanded={expandedId === r.id}
-                onToggle={() => setExpandedId(expandedId === r.id ? null : r.id)}
+          <div className="flex flex-col gap-3">
+            {visibleGroups.map(group => (
+              <RespondentCard
+                key={group.name.toLowerCase()}
+                group={group}
+                activeSection={activeSection}
+                expandedSectionId={expandedSectionId}
+                onToggleSection={(id) => setExpandedSectionId(expandedSectionId === id ? null : id)}
+                onDelete={handleDelete}
+                deleting={deletingRespondent === group.name}
               />
             ))}
           </div>
@@ -372,7 +508,7 @@ export default function AdminPage() {
 
       <footer className="px-6 py-4 border-t border-white/5 max-w-4xl mx-auto w-full">
         <p className="text-xs text-brand-muted font-mono">
-          Responses stored in <code>data/responses.csv</code> — edit <code>data/questions.json</code> to update the survey.
+          Responses stored in Postgres — edit <code>data/questions.json</code> to update the survey.
         </p>
       </footer>
     </div>
