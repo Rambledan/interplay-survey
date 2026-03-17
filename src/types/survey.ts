@@ -19,6 +19,9 @@ export interface SurveySection {
 export interface RespondentInfo {
   name: string
   role: string
+  company: string
+  sector: string
+  companyType: string   // 'Public' | 'Private' | 'Not-for-profit'
   token: string | null
 }
 

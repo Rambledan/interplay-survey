@@ -35,6 +35,9 @@ export interface ResponseEntry {
   timestamp: string
   respondentName: string
   respondentRole: string
+  respondentCompany: string
+  respondentSector: string
+  respondentType: string
   sectionSlug: string
   sectionName: string
   answers: AnswerEntry[]
@@ -96,6 +99,9 @@ async function getResponsesFromPostgres(): Promise<ResponseEntry[]> {
     timestamp: row.submitted_at ?? '',
     respondentName: row.respondent_name ?? '',
     respondentRole: row.respondent_role ?? '',
+    respondentCompany: row.respondent_company ?? '',
+    respondentSector: row.respondent_sector ?? '',
+    respondentType: row.respondent_type ?? '',
     sectionSlug: row.section_slug ?? '',
     sectionName: sectionNames.get(row.section_slug) ?? row.section_slug ?? '',
     answers: buildAnswerEntries(
@@ -128,6 +134,9 @@ function getResponsesFromCsv(): ResponseEntry[] {
       timestamp: timestamp ?? '',
       respondentName: respondentName ?? '',
       respondentRole: respondentRole ?? '',
+      respondentCompany: '',
+      respondentSector: '',
+      respondentType: '',
       sectionSlug: sectionSlug ?? '',
       sectionName: sectionNames.get(sectionSlug) ?? sectionSlug ?? '',
       answers: buildAnswerEntries(answersMap, followUpsMap),

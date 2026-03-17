@@ -91,7 +91,7 @@ export default function SectionPage({ params }: SectionPageProps) {
       }
 
       if (isLastSection) {
-        router.push('/complete')
+        router.push('/referral')
       } else if (nextSection) {
         // Reset answers for the next section
         setAnswers({})

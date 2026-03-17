@@ -60,17 +60,24 @@ export async function ensureTable(): Promise<void> {
   await withClient(async (client) => {
     await client.query(`
       CREATE TABLE IF NOT EXISTS responses (
-        id              SERIAL       PRIMARY KEY,
-        submitted_at    TIMESTAMPTZ  NOT NULL,
-        respondent_name TEXT         NOT NULL,
-        respondent_role TEXT         NOT NULL,
-        token           TEXT         NOT NULL DEFAULT '',
-        section_slug    TEXT         NOT NULL,
-        answers         JSONB        NOT NULL DEFAULT '{}',
-        follow_ups      JSONB        NOT NULL DEFAULT '{}',
-        created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+        id                  SERIAL       PRIMARY KEY,
+        submitted_at        TIMESTAMPTZ  NOT NULL,
+        respondent_name     TEXT         NOT NULL,
+        respondent_role     TEXT         NOT NULL,
+        respondent_company  TEXT         NOT NULL DEFAULT '',
+        respondent_sector   TEXT         NOT NULL DEFAULT '',
+        respondent_type     TEXT         NOT NULL DEFAULT '',
+        token               TEXT         NOT NULL DEFAULT '',
+        section_slug        TEXT         NOT NULL,
+        answers             JSONB        NOT NULL DEFAULT '{}',
+        follow_ups          JSONB        NOT NULL DEFAULT '{}',
+        created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
       )
     `)
+    // Add new columns to existing tables (safe to run repeatedly)
+    await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_company TEXT NOT NULL DEFAULT ''`)
+    await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_sector  TEXT NOT NULL DEFAULT ''`)
+    await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_type    TEXT NOT NULL DEFAULT ''`)
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_responses_submitted_at
       ON responses (submitted_at DESC)
@@ -78,6 +85,16 @@ export async function ensureTable(): Promise<void> {
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_responses_section_slug
       ON responses (section_slug)
+    `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS referrals (
+        id            SERIAL       PRIMARY KEY,
+        submitted_at  TIMESTAMPTZ  NOT NULL,
+        referrer_name TEXT         NOT NULL,
+        referee_name  TEXT         NOT NULL,
+        referee_email TEXT         NOT NULL,
+        created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
     `)
   })
 }
@@ -89,6 +106,9 @@ export interface DbRow {
   submitted_at: string
   respondent_name: string
   respondent_role: string
+  respondent_company: string
+  respondent_sector: string
+  respondent_type: string
   token: string
   section_slug: string
   answers: Record<string, string>
@@ -101,6 +121,9 @@ export async function insertResponse(
   submittedAt: string,
   respondentName: string,
   respondentRole: string,
+  respondentCompany: string,
+  respondentSector: string,
+  respondentType: string,
   token: string,
   sectionSlug: string,
   answers: Record<string, string>,
@@ -111,18 +134,42 @@ export async function insertResponse(
   await withClient(async (client) => {
     await client.query(
       `INSERT INTO responses
-         (submitted_at, respondent_name, respondent_role, token, section_slug, answers, follow_ups)
-       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb)`,
+         (submitted_at, respondent_name, respondent_role, respondent_company, respondent_sector,
+          respondent_type, token, section_slug, answers, follow_ups)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb)`,
       [
         submittedAt,
         respondentName,
         respondentRole,
+        respondentCompany,
+        respondentSector,
+        respondentType,
         token,
         sectionSlug,
         JSON.stringify(answers),
         JSON.stringify(followUps),
       ]
     )
+  })
+}
+
+export async function insertReferrals(
+  submittedAt: string,
+  referrerName: string,
+  referees: Array<{ name: string; email: string }>
+): Promise<void> {
+  await ensureTable()
+
+  if (referees.length === 0) return
+
+  await withClient(async (client) => {
+    for (const r of referees) {
+      await client.query(
+        `INSERT INTO referrals (submitted_at, referrer_name, referee_name, referee_email)
+         VALUES ($1, $2, $3, $4)`,
+        [submittedAt, referrerName, r.name, r.email]
+      )
+    }
   })
 }
 
@@ -144,6 +191,7 @@ export async function getAllResponses(): Promise<DbRow[]> {
   return withClient(async (client) => {
     const result = await client.query<DbRow>(`
       SELECT id, submitted_at, respondent_name, respondent_role,
+             respondent_company, respondent_sector, respondent_type,
              token, section_slug, answers, follow_ups
       FROM responses
       ORDER BY submitted_at DESC

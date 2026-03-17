@@ -35,6 +35,9 @@ function formatDate(iso: string) {
 interface RespondentGroup {
   name: string
   role: string
+  company: string
+  sector: string
+  companyType: string
   sections: ResponseEntry[]
 }
 
@@ -46,7 +49,14 @@ function groupByRespondent(responses: ResponseEntry[]): RespondentGroup[] {
   for (const r of responses) {
     const key = r.respondentName.toLowerCase()
     if (!map.has(key)) {
-      map.set(key, { name: r.respondentName, role: r.respondentRole, sections: [] })
+      map.set(key, {
+        name: r.respondentName,
+        role: r.respondentRole,
+        company: r.respondentCompany,
+        sector: r.respondentSector,
+        companyType: r.respondentType,
+        sections: [],
+      })
     }
     map.get(key)!.sections.push(r)
   }
@@ -166,6 +176,22 @@ function RespondentCard({
             <span className="font-bold text-white">{group.name}</span>
             {group.role && (
               <span className="text-brand-muted text-xs">{group.role}</span>
+            )}
+            {group.companyType && (
+              <span className="text-xs font-mono px-1.5 py-0.5 border border-white/10 text-white/40 rounded-sm">
+                {group.companyType}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+            {group.company && (
+              <span className="text-xs text-white/60">{group.company}</span>
+            )}
+            {group.company && group.sector && (
+              <span className="text-white/15 text-xs">·</span>
+            )}
+            {group.sector && (
+              <span className="text-xs text-white/40">{group.sector}</span>
             )}
           </div>
           <div className="flex items-center gap-3 mt-1 flex-wrap">

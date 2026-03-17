@@ -8,6 +8,9 @@ export default function IntroPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
+  const [company, setCompany] = useState('')
+  const [sector, setSector] = useState('')
+  const [companyType, setCompanyType] = useState('')
   const [loading, setLoading] = useState(false)
   const [firstSection, setFirstSection] = useState<string | null>(null)
   const [fetchError, setFetchError] = useState(false)
@@ -32,6 +35,9 @@ export default function IntroPage() {
     const respondent: RespondentInfo = {
       name: name.trim(),
       role: role.trim(),
+      company: company.trim(),
+      sector: sector.trim(),
+      companyType,
       token: null,
     }
 
@@ -121,10 +127,58 @@ export default function IntroPage() {
               />
             </div>
 
+            <div>
+              <label htmlFor="company" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
+                Company
+              </label>
+              <input
+                id="company"
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Acme Corp"
+                required
+                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="sector" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
+                Sector
+              </label>
+              <input
+                id="sector"
+                type="text"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+                placeholder="Food & Beverage"
+                required
+                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="companyType" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
+                Company type
+              </label>
+              <select
+                id="companyType"
+                value={companyType}
+                onChange={(e) => setCompanyType(e.target.value)}
+                required
+                className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors appearance-none"
+              >
+                <option value="" disabled className="bg-brand-bg text-white/40">Select one…</option>
+                <option value="Public" className="bg-brand-bg">Public</option>
+                <option value="Private" className="bg-brand-bg">Private</option>
+                <option value="Not-for-profit" className="bg-brand-bg">Not-for-profit</option>
+              </select>
+            </div>
+
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={!name.trim() || !role.trim() || !firstSection || loading}
+                disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading}
                 className="w-full bg-brand-green text-brand-bg font-black uppercase tracking-widest py-4 text-sm hover:bg-brand-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 {loading ? 'Starting…' : 'Begin the diagnostic →'}
