@@ -4,6 +4,18 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { RespondentInfo, SurveySection } from '@/types/survey'
 
+const inputCls = [
+  'w-full px-4 py-3 text-sm',
+  'focus:outline-none transition-colors',
+].join(' ')
+
+const inputStyle = {
+  backgroundColor: '#fff',
+  border: '1px solid rgba(47,42,42,0.15)',
+  color: '#2f2a2a',
+  borderRadius: '4px',
+}
+
 export default function IntroPage() {
   const router = useRouter()
   const [name, setName] = useState('')
@@ -45,120 +57,83 @@ export default function IntroPage() {
     router.push(`/survey/${firstSection}`)
   }
 
+  function focusBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    e.currentTarget.style.borderColor = '#2f2a2a'
+  }
+  function blurBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    e.currentTarget.style.borderColor = 'rgba(47,42,42,0.15)'
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f8faf5' }}>
       {/* Header */}
-      <header className="px-6 py-5 flex items-center justify-between border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-brand-muted">Interrupt</span>
-          <span className="text-white/20">×</span>
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-brand-muted">Like So</span>
+      <header className="px-6 py-5 flex items-center justify-between"
+        style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(47,42,42,0.1)' }}>
+        <div className="flex items-center gap-4">
+          <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto' }} />
+          <span style={{ color: 'rgba(47,42,42,0.25)' }}>×</span>
+          <img src="/LS.png" alt="Like So" style={{ height: '31px', width: 'auto' }} />
         </div>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 max-w-2xl mx-auto w-full">
 
         {/* Tagline */}
-        <p className="text-xs font-mono uppercase tracking-[0.3em] text-brand-green mb-6">
+        <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', display: 'inline-block', padding: '4px 10px' }}>
           Interplay Method — Diagnostic
         </p>
 
         {/* Headline */}
-        <h1 className="text-4xl md:text-5xl font-black uppercase leading-none tracking-tight text-white mb-6">
+        <h1 className="text-5xl md:text-5xl uppercase leading-none mb-6" style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', fontWeight: 400 }}>
           Where do you sit in<br />
-          <span className="text-brand-green">the interplay?</span>
+          <span style={{ color: '#2f2a2a', WebkitTextStroke: '0px #2f2a2a' }}>the interplay?</span>
         </h1>
 
         {/* Intro text */}
-        <p className="text-white/60 text-base leading-relaxed mb-4 max-w-lg">
+        <p className="text-base leading-relaxed mb-4 max-w-lg" style={{ color: 'rgba(47,42,42,0.65)' }}>
           Most organisations solve sustainability in silos. Brand teams, sustainability teams, and business teams — all expert, all disconnected.
         </p>
-        <p className="text-white/60 text-base leading-relaxed mb-10 max-w-lg">
+        <p className="text-base leading-relaxed mb-10 max-w-lg" style={{ color: 'rgba(47,42,42,0.65)' }}>
           This diagnostic reveals the gaps and opportunities between your sustainability, brand and business strategies — and where the interplay can unlock triple value.
         </p>
 
-        {/* Triple value pillars */}
-        <div className="flex gap-3 mb-12">
-          {[
-            { label: 'Sustainability Value', color: 'border-brand-green text-brand-green' },
-            { label: 'Brand Value', color: 'border-brand-orange text-brand-orange' },
-            { label: 'Business Value', color: 'border-brand-blue text-brand-blue' },
-          ].map(({ label, color }) => (
-            <div key={label} className={`flex-1 border px-3 py-2 text-center ${color}`}>
-              <span className="text-[10px] font-mono uppercase tracking-widest">{label}</span>
-            </div>
-          ))}
-        </div>
-
         {/* Form */}
         {fetchError ? (
-          <div className="border border-red-500/30 bg-red-500/10 px-5 py-4 text-red-400 text-sm">
+          <div className="px-5 py-4 text-sm" style={{ border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.06)', color: '#dc2626' }}>
             Failed to load survey. Please refresh the page.
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
-                Your name
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Smith"
-                required
-                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
-              />
-            </div>
+
+            {[
+              { id: 'name',    label: 'Your name',  value: name,    set: setName,    placeholder: 'Jane Smith' },
+              { id: 'role',    label: 'Your role',  value: role,    set: setRole,    placeholder: 'Head of Sustainability' },
+              { id: 'company', label: 'Company',    value: company, set: setCompany, placeholder: 'Acme Corp' },
+              { id: 'sector',  label: 'Sector',     value: sector,  set: setSector,  placeholder: 'Food & Beverage' },
+            ].map(({ id, label, value, set, placeholder }) => (
+              <div key={id}>
+                <label htmlFor={id} className="block text-xs uppercase tracking-widest mb-2"
+                  style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.5)' }}>
+                  {label}
+                </label>
+                <input
+                  id={id}
+                  type="text"
+                  value={value}
+                  onChange={(e) => set(e.target.value)}
+                  placeholder={placeholder}
+                  required
+                  className={inputCls}
+                  style={{ ...inputStyle, caretColor: '#faf000' }}
+                  onFocus={focusBorder}
+                  onBlur={blurBorder}
+                />
+              </div>
+            ))}
 
             <div>
-              <label htmlFor="role" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
-                Your role
-              </label>
-              <input
-                id="role"
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="Head of Sustainability"
-                required
-                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="company" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
-                Company
-              </label>
-              <input
-                id="company"
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Acme Corp"
-                required
-                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="sector" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
-                Sector
-              </label>
-              <input
-                id="sector"
-                type="text"
-                value={sector}
-                onChange={(e) => setSector(e.target.value)}
-                placeholder="Food & Beverage"
-                required
-                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/25 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="companyType" className="block text-xs font-mono uppercase tracking-widest text-brand-muted mb-2">
+              <label htmlFor="companyType" className="block text-xs uppercase tracking-widest mb-2"
+                style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.5)' }}>
                 Company type
               </label>
               <select
@@ -166,12 +141,15 @@ export default function IntroPage() {
                 value={companyType}
                 onChange={(e) => setCompanyType(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors appearance-none"
+                className={`${inputCls} appearance-none`}
+                style={{ ...inputStyle, color: companyType ? '#2f2a2a' : 'rgba(47,42,42,0.4)' }}
+                onFocus={focusBorder}
+                onBlur={blurBorder}
               >
-                <option value="" disabled className="bg-brand-bg text-white/40">Select one…</option>
-                <option value="Public" className="bg-brand-bg">Public</option>
-                <option value="Private" className="bg-brand-bg">Private</option>
-                <option value="Not-for-profit" className="bg-brand-bg">Not-for-profit</option>
+                <option value="" disabled>Select one…</option>
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+                <option value="Not-for-profit">Not-for-profit</option>
               </select>
             </div>
 
@@ -179,21 +157,24 @@ export default function IntroPage() {
               <button
                 type="submit"
                 disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading}
-                className="w-full bg-brand-green text-brand-bg font-black uppercase tracking-widest py-4 text-sm hover:bg-brand-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="w-full font-bold uppercase tracking-widest py-4 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                style={{ backgroundColor: '#000', color: '#fff', borderRadius: '12px' }}
+                onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#2f2a2a' }}
+                onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#000' }}
               >
                 {loading ? 'Starting…' : 'Begin the diagnostic →'}
               </button>
             </div>
 
-            <p className="text-xs text-brand-muted text-center pt-1">
+            <p className="text-xs text-center pt-1" style={{ color: 'rgba(47,42,42,0.4)' }}>
               Takes approximately 10–15 minutes. Multiple sections.
             </p>
           </form>
         )}
       </main>
 
-      <footer className="px-6 py-4 border-t border-white/5 text-center">
-        <p className="text-xs text-brand-muted font-mono">
+      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(47,42,42,0.1)' }}>
+        <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.4)' }}>
           Interrupt × Like So — The Interplay Method®
         </p>
       </footer>

@@ -96,6 +96,19 @@ export async function ensureTable(): Promise<void> {
         created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
       )
     `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS respondent_tokens (
+        id              SERIAL       PRIMARY KEY,
+        token           TEXT         NOT NULL UNIQUE,
+        respondent_name TEXT         NOT NULL,
+        created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+        revoked_at      TIMESTAMPTZ  NULL
+      )
+    `)
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_respondent_tokens_name
+      ON respondent_tokens (LOWER(respondent_name))
+    `)
   })
 }
 
@@ -173,6 +186,44 @@ export async function insertReferrals(
   })
 }
 
+export async function updateRespondentProfile(
+  oldName: string,
+  profile: { name: string; role: string; company: string; sector: string; type: string }
+): Promise<number> {
+  return withClient(async (client) => {
+    const result = await client.query(
+      `UPDATE responses SET
+         respondent_name    = $1,
+         respondent_role    = $2,
+         respondent_company = $3,
+         respondent_sector  = $4,
+         respondent_type    = $5
+       WHERE LOWER(respondent_name) = LOWER($6)`,
+      [profile.name, profile.role, profile.company, profile.sector, profile.type, oldName]
+    )
+    // Keep token table in sync if name changed
+    await client.query(
+      `UPDATE respondent_tokens SET respondent_name = $1 WHERE LOWER(respondent_name) = LOWER($2)`,
+      [profile.name, oldName]
+    )
+    return result.rowCount ?? 0
+  })
+}
+
+export async function updateRowAnswers(
+  id: number,
+  answers: Record<string, string>,
+  followUps: Record<string, string>
+): Promise<boolean> {
+  return withClient(async (client) => {
+    const result = await client.query(
+      `UPDATE responses SET answers = $1::jsonb, follow_ups = $2::jsonb WHERE id = $3`,
+      [JSON.stringify(answers), JSON.stringify(followUps), id]
+    )
+    return (result.rowCount ?? 0) > 0
+  })
+}
+
 export async function deleteResponsesByRespondent(name: string): Promise<number> {
   await ensureTable()
 
@@ -182,6 +233,16 @@ export async function deleteResponsesByRespondent(name: string): Promise<number>
       [name]
     )
     return result.rowCount ?? 0
+  })
+}
+
+export async function deleteResponseById(id: number): Promise<boolean> {
+  return withClient(async (client) => {
+    const result = await client.query(
+      `DELETE FROM responses WHERE id = $1`,
+      [id]
+    )
+    return (result.rowCount ?? 0) > 0
   })
 }
 
@@ -227,4 +288,73 @@ export function rowsToCsv(rows: DbRow[]): string {
   )
 
   return [header, ...lines].join('\n') + '\n'
+}
+
+// ── Token CRUD ────────────────────────────────────────────────────────────────
+
+import { randomBytes } from 'crypto'
+
+export interface TokenRow {
+  id: number
+  token: string
+  respondent_name: string
+  created_at: string
+  revoked_at: string | null
+}
+
+export async function createRespondentToken(respondentName: string): Promise<TokenRow> {
+  await ensureTable()
+  const token = randomBytes(20).toString('hex')  // 40-char hex
+
+  return withClient(async (client) => {
+    const result = await client.query<TokenRow>(
+      `INSERT INTO respondent_tokens (token, respondent_name)
+       VALUES ($1, $2)
+       RETURNING id, token, respondent_name, created_at, revoked_at`,
+      [token, respondentName]
+    )
+    return result.rows[0]
+  })
+}
+
+export async function listTokensForRespondent(respondentName: string): Promise<TokenRow[]> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query<TokenRow>(
+      `SELECT id, token, respondent_name, created_at, revoked_at
+       FROM respondent_tokens
+       WHERE LOWER(respondent_name) = LOWER($1)
+       ORDER BY created_at DESC`,
+      [respondentName]
+    )
+    return result.rows
+  })
+}
+
+export async function getRespondentToken(token: string): Promise<TokenRow | null> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query<TokenRow>(
+      `SELECT id, token, respondent_name, created_at, revoked_at
+       FROM respondent_tokens
+       WHERE token = $1 AND revoked_at IS NULL`,
+      [token]
+    )
+    return result.rows[0] ?? null
+  })
+}
+
+export async function revokeRespondentToken(token: string): Promise<boolean> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query(
+      `UPDATE respondent_tokens SET revoked_at = NOW()
+       WHERE token = $1 AND revoked_at IS NULL`,
+      [token]
+    )
+    return (result.rowCount ?? 0) > 0
+  })
 }

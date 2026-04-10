@@ -19,7 +19,15 @@ export function OpenAnswer({ questionId, label, value, onChange, placeholder }: 
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? 'Share your thoughts…'}
         rows={4}
-        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 px-4 py-3 text-sm resize-none focus:outline-none focus:border-brand-green/60 transition-colors"
+        className="w-full px-4 py-3 text-sm resize-none focus:outline-none transition-colors"
+        style={{
+          backgroundColor: '#fff',
+          border: '1px solid rgba(47,42,42,0.25)',
+          color: '#3a3a3a',
+          borderRadius: '4px',
+        }}
+        onFocus={e => e.currentTarget.style.borderColor = '#faf000'}
+        onBlur={e => e.currentTarget.style.borderColor = 'rgba(47,42,42,0.25)'}
       />
     </div>
   )

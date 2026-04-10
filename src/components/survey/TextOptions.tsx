@@ -21,22 +21,20 @@ export function TextOptions({ questionId, label, options, value, onChange }: Tex
             <label
               key={option}
               htmlFor={id}
-              className={`
-                flex items-center gap-3 cursor-pointer px-5 py-3.5 border transition-all duration-150
-                ${selected
-                  ? 'border-brand-green bg-brand-green/10 text-white'
-                  : 'border-white/10 bg-transparent text-white/70 hover:border-white/40 hover:text-white'
-                }
-              `}
+              className="flex items-center gap-3 cursor-pointer px-5 py-3.5 border transition-all duration-150"
+              style={{
+                borderColor: selected ? '#faf000' : 'rgba(47,42,42,0.12)',
+                backgroundColor: selected ? 'rgba(250,240,0,0.12)' : '#fff',
+                color: selected ? '#2f2a2a' : 'rgba(47,42,42,0.65)',
+                borderRadius: '4px',
+              }}
             >
               <span
-                className={`
-                  flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center
-                  ${selected ? 'border-brand-green' : 'border-white/30'}
-                `}
+                className="flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                style={{ borderColor: selected ? '#faf000' : 'rgba(47,42,42,0.2)' }}
                 aria-hidden
               >
-                {selected && <span className="w-2 h-2 rounded-full bg-brand-green" />}
+                {selected && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#faf000' }} />}
               </span>
               <input
                 type="radio"

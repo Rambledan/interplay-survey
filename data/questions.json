@@ -8,6 +8,7 @@
         "id": "appetite-q1",
         "text": "To what extent do you believe sustainability contributes to commercial value and growth in your organization?",
         "type": "text-options",
+        "subCategory": null,
         "options": ["Not at all", "Limited impact", "Moderate impact", "Significant impact", "Core driver of value"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
@@ -15,6 +16,7 @@
         "id": "appetite-q3",
         "text": "To what extent is sustainability seen as a cost centre?",
         "type": "text-options",
+        "subCategory": null,
         "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
@@ -22,6 +24,7 @@
         "id": "appetite-q4",
         "text": "How likely is sustainability to become a source of competitive advantage in your industry within the next 5 years?",
         "type": "text-options",
+        "subCategory": null,
         "options": ["Very unlikely", "Unlikely", "Neutral", "Likely", "Very likely"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
@@ -29,6 +32,7 @@
         "id": "appetite-q5",
         "text": "Which area is most likely to drive this advantage?",
         "type": "open-answer",
+        "subCategory": null,
         "options": [],
         "followUpLabel": null
       },
@@ -36,13 +40,14 @@
         "id": "appetite-q6",
         "text": "What are the biggest barriers to translating sustainability initiatives into commercial value?",
         "type": "open-answer",
+        "subCategory": null,
         "options": [],
         "followUpLabel": null
       }
     ]
   },
   {
-    "name": "Scale & AI",
+    "name": "Acceleration of Growth",
     "slug": "scale-and-delivery",
     "description": "Growth and impact through AI",
     "questions": [
@@ -50,6 +55,7 @@
         "id": "scale-q1",
         "text": "To what extent do you think AI can unlock revenue and accelerate impact from sustainability?",
         "type": "percentage",
+        "subCategory": null,
         "options": ["0%", "25%", "50%", "75%", "100%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
@@ -57,8 +63,23 @@
         "id": "scale-q2",
         "text": "How much access to AI do sustainability projects/teams have?",
         "type": "text-options",
-        "options": ["Full public access to the latest models", "Some access to internal AI tools", "No access"],
+        "subCategory": null,
+        "options": [
+          "All staff have access to any external tools they would like",
+          "Staff have access to a limited set of external AI tools",
+          "Staff have access to permitted internal AI tools",
+          "Some staff use co-pilot or personal ChatGPT",
+          "Staff are not permitted to access any AI tools"
+        ],
         "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "scale-q3",
+        "text": "In what areas is AI prevalent?",
+        "type": "multiple-select",
+        "subCategory": null,
+        "options": ["Strategy", "Marketing", "Sales", "Operations", "Customer Services"],
+        "followUpLabel": null
       }
     ]
   },
@@ -68,37 +89,10 @@
     "description": "Sustainability (business and brand)",
     "questions": [
       {
-        "id": "sus-q9",
-        "text": "What is your experience of selling your sustainability story to the rest of the business?",
-        "type": "text-options",
-        "options": ["Very easy", "Easy", "It's OK", "Difficult", "Very difficult"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "sus-q1",
-        "text": "To what level is the company's sustainability vision and strategy known, understood and activated across all teams?",
-        "type": "text-options",
-        "options": ["100%", "75%", "50%", "25%", "0%"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "sus-q10",
-        "text": "What proportion of time does the sustainability team spend on compliance and reporting?",
-        "type": "text-options",
-        "options": ["100%", "75%", "50%", "25%", "0%"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "sus-q2",
-        "text": "If sustainability regulations disappeared tomorrow, how much of your company's sustainability activity would continue?",
-        "type": "text-options",
-        "options": ["None", "A small portion", "About half", "Most", "All of it"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
         "id": "sus-q5",
         "text": "What is the level of involvement from brand in sustainability projects?",
         "type": "text-options",
+        "subCategory": "Collaboration",
         "options": ["High involvement", "Moderate involvement", "Low involvement"],
         "followUpLabel": "Please provide some examples"
       },
@@ -106,6 +100,7 @@
         "id": "sus-q6",
         "text": "What is the level of involvement from business in sustainability projects?",
         "type": "text-options",
+        "subCategory": "Collaboration",
         "options": ["High involvement", "Moderate involvement", "Low involvement"],
         "followUpLabel": "Please provide some examples"
       },
@@ -113,6 +108,7 @@
         "id": "sus-q7",
         "text": "To what extent are your sustainability strategic targets set up to deliver your business financial KPIs and performance?",
         "type": "text-options",
+        "subCategory": "Strategic Alignment",
         "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
@@ -120,8 +116,57 @@
         "id": "sus-q8",
         "text": "To what extent are your sustainability strategic targets set up to deliver your brand KPIs?",
         "type": "text-options",
+        "subCategory": "Strategic Alignment",
         "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q9",
+        "text": "What is your experience of selling your sustainability story to the rest of the business?",
+        "type": "text-options",
+        "subCategory": "Sell in",
+        "options": ["Very easy", "Easy", "It's OK", "Difficult", "Very difficult"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q11",
+        "text": "What is your experience of mobilising the rest of the organisation to deliver the sustainability strategy?",
+        "type": "text-options",
+        "subCategory": "Sustainability activation",
+        "options": ["Very easy", "Easy", "It's OK", "Difficult", "Very difficult"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q1",
+        "text": "To what extent is the company's sustainability vision and strategy known and understood?",
+        "type": "text-options",
+        "subCategory": "Story",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q10",
+        "text": "What proportion of time does the sustainability team spend on compliance and reporting?",
+        "type": "text-options",
+        "subCategory": "Time allocation",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q2",
+        "text": "If sustainability regulations disappeared tomorrow, how much of your company's sustainability activity would continue?",
+        "type": "text-options",
+        "subCategory": "Impact",
+        "options": ["None", "A small portion", "About half", "Most", "All of it"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "sus-q12",
+        "text": "Does the business see sustainability issues as risk or opportunity?",
+        "type": "open-answer",
+        "subCategory": "Risk",
+        "options": [],
+        "followUpLabel": null
       }
     ]
   },
@@ -131,65 +176,114 @@
     "description": "Brand and sustainability",
     "questions": [
       {
+        "id": "brand-q3",
+        "text": "How regular are meetings between brand and sustainability?",
+        "type": "text-options",
+        "subCategory": "Collaboration",
+        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
+        "followUpLabel": null
+      },
+      {
         "id": "brand-q1",
         "text": "To what extent are your sustainability priorities aligned with your brand priorities?",
         "type": "text-options",
+        "subCategory": "Strategic Alignment",
         "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q16",
+        "text": "Does brand have sustainability KPIs?",
+        "type": "text-options",
+        "subCategory": "Strategic Alignment",
+        "options": ["Yes", "No", "Maybe", "Not sure"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q8",
+        "text": "How strong is the connection between sustainability storytelling and your brand TOV?",
+        "type": "text-options",
+        "subCategory": "Story",
+        "options": ["Very weak", "Weak", "Moderate", "Strong", "Very strong"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "brand-q2",
         "text": "Is your sustainability story aligned with your brand purpose, vision & mission?",
         "type": "text-options",
+        "subCategory": "Story",
         "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
-        "id": "brand-q3",
-        "text": "How regular are meetings between brand and sustainability?",
+        "id": "brand-q13",
+        "text": "How much does sustainability help to build brand relevance and differentiation in your organisation?",
         "type": "text-options",
-        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
-        "followUpLabel": null
+        "subCategory": "Sell in",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
       },
       {
-        "id": "brand-q5",
-        "text": "When are your sustainability teams consulted on sustainability communications or campaigns?",
+        "id": "brand-q12",
+        "text": "To what extent has your sustainability strategy been activated through brand?",
         "type": "text-options",
-        "options": ["At the start", "After research", "After design", "Just before launch", "Just after launch"],
+        "subCategory": "Sustainability activation",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q15",
+        "text": "What proportion of products and services have you developed with sustainability integrated?",
+        "type": "text-options",
+        "subCategory": "Sustainability activation",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "brand-q7",
         "text": "What percentage of marketing spend is allocated to sustainability?",
         "type": "text-options",
+        "subCategory": "Sustainability activation",
         "options": ["0%", "20%", "50%", "More than 50%"],
         "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "brand-q8",
-        "text": "How strong is the correlation between sustainability and sales in your business?",
-        "type": "text-options",
-        "options": ["Very weak", "Weak", "Moderate", "Strong", "Very strong"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "brand-q10",
-        "text": "Which term is closest in describing your sustainability engagement?",
-        "type": "text-options",
-        "options": ["Highly desirable to customers", "Fairly desirable to customers", "Ignored", "Corporate jargon", "Seen as greenwashing"],
-        "followUpLabel": null
       },
       {
         "id": "brand-q9",
         "text": "When are your sustainability teams consulted on product and service innovation?",
         "type": "text-options",
-        "options": ["At the start", "After research", "After design", "Just before launch"],
+        "subCategory": "Time allocation",
+        "options": ["At the start", "After research", "After design", "Just before launch", "Just after launch"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q5",
+        "text": "When are your sustainability teams consulted on sustainability communications or campaigns?",
+        "type": "text-options",
+        "subCategory": "Time allocation",
+        "options": ["At the start", "After research", "After design", "Just before launch", "Just after launch"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q14",
+        "text": "To what extent does sustainability help to drive customer and consumer sales?",
+        "type": "text-options",
+        "subCategory": "Impact",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q10",
+        "text": "How well does your sustainability storytelling resonate with customers/consumers?",
+        "type": "text-options",
+        "subCategory": "Impact",
+        "options": ["Highly resonant", "Resonant", "Does not resonate", "Viewed with suspicion", "Seen as greenwashing"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "brand-q11",
         "text": "What level of risk is there of greenwashing?",
         "type": "text-options",
+        "subCategory": "Risk",
         "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       }
@@ -201,52 +295,107 @@
     "description": "Business investment and sustainability",
     "questions": [
       {
+        "id": "biz-q4",
+        "text": "How regular are meetings between sustainability and business?",
+        "type": "text-options",
+        "subCategory": "Collaboration",
+        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
+        "followUpLabel": null
+      },
+      {
         "id": "biz-q1",
         "text": "To what extent are your sustainability priorities aligned with your business priorities?",
         "type": "text-options",
+        "subCategory": "Strategic Alignment",
         "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q13",
+        "text": "Do commercial teams have sustainability KPIs?",
+        "type": "text-options",
+        "subCategory": "Strategic Alignment",
+        "options": ["Yes", "No", "Maybe", "Not sure"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q9",
+        "text": "How well does sustainability speak the commercial language?",
+        "type": "text-options",
+        "subCategory": "Story",
+        "options": ["Very commercial", "Commercial", "Moderately commercial", "Not very commercial", "Not commercial at all"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q14",
+        "text": "For the business, what does sustainability primarily contribute?",
+        "type": "text-options",
+        "subCategory": "Sell in",
+        "options": ["Creates revenue opportunities", "Creates efficiencies", "Squeezes margins", "Increases prices", "Too expensive to operationalise"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "biz-q2",
         "text": "Is your sustainability strategy incorporated into your business model?",
         "type": "text-options",
+        "subCategory": "Sustainability activation",
         "options": ["Yes", "No", "Maybe"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "biz-q4",
-        "text": "How regular are meetings between sustainability and business?",
-        "type": "text-options",
-        "options": ["Weekly", "Monthly", "Quarterly", "Annually", "Never"],
-        "followUpLabel": null
-      },
-      {
-        "id": "biz-q5",
-        "text": "What is the level of involvement from sustainability on business decisions?",
-        "type": "text-options",
-        "options": ["High involvement", "Moderate involvement", "Low involvement"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "biz-q6",
         "text": "Do you measure sustainability financial performance?",
         "type": "text-options",
+        "subCategory": "Sustainability activation",
         "options": ["Yes", "No", "Maybe"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "biz-q7",
-        "text": "If sustainability initiatives were removed from your strategy, which area of performance would deteriorate first?",
-        "type": "text-options",
-        "options": ["Brand reputation", "Revenue growth", "Cost efficiency", "Regulatory exposure", "Investor confidence", "Talent attraction"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
         "id": "biz-q8",
         "text": "What percentage of capital allocation goes to sustainability?",
         "type": "text-options",
+        "subCategory": "Sustainability activation",
         "options": ["0%", "Up to 25%", "Up to 50%", "More than 50%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q5",
+        "text": "What is the level of involvement from sustainability on business decisions?",
+        "type": "text-options",
+        "subCategory": "Time allocation",
+        "options": ["High involvement", "Moderate involvement", "Low involvement"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q7",
+        "text": "If sustainability initiatives were removed from your strategy, which area of performance would deteriorate first?",
+        "type": "text-options",
+        "subCategory": "Impact",
+        "options": ["Brand reputation", "Revenue growth", "Cost efficiency", "Regulatory exposure", "Investor confidence", "Talent attraction"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "biz-q12",
+        "text": "What is your approximate annual revenue?",
+        "type": "revenue-input",
+        "subCategory": "Impact",
+        "options": [],
+        "followUpLabel": null
+      },
+      {
+        "id": "biz-q15",
+        "text": "What percentage of that revenue comes from sustainability?",
+        "type": "open-answer",
+        "subCategory": "Impact",
+        "options": [],
+        "followUpLabel": null
+      },
+      {
+        "id": "biz-q16",
+        "text": "Is sustainability a regulatory and reputational risk?",
+        "type": "text-options",
+        "subCategory": "Risk",
+        "options": ["Yes", "No", "Maybe"],
         "followUpLabel": "Why did you choose this as your answer?"
       }
     ]

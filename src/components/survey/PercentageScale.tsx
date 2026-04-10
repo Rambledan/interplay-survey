@@ -22,13 +22,14 @@ export function PercentageScale({ questionId, label, value, onChange }: Percenta
             <label
               key={option}
               htmlFor={id}
-              className={`
-                flex-1 cursor-pointer text-center py-3 text-sm font-mono border transition-all duration-150
-                ${selected
-                  ? 'bg-brand-green text-brand-bg border-brand-green font-bold'
-                  : 'bg-transparent text-white/70 border-white/10 hover:border-white/40 hover:text-white'
-                }
-              `}
+              className="flex-1 cursor-pointer text-center py-3 text-sm border transition-all duration-150"
+              style={{
+                fontFamily: 'Almarai, sans-serif',
+                backgroundColor: selected ? '#faf000' : '#fff',
+                color: selected ? '#2f2a2a' : 'rgba(47,42,42,0.55)',
+                borderColor: selected ? '#faf000' : 'rgba(47,42,42,0.12)',
+                fontWeight: selected ? '700' : '400',
+              }}
             >
               <input
                 type="radio"
@@ -44,7 +45,7 @@ export function PercentageScale({ questionId, label, value, onChange }: Percenta
           )
         })}
       </div>
-      <div className="flex justify-between text-xs text-brand-muted mt-1 px-0.5 font-mono">
+      <div className="flex justify-between text-xs mt-1 px-0.5" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.35)' }}>
         <span>None</span>
         <span>All</span>
       </div>

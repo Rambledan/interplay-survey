@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interplay for Growth — Sustainability Driven Growth</title>
+  <style>
+    @font-face {
+      font-family: 'Robson';
+      src: url('app/resources/Robson-Bold.otf') format('opentype');
+      font-weight: bold;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('app/public/fonts/OpenSans-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('app/public/fonts/OpenSans-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      background: #fff;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: relative;
+      height: 109px;
+      background: #eef73e;
+      display: flex;
+      align-items: center;
+      gap: 38px;
+      padding: 15px 50px;
+      overflow: hidden;
+    }
+
+    .header-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .header-logos {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 38px;
+    }
+
+    .logo-interrupt {
+      height: 54px;
+      width: 87px;
+      object-fit: contain;
+    }
+
+    .logo-x {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .logo-likeso {
+      height: 53px;
+      width: 128px;
+      object-fit: contain;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: #eef73e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 100px;
+      min-height: 740px;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 23px;
+      justify-content: center;
+      max-width: 699px;
+      flex: 1;
+      padding: 60px 0;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #424242;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-heading {
+      font-family: 'Robson', sans-serif;
+      font-weight: 700;
+      font-size: clamp(80px, 10vw, 150px);
+      line-height: 0.8;
+      color: #424242;
+      text-transform: uppercase;
+    }
+
+    .hero-subheading {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(22px, 2.5vw, 36px);
+      color: #424242;
+      text-transform: uppercase;
+      line-height: 1.2;
+      max-width: 699px;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: #fff;
+      color: #424242;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 20px;
+      text-decoration: none;
+      text-transform: uppercase;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      width: fit-content;
+      min-width: 280px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .hero-btn:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      color: #424242;
+    }
+
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 494px;
+      height: 557px;
+    }
+
+    .hero-mockup-wrapper {
+      transform: rotate(11deg);
+      width: 409px;
+      overflow: hidden;
+    }
+
+    .hero-mockup {
+      width: 582px;
+      height: auto;
+      display: block;
+      box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+    }
+
+    /* ── DARK SECTION ── */
+    .dark-section {
+      background: #424242;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      padding: 50px 100px;
+    }
+
+    .dark-heading {
+      font-family: 'Robson', sans-serif;
+      font-weight: 700;
+      font-size: clamp(48px, 6.5vw, 96px);
+      line-height: 0.85;
+      color: #eef73e;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .dark-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .dark-left {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 683px;
+      flex: 1;
+    }
+
+    .dark-text-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dark-label {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .dark-body-text {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      color: #fff;
+      line-height: 1.5;
+    }
+
+    .dark-stats {
+      display: flex;
+      gap: 0;
+      align-items: flex-end;
+      margin-top: 12px;
+    }
+
+    .dark-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+    }
+
+    .dark-stat-label {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .dark-stat-value {
+      font-family: 'Robson', sans-serif;
+      font-weight: 700;
+      font-size: clamp(72px, 8vw, 128px);
+      line-height: 0.8;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .dark-right {
+      flex-shrink: 0;
+      width: 509px;
+      height: 421px;
+    }
+
+    .dark-diagram {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1200px) {
+      .hero {
+        padding: 0 60px;
+      }
+      .hero-right {
+        width: 380px;
+        height: 430px;
+      }
+      .hero-mockup-wrapper {
+        width: 320px;
+      }
+      .hero-mockup {
+        width: 460px;
+      }
+      .dark-section {
+        padding: 50px 60px;
+      }
+      .dark-right {
+        width: 380px;
+        height: 314px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .header {
+        padding: 15px 30px;
+        gap: 24px;
+      }
+      .hero {
+        flex-direction: column;
+        padding: 50px 40px;
+        min-height: auto;
+        gap: 40px;
+      }
+      .hero-left {
+        max-width: 100%;
+        padding: 0;
+      }
+      .hero-right {
+        width: 100%;
+        height: auto;
+        justify-content: center;
+      }
+      .hero-mockup-wrapper {
+        width: 280px;
+      }
+      .hero-mockup {
+        width: 380px;
+      }
+      .dark-section {
+        padding: 50px 40px;
+      }
+      .dark-body {
+        flex-direction: column;
+      }
+      .dark-left {
+        max-width: 100%;
+      }
+      .dark-right {
+        width: 100%;
+        height: auto;
+        max-width: 420px;
+        align-self: center;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .header {
+        height: auto;
+        padding: 16px 24px;
+        gap: 16px;
+      }
+      .logo-interrupt {
+        height: 36px;
+        width: 58px;
+      }
+      .logo-likeso {
+        height: 36px;
+        width: 86px;
+      }
+      .hero {
+        padding: 40px 24px;
+        gap: 32px;
+      }
+      .hero-heading {
+        font-size: clamp(56px, 14vw, 80px);
+      }
+      .hero-subheading {
+        font-size: clamp(18px, 5vw, 28px);
+      }
+      .hero-btn {
+        font-size: 16px;
+        min-width: 220px;
+      }
+      .hero-mockup-wrapper {
+        width: 200px;
+      }
+      .hero-mockup {
+        width: 270px;
+      }
+      .dark-section {
+        padding: 40px 24px;
+        gap: 32px;
+      }
+      .dark-heading {
+        font-size: clamp(36px, 10vw, 56px);
+      }
+      .dark-stat-value {
+        font-size: clamp(56px, 14vw, 96px);
+      }
+      .dark-stats {
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <img
+      class="header-bg"
+      src="https://www.figma.com/api/mcp/asset/5b0b3b47-6243-4e3d-8942-78045b598a70"
+      alt=""
+    />
+    <div class="header-logos">
+      <img
+        class="logo-interrupt"
+        src="https://www.figma.com/api/mcp/asset/684962cc-7ad0-42c6-9227-7873f6a1985e"
+        alt="Interrupt"
+      />
+      <span class="logo-x">X</span>
+      <img
+        class="logo-likeso"
+        src="https://www.figma.com/api/mcp/asset/41b5a112-c2fd-4092-928b-17faae990dd3"
+        alt="Like So"
+      />
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Interplay for Growth</p>
+      <h1 class="hero-heading">Sustainability<br>Driven<br>Growth</h1>
+      <p class="hero-subheading">Get your free personalised maturity report</p>
+      <a class="hero-btn" href="/">Run your assessment</a>
+      <p class="hero-note">Takes 30 seconds</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-mockup-wrapper">
+        <img
+          class="hero-mockup"
+          src="https://www.figma.com/api/mcp/asset/0f63a2ab-e766-4308-9cf8-1fbdf173d525"
+          alt="Interplay diagnostic report preview"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- DARK SECTION -->
+  <section class="dark-section">
+    <h2 class="dark-heading">When sustainability + business + brand interplay,&nbsp;growth accelerates</h2>
+    <div class="dark-body">
+      <div class="dark-left">
+        <div class="dark-text-block">
+          <p class="dark-label">Our diagnostic tool</p>
+          <p class="dark-body-text">Will reveal the gaps and opportunity between your sustainability, business and brand – and where their interplay can unlock triple value.</p>
+        </div>
+        <div class="dark-text-block">
+          <p class="dark-label">The value opportunity</p>
+          <p class="dark-body-text">There is a huge value in sustainability but it's mostly stuck in a compliance silo – disconnected from the commercials. Losing you pricing power, peer differentiation – and financial backing.</p>
+        </div>
+        <div class="dark-stats">
+          <div class="dark-stat">
+            <p class="dark-stat-label">Value add</p>
+            <p class="dark-stat-value">1.4X</p>
+          </div>
+          <div class="dark-stat">
+            <p class="dark-stat-label">Value add</p>
+            <p class="dark-stat-value">43%</p>
+          </div>
+        </div>
+      </div>
+      <div class="dark-right">
+        <img
+          class="dark-diagram"
+          src="https://www.figma.com/api/mcp/asset/58be2923-1260-41ec-8ca1-7f46158fd277"
+          alt="Interplay triangle diagram showing sustainability, business and brand strategy"
+        />
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

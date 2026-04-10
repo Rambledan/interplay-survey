@@ -11,6 +11,12 @@ interface Referee {
 
 const EMPTY_REFEREE: Referee = { name: '', email: '' }
 
+const inputStyle = {
+  backgroundColor: '#fff',
+  border: '1px solid rgba(13,20,16,0.12)',
+  color: '#0d1410',
+}
+
 export default function ReferralPage() {
   const router = useRouter()
   const [respondent, setRespondent] = useState<RespondentInfo | null>(null)
@@ -59,29 +65,37 @@ export default function ReferralPage() {
     router.push('/complete')
   }
 
+  function focusBorder(e: React.FocusEvent<HTMLInputElement>) {
+    e.currentTarget.style.borderColor = 'rgba(62,207,110,0.5)'
+  }
+  function blurBorder(e: React.FocusEvent<HTMLInputElement>) {
+    e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="px-6 py-5 flex items-center justify-between border-b border-white/5">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f6f8f6' }}>
+      <header className="px-6 py-5 flex items-center justify-between"
+        style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-brand-muted">Interrupt</span>
-          <span className="text-white/20">×</span>
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-brand-muted">Like So</span>
+          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Interrupt</span>
+          <span style={{ color: 'rgba(13,20,16,0.2)' }}>×</span>
+          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Like So</span>
         </div>
-        <span className="text-xs font-mono uppercase tracking-[0.2em] text-brand-green">Interplay Method</span>
+        <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>Interplay Method</span>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 max-w-2xl mx-auto w-full">
 
-        <p className="text-xs font-mono uppercase tracking-[0.3em] text-brand-green mb-6">
+        <p className="text-xs font-mono uppercase tracking-[0.3em] mb-6" style={{ color: '#3ecf6e' }}>
           Almost done
         </p>
 
-        <h1 className="text-4xl md:text-5xl font-black uppercase leading-none tracking-tight text-white mb-6">
+        <h1 className="text-4xl md:text-5xl font-black uppercase leading-none tracking-tight mb-6" style={{ color: '#0d1410' }}>
           Know anyone else<br />
-          <span className="text-brand-green">in the interplay?</span>
+          <span style={{ color: '#3ecf6e' }}>in the interplay?</span>
         </h1>
 
-        <p className="text-white/60 text-base leading-relaxed mb-10 max-w-lg">
+        <p className="text-base leading-relaxed mb-10 max-w-lg" style={{ color: 'rgba(13,20,16,0.6)' }}>
           Introduce colleagues from your sustainability, brand or business teams — they can take the same diagnostic and we'll map the interplay across your organisation.
         </p>
 
@@ -89,8 +103,8 @@ export default function ReferralPage() {
 
           {/* Column headers */}
           <div className="grid grid-cols-2 gap-3 mb-1">
-            <span className="text-xs font-mono uppercase tracking-widest text-brand-muted">Name</span>
-            <span className="text-xs font-mono uppercase tracking-widest text-brand-muted">Email address</span>
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'rgba(13,20,16,0.4)' }}>Name</span>
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'rgba(13,20,16,0.4)' }}>Email address</span>
           </div>
 
           {referees.map((referee, i) => (
@@ -100,23 +114,32 @@ export default function ReferralPage() {
                 value={referee.name}
                 onChange={e => updateReferee(i, 'name', e.target.value)}
                 placeholder={`Person ${i + 1}`}
-                className="bg-white/5 border border-white/10 text-white placeholder-white/20 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
+                className="px-4 py-3 text-sm focus:outline-none transition-colors"
+                style={{ ...inputStyle }}
+                onFocus={focusBorder}
+                onBlur={blurBorder}
               />
               <input
                 type="email"
                 value={referee.email}
                 onChange={e => updateReferee(i, 'email', e.target.value)}
                 placeholder="name@company.com"
-                className="bg-white/5 border border-white/10 text-white placeholder-white/20 px-4 py-3 text-sm focus:outline-none focus:border-brand-green/50 transition-colors"
+                className="px-4 py-3 text-sm focus:outline-none transition-colors"
+                style={{ ...inputStyle }}
+                onFocus={focusBorder}
+                onBlur={blurBorder}
               />
             </div>
           ))}
 
-          <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between pt-4" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
             <button
               type="button"
               onClick={handleSkip}
-              className="text-brand-muted text-sm hover:text-white transition-colors font-mono"
+              className="text-sm font-mono transition-colors"
+              style={{ color: 'rgba(13,20,16,0.45)' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.45)'}
             >
               Skip →
             </button>
@@ -136,8 +159,8 @@ export default function ReferralPage() {
         </form>
       </main>
 
-      <footer className="px-6 py-4 border-t border-white/5 text-center">
-        <p className="text-xs text-brand-muted font-mono">
+      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
+        <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
           Interrupt × Like So — The Interplay Method®
         </p>
       </footer>

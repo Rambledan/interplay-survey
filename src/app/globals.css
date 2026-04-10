@@ -1,17 +1,28 @@
 @import "tailwindcss";
 
-@theme {
-  /* Interplay brand palette */
-  --color-brand-bg: #0d1410;
-  --color-brand-surface: #151f18;
-  --color-brand-border: rgba(255, 255, 255, 0.08);
-  --color-brand-green: #3ecf6e;
-  --color-brand-orange: #f4821f;
-  --color-brand-blue: #4a9ff5;
-  --color-brand-muted: #6b8c74;
+@font-face {
+  font-family: 'Robson';
+  src: url('https://static1.squarespace.com/static/682b2f3ea7f48706efc43f77/t/682b4014d25ba40735d78d7e/1747664916554/Robson.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
-  --font-sans: 'Inter', 'system-ui', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
+@theme {
+  /* Interrupt brand palette */
+  --color-brand-bg:      #000000;
+  --color-brand-surface: #ffffff;
+  --color-brand-page:    #faf9f5;
+  --color-brand-border:  rgba(47, 42, 42, 0.09);
+  --color-brand-green:   #faf000;
+  --color-brand-orange:  #f4821f;
+  --color-brand-blue:    #4a9ff5;
+  --color-brand-muted:   #6b7280;
+  --color-brand-fg:      #2f2a2a;
+
+  --font-sans:    'Open Sans', system-ui, sans-serif;
+  --font-display: 'Robson', 'Open Sans', sans-serif;
+  --font-mono:    'Almarai', 'JetBrains Mono', monospace;
 }
 
 * {
@@ -24,16 +35,16 @@ html {
 }
 
 body {
-  background-color: var(--color-brand-bg);
-  color: #ffffff;
-  font-family: var(--font-sans);
+  background-color: #faf9f5;
+  color: #2f2a2a;
+  font-family: 'Open Sans', system-ui, sans-serif;
   min-height: 100vh;
 }
 
 /* Custom selection color */
 ::selection {
-  background-color: var(--color-brand-green);
-  color: var(--color-brand-bg);
+  background-color: #faf000;
+  color: #000;
 }
 
 /* Scrollbar */
@@ -41,8 +52,8 @@ body {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-brand-bg);
+  background: #faf9f5;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-brand-muted);
+  background: rgba(47, 42, 42, 0.2);
 }

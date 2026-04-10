@@ -1,4 +1,4 @@
-export type QuestionType = 'percentage' | 'text-options' | 'open-answer'
+export type QuestionType = 'percentage' | 'text-options' | 'open-answer' | 'revenue-input' | 'multiple-select'
 
 export interface Question {
   id: string

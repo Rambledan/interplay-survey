@@ -11,6 +11,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.2",
     "@vercel/postgres": "^0.10.0",
     "googleapis": "^171.4.0",
     "next": "16.1.6",

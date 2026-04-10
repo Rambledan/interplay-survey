@@ -5,6 +5,8 @@ import { PercentageScale } from './PercentageScale'
 import { TextOptions } from './TextOptions'
 import { OpenAnswer } from './OpenAnswer'
 import { FollowUp } from './FollowUp'
+import { RevenueInput } from './RevenueInput'
+import { MultipleSelect } from './MultipleSelect'
 
 interface QuestionRendererProps {
   question: Question
@@ -25,7 +27,7 @@ export function QuestionRenderer({
 
   return (
     <div className="mb-10">
-      <p className="text-white text-base mb-5 leading-relaxed">{text}</p>
+      <p className="text-base mb-5 leading-relaxed" style={{ color: '#0d1410' }}>{text}</p>
 
       {type === 'percentage' && (
         <PercentageScale
@@ -46,10 +48,28 @@ export function QuestionRenderer({
         />
       )}
 
+      {type === 'multiple-select' && (
+        <MultipleSelect
+          questionId={id}
+          label={text}
+          options={options}
+          value={answer}
+          onChange={(v) => onAnswerChange(id, v)}
+        />
+      )}
+
       {type === 'open-answer' && (
         <OpenAnswer
           questionId={id}
           label={text}
+          value={answer}
+          onChange={(v) => onAnswerChange(id, v)}
+        />
+      )}
+
+      {type === 'revenue-input' && (
+        <RevenueInput
+          questionId={id}
           value={answer}
           onChange={(v) => onAnswerChange(id, v)}
         />

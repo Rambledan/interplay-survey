@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import questionsData from '../../../../../data/questions.json'
 import { parseCsv } from '@/lib/parse-csv'
-import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent } from '@/lib/db'
+import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers } from '@/lib/db'
 import type { SurveySection, Question } from '@/types/survey'
 import type { DbRow } from '@/lib/db'
 
@@ -207,16 +207,80 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  if (!isAuthorised(request)) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+  }
+
+  let body: Record<string, unknown>
+  try { body = await request.json() } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  if (!isPostgresConfigured()) {
+    return NextResponse.json({ error: 'Editing only supported with Postgres' }, { status: 501 })
+  }
+
+  try {
+    if (body.type === 'profile') {
+      const { oldName, name, role, company, sector, companyType } = body as Record<string, string>
+      if (!oldName?.trim() || !name?.trim()) {
+        return NextResponse.json({ error: 'Missing oldName or name' }, { status: 400 })
+      }
+      const updated = await updateRespondentProfile(oldName, {
+        name, role: role ?? '', company: company ?? '',
+        sector: sector ?? '', type: companyType ?? '',
+      })
+      return NextResponse.json({ ok: true, updated })
+    }
+
+    if (body.type === 'answers') {
+      const { id, answers, followUps } = body as {
+        id: string
+        answers: Record<string, string>
+        followUps: Record<string, string>
+      }
+      if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+      const ok = await updateRowAnswers(Number(id), answers ?? {}, followUps ?? {})
+      return NextResponse.json({ ok })
+    }
+
+    return NextResponse.json({ error: 'Unknown update type' }, { status: 400 })
+  } catch (error) {
+    console.error('[PATCH /api/admin/responses]', error)
+    return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   if (!isAuthorised(request)) {
     return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   }
 
   const { searchParams } = new URL(request.url)
+  const idParam = searchParams.get('id')
   const respondent = searchParams.get('respondent')
 
+  // Single row delete by id
+  if (idParam) {
+    const id = parseInt(idParam, 10)
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid id' }, { status: 400 })
+    }
+    if (!isPostgresConfigured()) {
+      return NextResponse.json({ error: 'Single-row delete only supported with Postgres' }, { status: 501 })
+    }
+    try {
+      const ok = await deleteResponseById(id)
+      return NextResponse.json({ ok })
+    } catch (error) {
+      console.error('[DELETE /api/admin/responses?id]', error)
+      return NextResponse.json({ error: 'Failed to delete response' }, { status: 500 })
+    }
+  }
+
   if (!respondent?.trim()) {
-    return NextResponse.json({ error: 'Missing respondent parameter' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing respondent or id parameter' }, { status: 400 })
   }
 
   try {

@@ -1,0 +1,248 @@
+{
+  "appetite-q1": {
+    "Not at all": 0,
+    "Limited impact": 1,
+    "Moderate impact": 2,
+    "Significant impact": 3,
+    "Core driver of value": 4
+  },
+  "appetite-q3": {
+    "100%": 0,
+    "75%": 1,
+    "50%": 2,
+    "25%": 3,
+    "0%": 4
+  },
+  "appetite-q4": {
+    "Very unlikely": 0,
+    "Unlikely": 1,
+    "Neutral": 2,
+    "Likely": 3,
+    "Very likely": 4
+  },
+  "scale-q1": {
+    "0%": 0,
+    "25%": 1,
+    "50%": 2,
+    "75%": 3,
+    "100%": 4
+  },
+  "scale-q2": {
+    "Staff are not permitted to access any AI tools": 0,
+    "Some staff use co-pilot or personal ChatGPT": 1,
+    "Staff have access to permitted internal AI tools": 2,
+    "Staff have access to a limited set of external AI tools": 3,
+    "All staff have access to any external tools they would like": 4
+  },
+  "scale-q3": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5
+  },
+  "sus-q9": {
+    "Very easy": 4,
+    "Easy": 3,
+    "It's OK": 2,
+    "Difficult": 1,
+    "Very difficult": 0
+  },
+  "sus-q1": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "sus-q11": {
+    "Very easy": 4,
+    "Easy": 3,
+    "It's OK": 2,
+    "Difficult": 1,
+    "Very difficult": 0
+  },
+  "sus-q10": {
+    "100%": 0,
+    "75%": 1,
+    "50%": 2,
+    "25%": 3,
+    "0%": 4
+  },
+  "sus-q2": {
+    "None": 0,
+    "A small portion": 1,
+    "About half": 2,
+    "Most": 3,
+    "All of it": 4
+  },
+  "sus-q5": {
+    "High involvement": 4,
+    "Moderate involvement": 2,
+    "Low involvement": 0
+  },
+  "sus-q6": {
+    "High involvement": 4,
+    "Moderate involvement": 2,
+    "Low involvement": 0
+  },
+  "sus-q7": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "sus-q8": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q1": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q12": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q8": {
+    "Very weak": 0,
+    "Weak": 1,
+    "Moderate": 2,
+    "Strong": 3,
+    "Very strong": 4
+  },
+  "brand-q2": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q13": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q3": {
+    "Weekly": 4,
+    "Monthly": 3,
+    "Quarterly": 2,
+    "Annually": 1,
+    "Never": 0
+  },
+  "brand-q5": {
+    "At the start": 4,
+    "After research": 3,
+    "After design": 2,
+    "Just before launch": 1,
+    "Just after launch": 0
+  },
+  "brand-q7": {
+    "0%": 0,
+    "20%": 1,
+    "50%": 3,
+    "More than 50%": 4
+  },
+  "brand-q14": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q10": {
+    "Seen as greenwashing": 0,
+    "Viewed with suspicion": 1,
+    "Does not resonate": 2,
+    "Resonant": 3,
+    "Highly resonant": 4
+  },
+  "brand-q9": {
+    "At the start": 4,
+    "After research": 3,
+    "After design": 2,
+    "Just before launch": 1,
+    "Just after launch": 0
+  },
+  "brand-q11": {
+    "100%": 0,
+    "75%": 1,
+    "50%": 2,
+    "25%": 3,
+    "0%": 4
+  },
+  "biz-q1": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "biz-q9": {
+    "Very commercial": 4,
+    "Commercial": 3,
+    "Moderately commercial": 2,
+    "Not very commercial": 1,
+    "Not commercial at all": 0
+  },
+  "biz-q2": {
+    "Yes": 4,
+    "Maybe": 2,
+    "No": 0
+  },
+  "biz-q4": {
+    "Weekly": 4,
+    "Monthly": 3,
+    "Quarterly": 2,
+    "Annually": 1,
+    "Never": 0
+  },
+  "biz-q5": {
+    "High involvement": 4,
+    "Moderate involvement": 2,
+    "Low involvement": 0
+  },
+  "biz-q6": {
+    "Yes": 4,
+    "Maybe": 2,
+    "No": 0
+  },
+  "biz-q8": {
+    "0%": 0,
+    "Up to 25%": 1,
+    "Up to 50%": 3,
+    "More than 50%": 4
+  },
+  "brand-q15": {
+    "100%": 4,
+    "75%": 3,
+    "50%": 2,
+    "25%": 1,
+    "0%": 0
+  },
+  "brand-q16": {
+    "Yes": 4,
+    "Maybe": 2,
+    "Not sure": 1,
+    "No": 0
+  },
+  "biz-q13": {
+    "Yes": 4,
+    "Maybe": 2,
+    "Not sure": 1,
+    "No": 0
+  }
+}
