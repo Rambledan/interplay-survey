@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { ResponseEntry, AdminStats } from '@/app/api/admin/responses/route'
+import type { ReferralRow } from '@/lib/db'
 import type { SurveySection } from '@/types/survey'
 
 // ── Section colour palette (light-mode readable) ───────────────────────────
@@ -508,6 +509,67 @@ function ResultsLinkPanel({ respondentName, password }: { respondentName: string
   )
 }
 
+// ── Referrals panel ────────────────────────────────────────────────────────
+
+function ReferralsPanel({ referrals }: { referrals: ReferralRow[] }) {
+  const [open, setOpen] = useState(false)
+  if (referrals.length === 0) return null
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full text-left px-5 py-3 flex items-center gap-3 transition-colors"
+        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(13,20,16,0.02)'}
+        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'rgba(250,240,0,0.8)' }} />
+        <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.55)' }}>REFERRALS</span>
+        <span className="text-xs font-mono px-1.5 py-0.5 rounded-sm"
+          style={{ backgroundColor: 'rgba(250,240,0,0.15)', border: '1px solid rgba(250,240,0,0.4)', color: '#7a7000' }}>
+          {referrals.length}
+        </span>
+        <span className="text-xs font-mono ml-auto shrink-0" style={{ color: 'rgba(13,20,16,0.35)' }}>
+          {open ? '▲' : '▼'}
+        </span>
+      </button>
+
+      {open && (
+        <div className="px-5 pb-4" style={{ backgroundColor: '#fafafa' }}>
+          <table className="w-full text-xs" style={{ borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
+                <th className="text-left py-2 font-mono uppercase tracking-wider" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Name</th>
+                <th className="text-left py-2 font-mono uppercase tracking-wider" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Email</th>
+                <th className="text-left py-2 font-mono uppercase tracking-wider" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Referred</th>
+              </tr>
+            </thead>
+            <tbody>
+              {referrals.map(r => (
+                <tr key={r.id} style={{ borderBottom: '1px solid rgba(13,20,16,0.04)' }}>
+                  <td className="py-2 pr-4" style={{ color: '#0d1410' }}>{r.referee_name}</td>
+                  <td className="py-2 pr-4">
+                    <a href={`mailto:${r.referee_email}`}
+                      className="font-mono transition-colors"
+                      style={{ color: 'rgba(13,20,16,0.6)' }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.6)'}>
+                      {r.referee_email}
+                    </a>
+                  </td>
+                  <td className="py-2 font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+                    {formatDate(r.submitted_at)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RespondentCard({
   group,
   password,
@@ -518,6 +580,7 @@ function RespondentCard({
   deleting,
   allSections,
   onRefresh,
+  referrals,
 }: {
   group: RespondentGroup
   password: string
@@ -528,6 +591,7 @@ function RespondentCard({
   deleting: boolean
   allSections: SurveySection[]
   onRefresh: () => void
+  referrals: ReferralRow[]
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [editingProfile, setEditingProfile] = useState(false)
@@ -716,6 +780,9 @@ function RespondentCard({
 
       {/* Results link panel */}
       <ResultsLinkPanel respondentName={group.name} password={password} />
+
+      {/* Referrals panel */}
+      <ReferralsPanel referrals={referrals} />
     </div>
   )
 }
@@ -788,6 +855,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [responses, setResponses] = useState<ResponseEntry[]>([])
   const [stats, setStats] = useState<AdminStats | null>(null)
+  const [referralsByRespondent, setReferralsByRespondent] = useState<Record<string, ReferralRow[]>>({})
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('all')
   const [expandedSectionId, setExpandedSectionId] = useState<string | null>(null)
@@ -808,6 +876,7 @@ export default function AdminPage() {
       const data = await res.json()
       setResponses(data.responses ?? [])
       setStats(data.stats ?? null)
+      setReferralsByRespondent(data.referralsByRespondent ?? {})
       setAuthState('authenticated')
     } finally {
       setLoading(false)
@@ -989,6 +1058,7 @@ export default function AdminPage() {
                 deleting={deletingRespondent === group.name}
                 allSections={allSections}
                 onRefresh={() => fetchData(password)}
+                referrals={referralsByRespondent[group.name.toLowerCase()] ?? []}
               />
             ))}
           </div>

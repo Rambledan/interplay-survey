@@ -246,6 +246,27 @@ export async function deleteResponseById(id: number): Promise<boolean> {
   })
 }
 
+export interface ReferralRow {
+  id: number
+  submitted_at: string
+  referrer_name: string
+  referee_name: string
+  referee_email: string
+}
+
+export async function getAllReferrals(): Promise<ReferralRow[]> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query<ReferralRow>(`
+      SELECT id, submitted_at, referrer_name, referee_name, referee_email
+      FROM referrals
+      ORDER BY submitted_at DESC
+    `)
+    return result.rows
+  })
+}
+
 export async function getAllResponses(): Promise<DbRow[]> {
   await ensureTable()
 

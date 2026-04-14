@@ -3,7 +3,8 @@ import fs from 'fs'
 import path from 'path'
 import questionsData from '../../../../../data/questions.json'
 import { parseCsv } from '@/lib/parse-csv'
-import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers } from '@/lib/db'
+import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers, getAllReferrals } from '@/lib/db'
+import type { ReferralRow } from '@/lib/db'
 import type { SurveySection, Question } from '@/types/survey'
 import type { DbRow } from '@/lib/db'
 
@@ -192,13 +193,25 @@ export async function GET(request: NextRequest) {
       ? await getResponsesFromPostgres()
       : getResponsesFromCsv()
 
+    // Fetch referrals and group by lowercased referrer name
+    let referralsByRespondent: Record<string, ReferralRow[]> = {}
+    if (isPostgresConfigured()) {
+      const referrals = await getAllReferrals()
+      for (const r of referrals) {
+        const key = r.referrer_name.toLowerCase()
+        if (!referralsByRespondent[key]) referralsByRespondent[key] = []
+        referralsByRespondent[key].push(r)
+      }
+    }
+
     if (responses.length === 0) {
-      return NextResponse.json({ ...empty, source: isPostgresConfigured() ? 'postgres' : 'csv' })
+      return NextResponse.json({ ...empty, referralsByRespondent, source: isPostgresConfigured() ? 'postgres' : 'csv' })
     }
 
     return NextResponse.json({
       responses,
       stats: buildStats(responses),
+      referralsByRespondent,
       source: isPostgresConfigured() ? 'postgres' : 'csv',
     })
   } catch (error) {
