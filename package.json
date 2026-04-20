@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node -e \"const fs=require('fs'),path=require('path');const src=path.join(__dirname,'..','landing.html');if(fs.existsSync(src)){let h=fs.readFileSync(src,'utf-8');h=h.replace(/app\\/public\\//g,'/').replace(/app\\/resources\\//g,'/fonts/');fs.writeFileSync(path.join(__dirname,'public','landing.html'),h);console.log('landing.html synced to public/')}\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
