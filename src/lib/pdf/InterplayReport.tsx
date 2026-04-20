@@ -6,6 +6,8 @@ import type { SectionScore, RespondentScores } from '@/lib/score'
 import { SECTION_META, getScoreBand } from '@/lib/score'
 import type { FinancialModel } from '@/lib/financial'
 import { formatCurrency, SLUG_TO_SECTION_KEY } from '@/lib/financial'
+import type { ReportTemplateContent, ReportOverrideContent } from '@/lib/report-defaults'
+import { DEFAULT_EVIDENCE } from '@/lib/report-defaults'
 
 // Register built-in PDF fonts so fontWeight: 700 maps to Helvetica-Bold
 Font.register({
@@ -33,6 +35,13 @@ export interface SectionResponseData {
   questions: QuestionRow[]
 }
 
+export interface ContentOverrides {
+  /** Global template overrides (band-indexed arrays per section) */
+  globalTemplate?: ReportTemplateContent
+  /** Per-respondent overrides (flat text per section, replaces band-selected content) */
+  respondentOverride?: ReportOverrideContent | null
+}
+
 export interface ReportData {
   respondent: { name: string; role: string; company: string; sector: string; companyType: string }
   completedAt: string
@@ -41,6 +50,8 @@ export interface ReportData {
   benchmarkN: number
   financial: FinancialModel | null
   sectionResponses: SectionResponseData[]
+  /** Optional CMS overrides — loaded from DB by the PDF route */
+  contentOverrides?: ContentOverrides
 }
 
 // ── Colours ────────────────────────────────────────────────────────────────
@@ -69,12 +80,7 @@ const SECTION_COLORS: Record<string, string> = {
   'capability-business':    C.business,
 }
 
-const EVIDENCE = [
-  'Friede, G., Busch, T. & Bassen, A. (2015). "ESG and financial performance: aggregated evidence from more than 2000 empirical studies." Journal of Sustainable Finance & Investment, 5(4), 210–233.',
-  'B Lab UK (2025). B Corp Insights Report 2025. bcorporation.uk — B Corps grow 28× faster than UK GDP; 17pp employee retention premium.',
-  'Ellen MacArthur Foundation / McKinsey & Company (2015). Growth Within: A Circular Economy Vision for a Competitive Europe. Circular economy could reduce material costs by 32% by 2030.',
-  'UN Global Compact (2025). CMO Blueprint for Sustainable Growth (in partnership with Kantar). Brands with strong sustainability credentials command 0.7 Kantar BrandZ correlation to brand value; sustainable product lines growing 5–7× market average.',
-]
+// Evidence is imported from report-defaults.ts and overrideable via CMS
 
 // ── Styles ─────────────────────────────────────────────────────────────────
 
@@ -411,13 +417,34 @@ function SummaryPage({ data }: { data: ReportData }) {
 // ── Section Page ───────────────────────────────────────────────────────────
 
 function SectionPage({ section, data }: { section: SectionScore; data: ReportData }) {
-  const { benchmark, benchmarkN, financial, sectionResponses, respondent } = data
+  const { benchmark, benchmarkN, financial, sectionResponses, respondent, contentOverrides } = data
   const color = SECTION_COLORS[section.slug] ?? C.dark
   const meta = SECTION_META[section.slug]
   const { insightIdx, actionIdx } = getInsightIdx(section.pct)
   const band = getScoreBand(section.pct)
   const hasBenchmark = benchmarkN >= 2
   const bm = benchmark[section.slug]
+
+  // ── Resolve content with override priority ───────────────────────────────
+  // Priority: respondent-specific override > global template override > default
+  const slug = section.slug
+  const respSec = contentOverrides?.respondentOverride?.sections?.[slug]
+  const globalSec = contentOverrides?.globalTemplate?.sections?.[slug]
+
+  const insightText = respSec?.insight
+    || globalSec?.insights?.[insightIdx]
+    || meta?.insights[insightIdx]
+    || ''
+
+  const actionText = respSec?.action
+    || globalSec?.actions?.[actionIdx]
+    || meta?.actions[actionIdx]
+    || ''
+
+  const howWeCanHelpText = respSec?.howWeCanHelp
+    || globalSec?.howWeCanHelp?.[actionIdx]
+    || meta?.howWeCanHelp[actionIdx]
+    || ''
 
   // Questions for this section
   const secResponses = sectionResponses.find(s => s.slug === section.slug)
@@ -461,26 +488,26 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
       <View style={s.hr} />
 
       {/* Insight */}
-      {meta && (
+      {insightText && (
         <View style={{ marginBottom: 12 }} wrap={false}>
           <Text style={[s.label, { marginBottom: 6 }]}>INSIGHT</Text>
-          <Text style={s.body}>{sanitize(meta.insights[insightIdx])}</Text>
+          <Text style={s.body}>{sanitize(insightText)}</Text>
         </View>
       )}
 
       {/* Recommended action */}
-      {meta && (
+      {actionText && (
         <View style={{ marginBottom: 12 }} wrap={false}>
           <Text style={[s.label, { marginBottom: 6 }]}>RECOMMENDED ACTION</Text>
-          <Text style={s.body}>{sanitize(meta.actions[actionIdx])}</Text>
+          <Text style={s.body}>{sanitize(actionText)}</Text>
         </View>
       )}
 
       {/* How we can help */}
-      {meta && (
+      {howWeCanHelpText && (
         <View style={{ marginBottom: 12 }}>
           <Text style={[s.label, { marginBottom: 6 }]}>HOW WE CAN HELP</Text>
-          {meta.howWeCanHelp[actionIdx].split('\n\n').map((para, i) => (
+          {howWeCanHelpText.split('\n\n').map((para, i) => (
             <Text key={i} style={[s.body, { marginBottom: 4 }]}>{sanitize(para)}</Text>
           ))}
         </View>
@@ -548,6 +575,9 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
 // ── Evidence Page ──────────────────────────────────────────────────────────
 
 function EvidencePage({ data }: { data: ReportData }) {
+  // Use CMS override if present, otherwise fall back to defaults
+  const evidenceList = data.contentOverrides?.globalTemplate?.evidence ?? DEFAULT_EVIDENCE
+
   return (
     <Page size="A4" style={s.page}>
       <PageFooter company={data.respondent.company} />
@@ -559,7 +589,7 @@ function EvidencePage({ data }: { data: ReportData }) {
         The Interplay Method diagnostic is grounded in four independent bodies of evidence:
       </Text>
 
-      {EVIDENCE.map((ref, i) => (
+      {evidenceList.map((ref, i) => (
         <View key={i} style={{ flexDirection: 'row', marginBottom: 12 }} wrap={false}>
           <Text style={{ fontSize: 9, fontWeight: 700, color: C.green, marginRight: 8, width: 14 }}>{i + 1}.</Text>
           <Text style={[s.body, { flex: 1 }]}>{ref}</Text>

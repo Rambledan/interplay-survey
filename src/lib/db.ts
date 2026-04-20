@@ -109,6 +109,27 @@ export async function ensureTable(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_respondent_tokens_name
       ON respondent_tokens (LOWER(respondent_name))
     `)
+    // ── Report CMS tables ──────────────────────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS report_templates (
+        id         SERIAL      PRIMARY KEY,
+        key        TEXT        NOT NULL UNIQUE,
+        content    JSONB       NOT NULL DEFAULT '{}',
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS report_overrides (
+        id              SERIAL       PRIMARY KEY,
+        respondent_name TEXT         NOT NULL UNIQUE,
+        content         JSONB        NOT NULL DEFAULT '{}',
+        updated_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
+    `)
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_report_overrides_name
+      ON report_overrides (LOWER(respondent_name))
+    `)
   })
 }
 
@@ -378,4 +399,73 @@ export async function revokeRespondentToken(token: string): Promise<boolean> {
     )
     return (result.rowCount ?? 0) > 0
   })
+}
+
+// ── Report CMS ────────────────────────────────────────────────────────────────
+
+import type { ReportTemplateContent, ReportOverrideContent } from './report-defaults'
+export type { ReportTemplateContent, ReportOverrideContent }
+
+export async function getGlobalTemplate(): Promise<ReportTemplateContent> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query(
+      `SELECT content FROM report_templates WHERE key = 'global'`
+    )
+    return (result.rows[0]?.content ?? {}) as ReportTemplateContent
+  })
+}
+
+export async function saveGlobalTemplate(content: ReportTemplateContent): Promise<void> {
+  await ensureTable()
+
+  await withClient(async (client) => {
+    await client.query(
+      `INSERT INTO report_templates (key, content, updated_at)
+       VALUES ('global', $1::jsonb, NOW())
+       ON CONFLICT (key) DO UPDATE SET content = $1::jsonb, updated_at = NOW()`,
+      [JSON.stringify(content)]
+    )
+  })
+}
+
+export async function getRespondentOverride(name: string): Promise<ReportOverrideContent | null> {
+  await ensureTable()
+
+  return withClient(async (client) => {
+    const result = await client.query(
+      `SELECT content FROM report_overrides WHERE LOWER(respondent_name) = LOWER($1)`,
+      [name]
+    )
+    return result.rows.length > 0 ? (result.rows[0].content as ReportOverrideContent) : null
+  })
+}
+
+export async function saveRespondentOverride(
+  name: string,
+  content: ReportOverrideContent
+): Promise<void> {
+  await ensureTable()
+
+  await withClient(async (client) => {
+    await client.query(
+      `INSERT INTO report_overrides (respondent_name, content, updated_at)
+       VALUES (LOWER($1), $2::jsonb, NOW())
+       ON CONFLICT (respondent_name) DO UPDATE SET content = $2::jsonb, updated_at = NOW()`,
+      [name, JSON.stringify(content)]
+    )
+  })
+}
+
+/** Convenience: load both global template and respondent override in parallel */
+export async function getReportContentOverrides(respondentName: string): Promise<{
+  globalTemplate: ReportTemplateContent
+  respondentOverride: ReportOverrideContent | null
+}> {
+  const [globalTemplate, respondentOverride] = await Promise.all([
+    getGlobalTemplate(),
+    getRespondentOverride(respondentName),
+  ])
+  return { globalTemplate, respondentOverride }
 }

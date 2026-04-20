@@ -15,6 +15,37 @@ const SECTION_COLORS: Record<string, string> = {
   'capability-business':        '#d97706',  // amber instead of yellow for contrast
 }
 
+// ── Report template CMS constants ─────────────────────────────────────────
+
+const SECTION_SLUGS_ORDERED = [
+  'appetite',
+  'scale-and-delivery',
+  'capability-sustainability',
+  'capability-brand',
+  'capability-business',
+]
+
+const SECTION_SHORT_NAMES: Record<string, string> = {
+  'appetite':                   'APPETITE',
+  'scale-and-delivery':         'SCALE & AI',
+  'capability-sustainability':  'SUSTAINABILITY',
+  'capability-brand':           'BRAND',
+  'capability-business':        'BUSINESS',
+}
+
+const INSIGHT_BAND_LABELS = [
+  'Band 0 — EARLY STAGE (0–39%)',
+  'Band 1 — DEVELOPING (40–59%)',
+  'Band 2 — MATURING (60–79%)',
+  'Band 3 — LEADING (80–100%)',
+]
+
+const ACTION_BAND_LABELS = [
+  'Band 0 — EARLY STAGE (0–39%)',
+  'Band 1 — DEVELOPING (40–59%)',
+  'Band 2 — MATURING / LEADING (60–100%)',
+]
+
 function getSectionColor(slug: string) {
   return SECTION_COLORS[slug] ?? 'rgba(13,20,16,0.4)'
 }
@@ -570,6 +601,439 @@ function ReferralsPanel({ referrals }: { referrals: ReferralRow[] }) {
   )
 }
 
+// ── Global Report Template Editor ─────────────────────────────────────────
+
+type TemplateSectionContent = {
+  insights: string[]
+  actions: string[]
+  howWeCanHelp: string[]
+}
+
+type TemplateContent = {
+  sections: Record<string, TemplateSectionContent>
+  evidence: string[]
+}
+
+function CmsTextarea({ value, onChange, rows, placeholder }: {
+  value: string; onChange: (v: string) => void; rows?: number; placeholder?: string
+}) {
+  return (
+    <textarea
+      rows={rows ?? 3}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={{
+        width: '100%', padding: '6px 8px', fontSize: '0.8rem',
+        backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.15)',
+        color: '#0d1410', resize: 'vertical', fontFamily: 'inherit', outline: 'none',
+      }}
+      onFocus={e => e.currentTarget.style.borderColor = 'rgba(62,207,110,0.5)'}
+      onBlur={e => e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'}
+    />
+  )
+}
+
+function GlobalTemplatePanel({ password }: { password: string }) {
+  const [open, setOpen] = useState(false)
+  const [activeSlug, setActiveSlug] = useState<string>('appetite')
+  const [content, setContent] = useState<TemplateContent | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [savedMsg, setSavedMsg] = useState(false)
+
+  async function fetchTemplate() {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/report-cms?type=global', {
+        headers: { Authorization: `Bearer ${password}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setContent(data.template as TemplateContent)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleToggle() {
+    if (!open && !content) fetchTemplate()
+    setOpen(o => !o)
+  }
+
+  async function handleSave() {
+    if (!content) return
+    setSaving(true)
+    setSavedMsg(false)
+    try {
+      await fetch('/api/admin/report-cms', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ type: 'global', content }),
+      })
+      setSavedMsg(true)
+      setTimeout(() => setSavedMsg(false), 3000)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function updateField(
+    slug: string,
+    field: 'insights' | 'actions' | 'howWeCanHelp',
+    idx: number,
+    value: string
+  ) {
+    setContent(prev => {
+      if (!prev) return prev
+      const newArr = [...(prev.sections[slug]?.[field] ?? [])]
+      newArr[idx] = value
+      return {
+        ...prev,
+        sections: { ...prev.sections, [slug]: { ...prev.sections[slug], [field]: newArr } },
+      }
+    })
+  }
+
+  function updateEvidence(idx: number, value: string) {
+    setContent(prev => {
+      if (!prev) return prev
+      const ev = [...prev.evidence]
+      ev[idx] = value
+      return { ...prev, evidence: ev }
+    })
+  }
+
+  const activeSection = content?.sections[activeSlug]
+
+  return (
+    <div style={{ backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)', marginBottom: '1.5rem' }}>
+      <button
+        onClick={handleToggle}
+        className="w-full text-left px-5 py-4 flex items-center gap-3 transition-colors"
+        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(13,20,16,0.015)'}
+        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: '#faf000' }} />
+        <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: '#0d1410' }}>
+          Report Templates
+        </span>
+        <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.4)' }}>
+          — edit global report content for all participants
+        </span>
+        <span className="text-xs font-mono ml-auto shrink-0" style={{ color: 'rgba(13,20,16,0.35)' }}>
+          {open ? '▲' : '▼'}
+        </span>
+      </button>
+
+      {open && (
+        <div style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+          {loading ? (
+            <p className="px-5 py-8 text-xs font-mono animate-pulse" style={{ color: 'rgba(13,20,16,0.4)' }}>
+              Loading template…
+            </p>
+          ) : !content ? (
+            <p className="px-5 py-8 text-xs font-mono" style={{ color: 'rgba(13,20,16,0.4)' }}>
+              Could not load template.
+            </p>
+          ) : (
+            <div>
+              {/* Section tabs */}
+              <div className="flex gap-0 px-5 pt-4 flex-wrap"
+                style={{ borderBottom: '1px solid rgba(13,20,16,0.06)' }}>
+                {SECTION_SLUGS_ORDERED.map(slug => {
+                  const color = SECTION_COLORS[slug] ?? '#888'
+                  const isActive = activeSlug === slug
+                  return (
+                    <button
+                      key={slug}
+                      onClick={() => setActiveSlug(slug)}
+                      className="text-xs font-mono px-3 py-2 transition-colors"
+                      style={{
+                        borderWidth: '1px 1px 0 1px', borderStyle: 'solid',
+                        borderColor: isActive ? `${color}40` : 'transparent',
+                        color: isActive ? color : 'rgba(13,20,16,0.45)',
+                        backgroundColor: isActive ? `${color}08` : 'transparent',
+                        marginBottom: isActive ? '-1px' : '0',
+                      }}
+                    >
+                      {SECTION_SHORT_NAMES[slug]}
+                    </button>
+                  )
+                })}
+                <button
+                  onClick={() => setActiveSlug('evidence')}
+                  className="text-xs font-mono px-3 py-2 transition-colors"
+                  style={{
+                    borderWidth: '1px 1px 0 1px', borderStyle: 'solid',
+                    borderColor: activeSlug === 'evidence' ? 'rgba(62,207,110,0.4)' : 'transparent',
+                    color: activeSlug === 'evidence' ? '#22a855' : 'rgba(13,20,16,0.45)',
+                    backgroundColor: activeSlug === 'evidence' ? 'rgba(62,207,110,0.06)' : 'transparent',
+                    marginBottom: activeSlug === 'evidence' ? '-1px' : '0',
+                  }}
+                >
+                  EVIDENCE
+                </button>
+              </div>
+
+              {/* Evidence tab */}
+              {activeSlug === 'evidence' && (
+                <div className="px-5 py-5 flex flex-col gap-4">
+                  <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.4)' }}>
+                    These references appear on the final page of every report.
+                  </p>
+                  {content.evidence.map((ev, i) => (
+                    <div key={i}>
+                      <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                        style={{ color: 'rgba(13,20,16,0.35)' }}>Reference {i + 1}</p>
+                      <CmsTextarea rows={3} value={ev} onChange={v => updateEvidence(i, v)} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Section content tab */}
+              {activeSlug !== 'evidence' && activeSection && (
+                <div className="px-5 py-5 flex flex-col gap-6">
+                  {/* Insights */}
+                  <div>
+                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
+                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Insights</p>
+                    {INSIGHT_BAND_LABELS.map((label, i) => (
+                      <div key={i} className="mb-4">
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                        <CmsTextarea rows={3} value={activeSection.insights[i] ?? ''}
+                          onChange={v => updateField(activeSlug, 'insights', i, v)} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div>
+                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
+                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Recommended Actions</p>
+                    {ACTION_BAND_LABELS.map((label, i) => (
+                      <div key={i} className="mb-4">
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                        <CmsTextarea rows={2} value={activeSection.actions[i] ?? ''}
+                          onChange={v => updateField(activeSlug, 'actions', i, v)} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* How We Can Help */}
+                  <div>
+                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
+                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>How We Can Help</p>
+                    {ACTION_BAND_LABELS.map((label, i) => (
+                      <div key={i} className="mb-4">
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                        <CmsTextarea rows={4} value={activeSection.howWeCanHelp[i] ?? ''}
+                          onChange={v => updateField(activeSlug, 'howWeCanHelp', i, v)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="px-5 py-4 flex items-center gap-4"
+                style={{ borderTop: '1px solid rgba(13,20,16,0.06)', backgroundColor: '#fafafa' }}>
+                <button
+                  onClick={handleSave} disabled={saving}
+                  className="text-xs font-mono px-4 py-2 transition-colors disabled:opacity-40"
+                  style={{ border: '1px solid rgba(62,207,110,0.4)', color: '#22a855' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(62,207,110,0.07)'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  {saving ? 'Saving…' : 'Save template'}
+                </button>
+                {savedMsg && (
+                  <span className="text-xs font-mono" style={{ color: '#22a855' }}>Saved ✓</span>
+                )}
+                <span className="text-xs font-mono ml-auto" style={{ color: 'rgba(13,20,16,0.3)' }}>
+                  Applies to all future PDF exports
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Per-respondent Report Override Editor ──────────────────────────────────
+
+type OverrideSection = { insight: string; action: string; howWeCanHelp: string }
+type OverrideState = Record<string, OverrideSection>
+
+function ReportOverridePanel({
+  respondentName,
+  password,
+  completedSlugs,
+}: {
+  respondentName: string
+  password: string
+  completedSlugs: string[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [overrides, setOverrides] = useState<OverrideState>({})
+  const [loaded, setLoaded] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [savedMsg, setSavedMsg] = useState(false)
+
+  async function fetchOverride() {
+    setLoading(true)
+    try {
+      const res = await fetch(
+        `/api/admin/report-cms?type=respondent&name=${encodeURIComponent(respondentName)}`,
+        { headers: { Authorization: `Bearer ${password}` } }
+      )
+      if (res.ok) {
+        const data = await res.json()
+        const init: OverrideState = {}
+        for (const slug of completedSlugs) {
+          init[slug] = {
+            insight: data.override?.sections?.[slug]?.insight ?? '',
+            action: data.override?.sections?.[slug]?.action ?? '',
+            howWeCanHelp: data.override?.sections?.[slug]?.howWeCanHelp ?? '',
+          }
+        }
+        setOverrides(init)
+        setLoaded(true)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleToggle() {
+    if (!open && !loaded) fetchOverride()
+    setOpen(o => !o)
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    setSavedMsg(false)
+    try {
+      const sections: Record<string, Record<string, string>> = {}
+      for (const [slug, vals] of Object.entries(overrides)) {
+        const sec: Record<string, string> = {}
+        if (vals.insight.trim()) sec.insight = vals.insight
+        if (vals.action.trim()) sec.action = vals.action
+        if (vals.howWeCanHelp.trim()) sec.howWeCanHelp = vals.howWeCanHelp
+        if (Object.keys(sec).length > 0) sections[slug] = sec
+      }
+      await fetch('/api/admin/report-cms', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ type: 'respondent', name: respondentName, content: { sections } }),
+      })
+      setSavedMsg(true)
+      setTimeout(() => setSavedMsg(false), 3000)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function updateField(slug: string, field: keyof OverrideSection, value: string) {
+    setOverrides(prev => ({
+      ...prev,
+      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: '' }), [field]: value },
+    }))
+  }
+
+  const sectionsToShow = SECTION_SLUGS_ORDERED.filter(s => completedSlugs.includes(s))
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+      <button
+        onClick={handleToggle}
+        className="w-full text-left px-5 py-3 flex items-center gap-3 transition-colors"
+        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(13,20,16,0.02)'}
+        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <span className="w-1.5 h-1.5 rounded-full shrink-0"
+          style={{ backgroundColor: 'rgba(168,85,247,0.6)' }} />
+        <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.55)' }}>REPORT OVERRIDES</span>
+        <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+          — custom content for this participant&apos;s report
+        </span>
+        <span className="text-xs font-mono ml-auto shrink-0" style={{ color: 'rgba(13,20,16,0.35)' }}>
+          {open ? '▲' : '▼'}
+        </span>
+      </button>
+
+      {open && (
+        <div className="px-5 py-4 flex flex-col gap-5" style={{ backgroundColor: '#fafafa' }}>
+          {loading ? (
+            <p className="text-xs font-mono animate-pulse" style={{ color: 'rgba(13,20,16,0.4)' }}>
+              Loading overrides…
+            </p>
+          ) : (
+            <>
+              <p className="text-xs" style={{ color: 'rgba(13,20,16,0.45)' }}>
+                Override specific report content for this participant only.
+                Leave any field blank to use the global template content.
+              </p>
+
+              {sectionsToShow.map(slug => (
+                <div key={slug}>
+                  <p className="text-xs font-mono font-bold uppercase tracking-wider mb-3"
+                    style={{ color: SECTION_COLORS[slug] ?? '#888' }}>
+                    {SECTION_SHORT_NAMES[slug] ?? slug}
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {(
+                      [
+                        { key: 'insight' as const, label: 'Insight', rows: 3 },
+                        { key: 'action' as const, label: 'Recommended Action', rows: 2 },
+                        { key: 'howWeCanHelp' as const, label: 'How We Can Help', rows: 4 },
+                      ]
+                    ).map(({ key, label, rows }) => (
+                      <div key={key}>
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                        <CmsTextarea
+                          rows={rows}
+                          value={overrides[slug]?.[key] ?? ''}
+                          onChange={v => updateField(slug, key, v)}
+                          placeholder="Leave blank to use template content"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  onClick={handleSave} disabled={saving}
+                  className="self-start text-xs font-mono px-4 py-2 transition-colors disabled:opacity-40"
+                  style={{ border: '1px solid rgba(62,207,110,0.35)', color: '#22a855' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(62,207,110,0.07)'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  {saving ? 'Saving…' : 'Save overrides'}
+                </button>
+                {savedMsg && (
+                  <span className="text-xs font-mono" style={{ color: '#22a855' }}>Saved ✓</span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RespondentCard({
   group,
   password,
@@ -783,6 +1247,13 @@ function RespondentCard({
 
       {/* Referrals panel */}
       <ReferralsPanel referrals={referrals} />
+
+      {/* Per-respondent report overrides */}
+      <ReportOverridePanel
+        respondentName={group.name}
+        password={password}
+        completedSlugs={[...new Set(group.sections.map(s => s.sectionSlug))]}
+      />
     </div>
   )
 }
@@ -988,6 +1459,9 @@ export default function AdminPage() {
             />
           </div>
         )}
+
+        {/* Global report templates */}
+        <GlobalTemplatePanel password={password} />
 
         {/* Section tabs + export */}
         <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
