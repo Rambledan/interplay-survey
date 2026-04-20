@@ -7,6 +7,198 @@ import type { FinancialModel, SectionOpportunity } from '@/lib/financial'
 import { formatCurrency, SLUG_TO_SECTION_KEY } from '@/lib/financial'
 import type { QuestionResponse, SectionResponses } from '@/app/api/results/[token]/route'
 
+// ── Editable introduction content ─────────────────────────────────────────────
+// Edit the text here — it appears at the top of every report page and on the PDF.
+
+const INTRO = {
+  headline: 'Are you ready to Interplay for growth?',
+  welcome: [
+    'Welcome back to Interplay. We hope that you find your results useful and that it inspires your organisation to take action – and unlock value from sustainability.',
+    'This ground-breaking industry first study is based on the premise that: When sustainability + business + brand interplay > growth accelerates. There is huge value potential in sustainability, but it\'s mostly sitting in a compliance silo – disconnected from the commercials. This report aims to demonstrate the sustainability value potential of your organisation through interplay.',
+  ],
+  reportSections: [
+    {
+      title: 'Interplay score',
+      desc: 'This will indicate your organisation\'s current growth potential – through interplay. The higher the score, the higher the potential.',
+    },
+    {
+      title: 'Value opportunity',
+      desc: 'Based on your current revenue, you will see conservative, moderate and optimistic predictions of the potential value your organisation could unlock through greater interplay.',
+    },
+    {
+      title: 'Recommendations',
+      desc: 'Our diagnostic tool will uncover the gaps and opportunity between your sustainability, business and brand – and where their interplay can unlock triple value.',
+    },
+    {
+      title: 'How we can help',
+      desc: 'You are not obliged to use our services, but we will outline how we could potentially help your organisation to grow through interplay.',
+    },
+  ],
+  pillarsIntro: 'The interview questions have been structured around 5 pillars, to enable you to see exactly where your strengths and weaknesses lie. Pillar one measures appetite for growth. Pillars 2–5 indicate your current ability to grow through interplay.',
+  pillars: [
+    {
+      num: '1', name: 'Appetite', color: '#f4821f',
+      desc: 'Gauges your organisation\'s sentiment around sustainability, as a cost centre or a growth driver. This is important because growth needs to be led from the top.',
+    },
+    {
+      num: '2', name: 'Scale and AI', color: '#4a9ff5',
+      desc: 'Measures your current ability to grow with AI as the accelerator. Your capability in leveraging sustainability for growth relies in part on your digital innovation capability.',
+    },
+    {
+      num: '3', name: 'Sustainability', color: '#3ecf6e',
+      desc: 'Measures the connectivity between sustainability activity and your business and brand.',
+    },
+    {
+      num: '4', name: 'Brand', color: '#a855f7',
+      desc: 'Measures the connectivity between brand (through campaigns, products and services etc) and your sustainability function.',
+    },
+    {
+      num: '5', name: 'Business', color: '#eab308',
+      desc: 'Measures how central sustainability is to the business strategy, decisions and capital allocation.',
+    },
+  ],
+  bands: [
+    {
+      label: 'Early Stage', range: '0–39%',
+      desc: 'Sustainability is a low priority and disconnected from the business, leading to poor potential for growth.',
+    },
+    {
+      label: 'Developing', range: '40–59%',
+      desc: 'Sustainability is important but has limited connectivity across the organisation, limiting growth.',
+    },
+    {
+      label: 'Maturing', range: '60–79%',
+      desc: 'Sustainability strategy is mature and you are starting to integrate it with other business functions. However it needs more encouragement to unlock growth and get you into a leadership position.',
+    },
+    {
+      label: 'Leading', range: '80–100%',
+      desc: 'Sustainability is well integrated across the business. There is ongoing potential to unlock greater value – to stay ahead of the competition.',
+    },
+  ],
+}
+
+// ── Introduction Section Component ────────────────────────────────────────────
+
+function IntroductionSection() {
+  return (
+    <section style={{ backgroundColor: '#2f2a2a', color: '#fff' }} className="px-6 py-16">
+      <div className="max-w-3xl mx-auto">
+
+        {/* Eyebrow */}
+        <p className="text-xs font-mono uppercase tracking-[0.25em] mb-5"
+          style={{ color: 'rgba(250,240,0,0.7)', fontFamily: 'Open Sans, sans-serif' }}>
+          Interplay Method — Diagnostic Report
+        </p>
+
+        {/* Headline */}
+        <h1 className="uppercase leading-none mb-8"
+          style={{ fontFamily: 'Robson, sans-serif', fontSize: 'clamp(36px, 5vw, 64px)', color: '#faf000', lineHeight: 0.9 }}>
+          {INTRO.headline}
+        </h1>
+
+        {/* Welcome paragraphs */}
+        <div className="mb-10 space-y-4 max-w-2xl">
+          {INTRO.welcome.map((p, i) => (
+            <p key={i} className="text-base leading-relaxed"
+              style={{ color: i === 1 ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
+              {i === 1 ? (
+                <>
+                  This ground-breaking industry first study is based on the premise that:{' '}
+                  <strong style={{ color: '#faf000' }}>
+                    When sustainability + business + brand interplay &gt; growth accelerates.
+                  </strong>{' '}
+                  There is huge value potential in sustainability, but it&apos;s mostly sitting in a compliance silo – disconnected from the commercials. This report aims to demonstrate the sustainability value potential of your organisation through interplay.
+                </>
+              ) : p}
+            </p>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', backgroundColor: 'rgba(250,240,0,0.2)', marginBottom: '2.5rem' }} />
+
+        {/* In this report */}
+        <div className="mb-10">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] mb-5"
+            style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
+            In this report you will find
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {INTRO.reportSections.map(item => (
+              <div key={item.title} style={{ borderLeft: '2px solid rgba(250,240,0,0.5)', paddingLeft: '1rem' }}>
+                <p className="font-bold text-sm uppercase mb-1.5"
+                  style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
+                  {item.title}
+                </p>
+                <p className="text-sm leading-relaxed"
+                  style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', marginBottom: '2.5rem' }} />
+
+        {/* 5 Pillars */}
+        <div className="mb-10">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] mb-3"
+            style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
+            The 5 pillars of our scorecard
+          </p>
+          <p className="text-sm leading-relaxed mb-5"
+            style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+            {INTRO.pillarsIntro}
+          </p>
+          <div className="space-y-3">
+            {INTRO.pillars.map(p => (
+              <div key={p.num} className="flex gap-3 items-start">
+                <span style={{ color: p.color, fontFamily: 'Robson, sans-serif', fontSize: '1.25rem', lineHeight: 1, minWidth: '1.75rem', paddingTop: '2px' }}>
+                  {p.num}.
+                </span>
+                <p className="text-sm leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  <strong style={{ color: p.color }}>{p.name} </strong>
+                  <span style={{ color: 'rgba(255,255,255,0.65)' }}>{p.desc}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', marginBottom: '2.5rem' }} />
+
+        {/* Rating explanation */}
+        <div>
+          <p className="text-xs font-mono uppercase tracking-[0.2em] mb-5"
+            style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
+            Rating explanation
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {INTRO.bands.map(b => (
+              <div key={b.label}
+                style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: '1rem' }}>
+                <div className="flex items-baseline gap-2 mb-1.5">
+                  <span className="text-sm font-bold uppercase" style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
+                    {b.label}
+                  </span>
+                  <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.35)' }}>{b.range}</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Open Sans, sans-serif' }}>
+                  {b.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface ResultsData {
@@ -718,6 +910,9 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
 
       <main className="flex-1">
 
+        {/* ── Introduction ─────────────────────────────────────────────────── */}
+        <IntroductionSection />
+
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section style={cardStyle} className="px-6 py-12">
           <div className="max-w-3xl mx-auto">
@@ -785,8 +980,11 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
                 <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.4)' }}>
                   Your Interplay Map
                 </p>
-                <p className="text-sm max-w-md" style={{ color: 'rgba(47,42,42,0.6)' }}>
-                  Each axis represents one dimension of the Interplay. The further your score reaches toward the edge, the more integrated and mature that dimension.
+                <p className="text-sm max-w-md mb-2" style={{ color: 'rgba(47,42,42,0.7)', fontFamily: 'Open Sans, sans-serif', lineHeight: 1.6 }}>
+                  Each of the five axes represents one pillar of the Interplay Method. The further your score extends toward the outer edge, the greater your organisation&apos;s integration and growth potential in that dimension.
+                </p>
+                <p className="text-sm max-w-md" style={{ color: 'rgba(47,42,42,0.5)', fontFamily: 'Open Sans, sans-serif', lineHeight: 1.6 }}>
+                  A compact, centre-weighted shape indicates siloed sustainability. A wide, balanced shape indicates strong interplay — and accelerating growth potential.
                 </p>
               </div>
               <div className="flex items-center gap-6 text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.4)' }}>

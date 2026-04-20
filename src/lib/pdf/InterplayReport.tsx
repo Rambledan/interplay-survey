@@ -320,6 +320,135 @@ function CoverPage({ data }: { data: ReportData }) {
   )
 }
 
+// ── Introduction Page ─────────────────────────────────────────────────────
+
+const PDF_INTRO = {
+  headline: 'Are you ready to Interplay for growth?',
+  welcome: 'Welcome back to Interplay. We hope that you find your results useful and that it inspires your organisation to take action – and unlock value from sustainability.',
+  premise: 'This ground-breaking industry first study is based on the premise that: When sustainability + business + brand interplay > growth accelerates. There is huge value potential in sustainability, but it\'s mostly sitting in a compliance silo – disconnected from the commercials. This report aims to demonstrate the sustainability value potential of your organisation through interplay.',
+  reportItems: [
+    { title: 'Interplay score', desc: 'Your organisation\'s current growth potential through interplay. The higher the score, the higher the potential.' },
+    { title: 'Value opportunity', desc: 'Conservative, moderate and optimistic predictions of the value your organisation could unlock through greater interplay.' },
+    { title: 'Recommendations', desc: 'Where interplay can unlock triple value across your sustainability, business and brand.' },
+    { title: 'How we can help', desc: 'How we could help your organisation grow through interplay.' },
+  ],
+  pillars: [
+    { num: '1', name: 'Appetite', desc: 'Gauges your organisation\'s sentiment around sustainability as a cost centre or a growth driver.' },
+    { num: '2', name: 'Scale and AI', desc: 'Measures your current ability to grow with AI as the accelerator.' },
+    { num: '3', name: 'Sustainability', desc: 'Measures the connectivity between sustainability activity and your business and brand.' },
+    { num: '4', name: 'Brand', desc: 'Measures the connectivity between brand and your sustainability function.' },
+    { num: '5', name: 'Business', desc: 'Measures how central sustainability is to the business strategy and capital allocation.' },
+  ],
+  bands: [
+    { label: 'Early Stage', range: '0–39%', desc: 'Sustainability is a low priority and disconnected from the business.' },
+    { label: 'Developing', range: '40–59%', desc: 'Sustainability is important but has limited connectivity across the organisation.' },
+    { label: 'Maturing', range: '60–79%', desc: 'Sustainability strategy is mature but needs more encouragement to unlock growth.' },
+    { label: 'Leading', range: '80–100%', desc: 'Sustainability is well integrated. Ongoing potential to unlock greater value and stay ahead.' },
+  ],
+}
+
+const PILLAR_COLORS = ['#f4821f', '#4a9ff5', '#3ecf6e', '#a855f7', '#eab308']
+
+function IntroductionPage({ data }: { data: ReportData }) {
+  return (
+    <Page size="A4" style={[s.page, { backgroundColor: '#2f2a2a' }]}>
+      <PageFooter company={data.respondent.company} />
+
+      {/* Yellow top bar */}
+      <View style={{ height: 3, backgroundColor: C.yellow, marginBottom: 20, marginHorizontal: -48, marginTop: -48 }} />
+
+      {/* Eyebrow */}
+      <Text style={{ fontSize: 7, letterSpacing: 2, color: 'rgba(250,240,0,0.6)', marginBottom: 10 }}>
+        INTERPLAY METHOD — DIAGNOSTIC REPORT
+      </Text>
+
+      {/* Headline */}
+      <Text style={{ fontSize: 22, fontWeight: 700, color: C.yellow, marginBottom: 10, lineHeight: 1.1 }}>
+        {sanitize(PDF_INTRO.headline)}
+      </Text>
+
+      {/* Welcome */}
+      <Text style={{ fontSize: 8.5, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, marginBottom: 6 }}>
+        {sanitize(PDF_INTRO.welcome)}
+      </Text>
+      <Text style={{ fontSize: 8.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: 14 }}>
+        {sanitize(PDF_INTRO.premise)}
+      </Text>
+
+      {/* Divider */}
+      <View style={{ borderBottomWidth: 0.5, borderBottomColor: 'rgba(250,240,0,0.25)', marginBottom: 12 }} />
+
+      {/* In this report — 2 columns */}
+      <Text style={{ fontSize: 7, letterSpacing: 1.5, color: C.yellow, marginBottom: 8 }}>
+        IN THIS REPORT YOU WILL FIND
+      </Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+        {PDF_INTRO.reportItems.map((item, i) => (
+          <View key={i} style={{ width: '47%', borderLeftWidth: 1.5, borderLeftColor: 'rgba(250,240,0,0.4)', paddingLeft: 6 }}>
+            <Text style={{ fontSize: 7.5, fontWeight: 700, color: C.yellow, marginBottom: 2 }}>
+              {sanitize(item.title.toUpperCase())}
+            </Text>
+            <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
+              {sanitize(item.desc)}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Divider */}
+      <View style={{ borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.08)', marginBottom: 12 }} />
+
+      {/* 5 Pillars */}
+      <Text style={{ fontSize: 7, letterSpacing: 1.5, color: C.yellow, marginBottom: 8 }}>
+        THE 5 PILLARS OF OUR SCORECARD
+      </Text>
+      {PDF_INTRO.pillars.map((p, i) => (
+        <View key={i} style={{ flexDirection: 'row', gap: 6, marginBottom: 5 }}>
+          <Text style={{ fontSize: 9, fontWeight: 700, color: PILLAR_COLORS[i], width: 12 }}>
+            {p.num}.
+          </Text>
+          <Text style={{ fontSize: 8, flex: 1, lineHeight: 1.5 }}>
+            <Text style={{ fontWeight: 700, color: PILLAR_COLORS[i] }}>{sanitize(p.name)}  </Text>
+            <Text style={{ color: 'rgba(255,255,255,0.65)' }}>{sanitize(p.desc)}</Text>
+          </Text>
+        </View>
+      ))}
+
+      {/* Divider */}
+      <View style={{ borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.08)', marginBottom: 12, marginTop: 8 }} />
+
+      {/* Rating explanation — 2 columns */}
+      <Text style={{ fontSize: 7, letterSpacing: 1.5, color: C.yellow, marginBottom: 8 }}>
+        RATING EXPLANATION
+      </Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+        {PDF_INTRO.bands.map((b, i) => (
+          <View key={i} style={{
+            width: '47%',
+            backgroundColor: 'rgba(255,255,255,0.04)',
+            borderWidth: 0.5,
+            borderColor: 'rgba(255,255,255,0.1)',
+            padding: 6,
+          }}>
+            <View style={{ flexDirection: 'row', gap: 4, alignItems: 'baseline', marginBottom: 3 }}>
+              <Text style={{ fontSize: 7.5, fontWeight: 700, color: C.yellow }}>
+                {sanitize(b.label.toUpperCase())}
+              </Text>
+              <Text style={{ fontSize: 7, color: 'rgba(255,255,255,0.35)' }}>{b.range}</Text>
+            </View>
+            <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
+              {sanitize(b.desc)}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Bottom bar */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: C.green }} />
+    </Page>
+  )
+}
+
 // ── Summary Page ───────────────────────────────────────────────────────────
 
 function SummaryPage({ data }: { data: ReportData }) {
@@ -622,6 +751,7 @@ export function InterplayReport({ data }: { data: ReportData }) {
       subject="Interplay Method Diagnostic Report"
     >
       <CoverPage data={data} />
+      <IntroductionPage data={data} />
       <SummaryPage data={data} />
       {data.scores.sections.map(section => (
         <SectionPage key={section.slug} section={section} data={data} />
