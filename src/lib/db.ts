@@ -403,6 +403,7 @@ export async function revokeRespondentToken(token: string): Promise<boolean> {
 
 // ── Report CMS ────────────────────────────────────────────────────────────────
 
+import { getDefaultTemplate, mergeWithDefaults } from './report-defaults'
 import type { ReportTemplateContent, ReportOverrideContent } from './report-defaults'
 export type { ReportTemplateContent, ReportOverrideContent }
 
@@ -458,14 +459,17 @@ export async function saveRespondentOverride(
   })
 }
 
-/** Convenience: load both global template and respondent override in parallel */
+/** Convenience: load both global template and respondent override in parallel.
+ *  The globalTemplate is merged with hard-coded defaults so callers always get
+ *  a fully-populated template even if nothing (or only partial data) is saved. */
 export async function getReportContentOverrides(respondentName: string): Promise<{
   globalTemplate: ReportTemplateContent
   respondentOverride: ReportOverrideContent | null
 }> {
-  const [globalTemplate, respondentOverride] = await Promise.all([
+  const [savedTemplate, respondentOverride] = await Promise.all([
     getGlobalTemplate(),
     getRespondentOverride(respondentName),
   ])
+  const globalTemplate = mergeWithDefaults(getDefaultTemplate(), savedTemplate)
   return { globalTemplate, respondentOverride }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRespondentToken, getAllResponses } from '@/lib/db'
+import { getRespondentToken, getAllResponses, getReportContentOverrides } from '@/lib/db'
 import { computeAllSectionScores, computeBenchmark } from '@/lib/score'
 import {
   calculateFinancialOpportunity,
@@ -139,6 +139,15 @@ export async function GET(
       }),
   })).filter(s => s.questions.length > 0)
 
+  // Load CMS overrides — silently ignore errors so a DB issue never blocks the report
+  let contentOverrides
+  try {
+    contentOverrides = await getReportContentOverrides(respondentName)
+  } catch (err) {
+    console.warn('[Results] Could not load CMS overrides, using defaults:', err)
+    contentOverrides = undefined
+  }
+
   return NextResponse.json({
     respondent: {
       name: latestRow.respondent_name,
@@ -153,5 +162,6 @@ export async function GET(
     benchmarkN: othersByName.size,
     financial,
     sectionResponses,
+    contentOverrides,
   })
 }

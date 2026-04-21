@@ -111,12 +111,26 @@ export function computeBenchmark(
 
 // ── Section metadata for the results page ────────────────────────────────────
 
+// ── How We Can Help structured types ─────────────────────────────────────────
+
+export interface HowWeCanHelpItem {
+  title: string
+  content: string
+}
+
+export interface HowWeCanHelpBand {
+  intro?: string
+  items?: HowWeCanHelpItem[]
+}
+
+// ── Section metadata ──────────────────────────────────────────────────────────
+
 export const SECTION_META: Record<string, {
   shortName: string
   color: string
-  insights: [string, string, string, string]    // [0-39, 40-59, 60-79, 80-100]
-  actions: [string, string, string]             // [0-39, 40-59, 60-100]
-  howWeCanHelp: [string, string, string]        // [0-39, 40-59, 60-100]
+  insights: [string, string, string, string]        // [0-39, 40-59, 60-79, 80-100]
+  actions: [string, string, string]                 // [0-39, 40-59, 60+]
+  howWeCanHelp: [HowWeCanHelpBand, HowWeCanHelpBand, HowWeCanHelpBand]  // [0-39, 40-59, 60+]
 }> = {
   'appetite': {
     shortName: 'APPETITE',
@@ -133,9 +147,27 @@ export const SECTION_META: Record<string, {
       'Connect sustainability to the commercials. Build a clear ROI story to accelerate internal buy-in.',
     ],
     howWeCanHelp: [
-      'Interplay workshop – to connect sustainability to business and brand commercials. It will deliver: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.\n\nInterplay fast track – a 2-hour quick-fire workshop to deliver fast top-line recommendations.\n\nROI story – build the business/brand case.',
-      'Interplay workshop – to connect sustainability to business and brand commercials. It will deliver: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.\n\nInterplay fast track – a 2-hour quick-fire workshop to deliver fast top-line recommendations.\n\nROI story – build the business/brand case.',
-      'Interplay workshop – to connect sustainability to business and brand commercials. It will deliver: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.\n\nInterplay fast track – a 2-hour quick-fire workshop to deliver fast top-line recommendations.\n\nROI story – build the business/brand case.',
+      {
+        items: [
+          { title: 'Interplay workshop', content: 'Connect sustainability to business and brand commercials. Delivers: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.' },
+          { title: 'Interplay fast track', content: 'A 2-hour quick-fire workshop to deliver fast top-line recommendations.' },
+          { title: 'ROI story', content: 'Build the business/brand case.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Interplay workshop', content: 'Connect sustainability to business and brand commercials. Delivers: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.' },
+          { title: 'Interplay fast track', content: 'A 2-hour quick-fire workshop to deliver fast top-line recommendations.' },
+          { title: 'ROI story', content: 'Build the business/brand case.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Interplay workshop', content: 'Connect sustainability to business and brand commercials. Delivers: a unified commercial story across teams, integrated commercial sustainability priorities, and identified revenue & efficiency opportunities along the value chain & customer/consumer journeys.' },
+          { title: 'Interplay fast track', content: 'A 2-hour quick-fire workshop to deliver fast top-line recommendations.' },
+          { title: 'ROI story', content: 'Build the business/brand case.' },
+        ],
+      },
     ],
   },
   'scale-and-delivery': {
@@ -153,9 +185,24 @@ export const SECTION_META: Record<string, {
       'Build dedicated workflows that connect AI to both impact measurement and commercial sustainability strategy, storytelling and activation.',
     ],
     howWeCanHelp: [
-      'AI Audit – assess effectiveness, identify gaps and opportunity for value and growth.\n\nAI product and services recommendations – that will unlock revenue streams and scale impact, eg to make recommerce economically viable.',
-      'AI Audit – assess effectiveness, identify gaps and opportunity for value and growth.\n\nAI product and services recommendations – that will unlock revenue streams and scale impact, eg to make recommerce economically viable.',
-      'AI Audit – assess effectiveness, identify gaps and opportunity for value and growth.\n\nAI product and services recommendations – that will unlock revenue streams and scale impact, eg to make recommerce economically viable.',
+      {
+        items: [
+          { title: 'AI Audit', content: 'Assess effectiveness, identify gaps and opportunity for value and growth.' },
+          { title: 'AI product and services recommendations', content: 'Unlock revenue streams and scale impact, e.g. to make recommerce economically viable.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'AI Audit', content: 'Assess effectiveness, identify gaps and opportunity for value and growth.' },
+          { title: 'AI product and services recommendations', content: 'Unlock revenue streams and scale impact, e.g. to make recommerce economically viable.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'AI Audit', content: 'Assess effectiveness, identify gaps and opportunity for value and growth.' },
+          { title: 'AI product and services recommendations', content: 'Unlock revenue streams and scale impact, e.g. to make recommerce economically viable.' },
+        ],
+      },
     ],
   },
   'capability-sustainability': {
@@ -173,9 +220,24 @@ export const SECTION_META: Record<string, {
       'Connect sustainability with cross-team accountability and action – by increasing internal storytelling, activation, and target visibility to deepen its reach.',
     ],
     howWeCanHelp: [
-      'Employee engagement – develop an internal campaign to embed and activate your sustainability strategy.\n\nRecommend team KPIs – create responsibility across all team functions to integrate sustainability into their day-to-day roles.',
-      'Employee engagement – develop an internal campaign to embed and activate your sustainability strategy.\n\nRecommend team KPIs – create responsibility across all team functions to integrate sustainability into their day-to-day roles.',
-      'Employee engagement – develop an internal campaign to embed and activate your sustainability strategy.\n\nRecommend team KPIs – create responsibility across all team functions to integrate sustainability into their day-to-day roles.',
+      {
+        items: [
+          { title: 'Employee engagement', content: 'Develop an internal campaign to embed and activate your sustainability strategy.' },
+          { title: 'Team KPIs', content: 'Create responsibility across all team functions to integrate sustainability into their day-to-day roles.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Employee engagement', content: 'Develop an internal campaign to embed and activate your sustainability strategy.' },
+          { title: 'Team KPIs', content: 'Create responsibility across all team functions to integrate sustainability into their day-to-day roles.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Employee engagement', content: 'Develop an internal campaign to embed and activate your sustainability strategy.' },
+          { title: 'Team KPIs', content: 'Create responsibility across all team functions to integrate sustainability into their day-to-day roles.' },
+        ],
+      },
     ],
   },
   'capability-brand': {
@@ -193,9 +255,30 @@ export const SECTION_META: Record<string, {
       'Connect sustainability to consumers to address the intention-action gap.',
     ],
     howWeCanHelp: [
-      'Clear brand-aligned consumer-facing sustainability story – connect and simplify your sustainability strategy for consumers.\n\nConsumer messaging framework – develop a framework aligned with brand purpose and consumer TOV.\n\nConsumer AI-enhanced products and services – to engage and drive action (existing and new).\n\nToolkit – activate across all your regions with sustainability understanding all in one place.',
-      'Clear brand-aligned consumer-facing sustainability story – connect and simplify your sustainability strategy for consumers.\n\nConsumer messaging framework – develop a framework aligned with brand purpose and consumer TOV.\n\nConsumer AI-enhanced products and services – to engage and drive action (existing and new).\n\nToolkit – activate across all your regions with sustainability understanding all in one place.',
-      'Clear brand-aligned consumer-facing sustainability story – connect and simplify your sustainability strategy for consumers.\n\nConsumer messaging framework – develop a framework aligned with brand purpose and consumer TOV.\n\nConsumer AI-enhanced products and services – to engage and drive action (existing and new).\n\nToolkit – activate across all your regions with sustainability understanding all in one place.',
+      {
+        items: [
+          { title: 'Consumer sustainability story', content: 'Connect and simplify your sustainability strategy for consumers with a clear brand-aligned narrative.' },
+          { title: 'Consumer messaging framework', content: 'Develop a framework aligned with brand purpose and consumer tone of voice.' },
+          { title: 'AI-enhanced products and services', content: 'Engage consumers and drive action with existing and new AI-powered offerings.' },
+          { title: 'Toolkit', content: 'Activate across all your regions with sustainability understanding all in one place.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Consumer sustainability story', content: 'Connect and simplify your sustainability strategy for consumers with a clear brand-aligned narrative.' },
+          { title: 'Consumer messaging framework', content: 'Develop a framework aligned with brand purpose and consumer tone of voice.' },
+          { title: 'AI-enhanced products and services', content: 'Engage consumers and drive action with existing and new AI-powered offerings.' },
+          { title: 'Toolkit', content: 'Activate across all your regions with sustainability understanding all in one place.' },
+        ],
+      },
+      {
+        items: [
+          { title: 'Consumer sustainability story', content: 'Connect and simplify your sustainability strategy for consumers with a clear brand-aligned narrative.' },
+          { title: 'Consumer messaging framework', content: 'Develop a framework aligned with brand purpose and consumer tone of voice.' },
+          { title: 'AI-enhanced products and services', content: 'Engage consumers and drive action with existing and new AI-powered offerings.' },
+          { title: 'Toolkit', content: 'Activate across all your regions with sustainability understanding all in one place.' },
+        ],
+      },
     ],
   },
   'capability-business': {
@@ -213,9 +296,24 @@ export const SECTION_META: Record<string, {
       'Connect and integrate sustainability into financial planning, capital allocation, and decision-making frameworks.',
     ],
     howWeCanHelp: [
-      '£ESG (product) – convert reporting and compliance (Double Materiality) into commercial value.\n\nExecutive story – develop and convert your sustainability strategy and initiatives into commercial language.',
-      '£ESG (product) – convert reporting and compliance (Double Materiality) into commercial value.\n\nExecutive story – develop and convert your sustainability strategy and initiatives into commercial language.',
-      '£ESG (product) – convert reporting and compliance (Double Materiality) into commercial value.\n\nExecutive story – develop and convert your sustainability strategy and initiatives into commercial language.',
+      {
+        items: [
+          { title: '£ESG', content: 'Convert reporting and compliance (Double Materiality) into commercial value.' },
+          { title: 'Executive story', content: 'Develop and convert your sustainability strategy and initiatives into commercial language.' },
+        ],
+      },
+      {
+        items: [
+          { title: '£ESG', content: 'Convert reporting and compliance (Double Materiality) into commercial value.' },
+          { title: 'Executive story', content: 'Develop and convert your sustainability strategy and initiatives into commercial language.' },
+        ],
+      },
+      {
+        items: [
+          { title: '£ESG', content: 'Convert reporting and compliance (Double Materiality) into commercial value.' },
+          { title: 'Executive story', content: 'Develop and convert your sustainability strategy and initiatives into commercial language.' },
+        ],
+      },
     ],
   },
 }

@@ -570,10 +570,12 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
     || meta?.actions[actionIdx]
     || ''
 
-  const howWeCanHelpText = respSec?.howWeCanHelp
+  const howWeCanHelpBand = (
+    respSec?.howWeCanHelp
     || globalSec?.howWeCanHelp?.[actionIdx]
     || meta?.howWeCanHelp[actionIdx]
-    || ''
+    || null
+  )
 
   // Questions for this section
   const secResponses = sectionResponses.find(s => s.slug === section.slug)
@@ -633,11 +635,21 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
       )}
 
       {/* How we can help */}
-      {howWeCanHelpText && (
+      {howWeCanHelpBand && (howWeCanHelpBand.intro?.trim() || (howWeCanHelpBand.items && howWeCanHelpBand.items.length > 0)) && (
         <View style={{ marginBottom: 12 }}>
           <Text style={[s.label, { marginBottom: 6 }]}>HOW WE CAN HELP</Text>
-          {howWeCanHelpText.split('\n\n').map((para, i) => (
-            <Text key={i} style={[s.body, { marginBottom: 4 }]}>{sanitize(para)}</Text>
+          {howWeCanHelpBand.intro?.trim() ? (
+            <Text style={[s.body, { marginBottom: 6 }]}>{sanitize(howWeCanHelpBand.intro)}</Text>
+          ) : null}
+          {howWeCanHelpBand.items?.map((item, i) => (
+            <View key={i} style={{ marginBottom: 6, paddingLeft: 8, borderLeftWidth: 1.5, borderLeftColor: color, borderLeftStyle: 'solid' }}>
+              {item.title ? (
+                <Text style={[s.body, { fontWeight: 700, marginBottom: 2 }]}>{sanitize(item.title)}</Text>
+              ) : null}
+              {item.content ? (
+                <Text style={s.body}>{sanitize(item.content)}</Text>
+              ) : null}
+            </View>
           ))}
         </View>
       )}

@@ -603,15 +603,94 @@ function ReferralsPanel({ referrals }: { referrals: ReferralRow[] }) {
 
 // ── Global Report Template Editor ─────────────────────────────────────────
 
+type HwchItem = { title: string; content: string }
+type HwchBand = { intro?: string; items?: HwchItem[] }
+
 type TemplateSectionContent = {
   insights: string[]
   actions: string[]
-  howWeCanHelp: string[]
+  howWeCanHelp: HwchBand[]  // 3 entries, one per action band
 }
 
 type TemplateContent = {
   sections: Record<string, TemplateSectionContent>
   evidence: string[]
+}
+
+// ── How We Can Help band editor ────────────────────────────────────────────
+
+function HwchBandEditor({
+  band,
+  onChange,
+}: {
+  band: HwchBand
+  onChange: (updated: HwchBand) => void
+}) {
+  const items = band.items ?? []
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '5px 8px', fontSize: '0.78rem',
+    backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.15)',
+    color: '#0d1410', fontFamily: 'inherit', outline: 'none',
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Intro */}
+      <div>
+        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+          style={{ color: 'rgba(13,20,16,0.35)' }}>Introduction (optional)</p>
+        <CmsTextarea rows={2} value={band.intro ?? ''}
+          placeholder="Optional intro paragraph shown above the items…"
+          onChange={v => onChange({ ...band, intro: v })} />
+      </div>
+
+      {/* Items */}
+      <div>
+        <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
+          style={{ color: 'rgba(13,20,16,0.35)' }}>
+          Recommendation items ({items.length})
+        </p>
+        <div className="flex flex-col gap-3">
+          {items.map((item, i) => (
+            <div key={i} style={{ border: '1px solid rgba(13,20,16,0.08)', padding: '10px', backgroundColor: '#fafafa' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>#{i + 1}</span>
+                <input
+                  value={item.title}
+                  onChange={e => {
+                    const newItems = items.map((it, idx) => idx === i ? { ...it, title: e.target.value } : it)
+                    onChange({ ...band, items: newItems })
+                  }}
+                  placeholder="Title…"
+                  style={{ ...inputStyle, fontWeight: 600 }}
+                  onFocus={e => e.currentTarget.style.borderColor = 'rgba(62,207,110,0.5)'}
+                  onBlur={e => e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'}
+                />
+                <button
+                  onClick={() => onChange({ ...band, items: items.filter((_, idx) => idx !== i) })}
+                  style={{ fontSize: '0.7rem', color: 'rgba(220,50,50,0.6)', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: '2px 4px' }}
+                  title="Remove item"
+                >✕</button>
+              </div>
+              <CmsTextarea rows={2} value={item.content} placeholder="Content…"
+                onChange={v => {
+                  const newItems = items.map((it, idx) => idx === i ? { ...it, content: v } : it)
+                  onChange({ ...band, items: newItems })
+                }} />
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={() => onChange({ ...band, items: [...items, { title: '', content: '' }] })}
+          className="mt-2 text-[10px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors"
+          style={{ border: '1px dashed rgba(13,20,16,0.2)', color: 'rgba(13,20,16,0.45)', background: 'none', cursor: 'pointer' }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(62,207,110,0.5)'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(13,20,16,0.2)'}
+        >+ Add item</button>
+      </div>
+    </div>
+  )
 }
 
 function CmsTextarea({ value, onChange, rows, placeholder }: {
@@ -681,7 +760,7 @@ function GlobalTemplatePanel({ password }: { password: string }) {
 
   function updateField(
     slug: string,
-    field: 'insights' | 'actions' | 'howWeCanHelp',
+    field: 'insights' | 'actions',
     idx: number,
     value: string
   ) {
@@ -692,6 +771,18 @@ function GlobalTemplatePanel({ password }: { password: string }) {
       return {
         ...prev,
         sections: { ...prev.sections, [slug]: { ...prev.sections[slug], [field]: newArr } },
+      }
+    })
+  }
+
+  function updateHwch(slug: string, bandIdx: number, updated: HwchBand) {
+    setContent(prev => {
+      if (!prev) return prev
+      const newBands = [...(prev.sections[slug]?.howWeCanHelp ?? [])]
+      newBands[bandIdx] = updated
+      return {
+        ...prev,
+        sections: { ...prev.sections, [slug]: { ...prev.sections[slug], howWeCanHelp: newBands } },
       }
     })
   }
@@ -829,11 +920,13 @@ function GlobalTemplatePanel({ password }: { password: string }) {
                     <p className="text-xs font-mono uppercase tracking-wider mb-3"
                       style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>How We Can Help</p>
                     {ACTION_BAND_LABELS.map((label, i) => (
-                      <div key={i} className="mb-4">
-                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
-                        <CmsTextarea rows={4} value={activeSection.howWeCanHelp[i] ?? ''}
-                          onChange={v => updateField(activeSlug, 'howWeCanHelp', i, v)} />
+                      <div key={i} className="mb-5" style={{ borderLeft: '2px solid rgba(13,20,16,0.08)', paddingLeft: '12px' }}>
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
+                          style={{ color: 'rgba(13,20,16,0.4)' }}>{label}</p>
+                        <HwchBandEditor
+                          band={activeSection.howWeCanHelp[i] ?? { items: [] }}
+                          onChange={updated => updateHwch(activeSlug, i, updated)}
+                        />
                       </div>
                     ))}
                   </div>
@@ -869,7 +962,7 @@ function GlobalTemplatePanel({ password }: { password: string }) {
 
 // ── Per-respondent Report Override Editor ──────────────────────────────────
 
-type OverrideSection = { insight: string; action: string; howWeCanHelp: string }
+type OverrideSection = { insight: string; action: string; howWeCanHelp: HwchBand }
 type OverrideState = Record<string, OverrideSection>
 
 function ReportOverridePanel({
@@ -902,7 +995,7 @@ function ReportOverridePanel({
           init[slug] = {
             insight: data.override?.sections?.[slug]?.insight ?? '',
             action: data.override?.sections?.[slug]?.action ?? '',
-            howWeCanHelp: data.override?.sections?.[slug]?.howWeCanHelp ?? '',
+            howWeCanHelp: data.override?.sections?.[slug]?.howWeCanHelp ?? { items: [] },
           }
         }
         setOverrides(init)
@@ -922,12 +1015,14 @@ function ReportOverridePanel({
     setSaving(true)
     setSavedMsg(false)
     try {
-      const sections: Record<string, Record<string, string>> = {}
+      const sections: Record<string, Record<string, unknown>> = {}
       for (const [slug, vals] of Object.entries(overrides)) {
-        const sec: Record<string, string> = {}
+        const sec: Record<string, unknown> = {}
         if (vals.insight.trim()) sec.insight = vals.insight
         if (vals.action.trim()) sec.action = vals.action
-        if (vals.howWeCanHelp.trim()) sec.howWeCanHelp = vals.howWeCanHelp
+        const hwch = vals.howWeCanHelp
+        const hasHwch = hwch.intro?.trim() || hwch.items?.some(it => it.title.trim() || it.content.trim())
+        if (hasHwch) sec.howWeCanHelp = hwch
         if (Object.keys(sec).length > 0) sections[slug] = sec
       }
       await fetch('/api/admin/report-cms', {
@@ -942,10 +1037,17 @@ function ReportOverridePanel({
     }
   }
 
-  function updateField(slug: string, field: keyof OverrideSection, value: string) {
+  function updateField(slug: string, field: 'insight' | 'action', value: string) {
     setOverrides(prev => ({
       ...prev,
-      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: '' }), [field]: value },
+      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: { items: [] } }), [field]: value },
+    }))
+  }
+
+  function updateOverrideHwch(slug: string, updated: HwchBand) {
+    setOverrides(prev => ({
+      ...prev,
+      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: { items: [] } }), howWeCanHelp: updated },
     }))
   }
 
@@ -994,8 +1096,7 @@ function ReportOverridePanel({
                       [
                         { key: 'insight' as const, label: 'Insight', rows: 3 },
                         { key: 'action' as const, label: 'Recommended Action', rows: 2 },
-                        { key: 'howWeCanHelp' as const, label: 'How We Can Help', rows: 4 },
-                      ]
+                      ] as Array<{ key: 'insight' | 'action'; label: string; rows: number }>
                     ).map(({ key, label, rows }) => (
                       <div key={key}>
                         <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
@@ -1008,6 +1109,14 @@ function ReportOverridePanel({
                         />
                       </div>
                     ))}
+                    <div>
+                      <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
+                        style={{ color: 'rgba(13,20,16,0.35)' }}>How We Can Help (overrides template)</p>
+                      <HwchBandEditor
+                        band={overrides[slug]?.howWeCanHelp ?? { items: [] }}
+                        onChange={updated => updateOverrideHwch(slug, updated)}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
