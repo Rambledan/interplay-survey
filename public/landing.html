@@ -5,28 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interplay Method — Are you prepared for sustainable growth?</title>
 
-  <!--
-       EDITABLE CONTENT — change text in the HTML below.
-       Look for EDIT comments to find each section.
-  -->
+  <!-- Open Sans with italic variants from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
   <style>
-    /* ── Fonts ── */
+    /* ── Robson display font ── */
     @font-face {
       font-family: 'Robson';
-      src: url('/fonts/Robson-Bold.otf') format('opentype');
-      font-weight: 700;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Open Sans';
-      src: url('/fonts/OpenSans-Regular.ttf') format('truetype');
-      font-weight: 400;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Open Sans';
-      src: url('/fonts/OpenSans-Bold.ttf') format('truetype');
+      src: url('app/public/fonts/Robson-Bold.otf') format('opentype');
       font-weight: 700;
       font-style: normal;
     }
@@ -37,590 +25,613 @@
     img { display: block; max-width: 100%; }
     a { text-decoration: none; }
 
+    /* ── 1440px page constraint ── */
+    .page-wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: #fff;
+      overflow: hidden;
+    }
+
     /* ── Design tokens ── */
     :root {
-      --yellow: #faf000;
-      --dark:   #2f2a2a;
+      --yellow: #faf002;
+      --dark:   #424242;
       --white:  #ffffff;
-      --pad-h:  clamp(24px, 6.5vw, 100px);
-      --pad-v:  clamp(40px, 5vw, 64px);
+      --ph:     clamp(24px, 6.9vw, 100px);   /* horizontal padding */
     }
 
-    /* ───────────────────────────────────────────────────────────
-       HEADER
-    ─────────────────────────────────────────────────────────── */
-    .header {
-      background: var(--dark);
+    body { font-family: 'Open Sans', sans-serif; color: #424242; }
+
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    .nav {
+      background: #fff;
       display: flex;
       align-items: center;
-      gap: 24px;
-      padding: 16px var(--pad-h);
-      border-bottom: 1px solid rgba(47,42,42,0.12);
+      justify-content: space-between;
+      padding: 15px var(--ph);
+      min-height: 109px;
     }
-    .header img { height: 40px; width: auto; object-fit: contain; }
-    .header .sep {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      color: rgba(47,42,42,0.5);
-    }
+    .nav-logo      { height: 67px; width: auto; }
+    .nav-right     { display: flex; align-items: center; gap: 38px; }
+    .nav-by        { font-size: 16px; color: #424242; white-space: nowrap; }
+    .nav-interrupt { height: 54px; width: auto; }
+    .nav-x         { font-weight: 700; font-size: 16px; color: #424242; }
+    .nav-likeso    { height: 53px; width: auto; filter: invert(1); }
 
-    /* ───────────────────────────────────────────────────────────
-       HERO
-    ─────────────────────────────────────────────────────────── */
-    .hero {
-      background: var(--yellow);
-      display: flex;
-      align-items: flex-end;
-      gap: 40px;
-      padding: 48px var(--pad-h) 0;
-      overflow: hidden;
-      min-height: 520px;
-    }
-    .hero-left {
-      flex: 0 0 auto;
-      max-width: 580px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding-bottom: 56px;
-    }
-    .hero-logo { height: 80px; width: auto; object-fit: contain; object-position: left; }
-    .hero-heading {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(52px, 7.5vw, 100px);
-      line-height: 0.85;
-      color: var(--dark);
-      text-transform: uppercase;
-    }
-    .hero-sub {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: clamp(16px, 2vw, 24px);
-      color: var(--dark);
-      text-transform: uppercase;
-      line-height: 1.3;
-    }
-    .cta-wrap { display: flex; flex-direction: column; gap: 8px; }
+    /* ══════════════════════════════════════════
+       SHARED BUTTON
+    ══════════════════════════════════════════ */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: var(--white);
-      color: var(--dark);
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 14px 28px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      width: fit-content;
-      transition: box-shadow 0.2s, transform 0.15s;
-      cursor: pointer;
-    }
-    .btn:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.22); transform: translateY(-2px); }
-    .btn--yellow { background: var(--yellow); }
-    .cta-note {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 14px;
-      color: rgba(47,42,42,0.6);
-    }
-
-    .hero-right {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: flex-end;
-      min-width: 0;
-    }
-    .hero-mockup-wrap {
-      transform: rotate(7deg);
-      box-shadow: 8px 8px 32px 12px rgba(0,0,0,0.22);
-      max-width: 420px;
-      width: 100%;
-      flex-shrink: 0;
-    }
-    .hero-mockup { width: 100%; height: auto; }
-
-    /* ───────────────────────────────────────────────────────────
-       HOW READY SECTION (white)
-    ─────────────────────────────────────────────────────────── */
-    .how-ready {
-      background: var(--white);
-      padding: var(--pad-v) var(--pad-h);
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
-    }
-    .section-heading {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(36px, 5vw, 72px);
-      line-height: 0.85;
-      color: var(--dark);
-      text-transform: uppercase;
-    }
-    .how-ready-body {
-      display: flex;
-      align-items: center;
-      gap: 60px;
-    }
-    .how-ready-text {
-      flex: 0 0 auto;
-      max-width: 440px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
-    .text-block-title {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      text-transform: uppercase;
-      color: var(--dark);
-      margin-bottom: 6px;
-    }
-    .text-block-body {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 1.6;
-      color: rgba(47,42,42,0.7);
-    }
-    .pentagon-wrap {
-      flex: 1;
-      display: flex;
       justify-content: center;
-      min-width: 0;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 20px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 4px rgba(0,0,0,0.15);
+      white-space: nowrap;
+      transition: opacity .15s;
     }
-    .pentagon-wrap svg { width: 100%; max-width: 460px; }
+    .btn:hover { opacity: .88; }
+    .btn--dark  { background: #424242; color: #fff; min-width: 320px; }
+    .btn--white { background: #fff;    color: #424242; min-width: 280px; }
 
-    /* ───────────────────────────────────────────────────────────
-       WHEN INTERPLAY SECTION (dark)
-    ─────────────────────────────────────────────────────────── */
-    .when-interplay {
-      background: var(--dark);
-      padding: var(--pad-v) var(--pad-h);
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      background: #fff;
+      padding: 50px var(--ph) 70px;
+      position: relative;
     }
-    .section-heading--yellow { color: var(--yellow); }
-    .when-body {
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-weight: 700;
+      font-size: clamp(18px, 2.5vw, 36px);
+      color: #424242;
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+    }
+    .hero-headline {
+      font-family: 'Robson', sans-serif;
+      font-weight: 700;
+      font-size: clamp(54px, 8.9vw, 128px);
+      line-height: 0.85;
+      color: #424242;
+      margin-bottom: 36px;
+    }
+    .hero-sub {
+      margin-top: 14px;
+      font-size: 16px;
+      color: #424242;
+    }
+
+    /* ══════════════════════════════════════════
+       ENDORSEMENT
+    ══════════════════════════════════════════ */
+    .endorsement {
+      background: #fff;
+      padding: 50px var(--ph);
+    }
+    .endorsement-card {
+      background: #424242;
+      border-radius: 60px;
+      padding: 50px;
+      display: flex;
+      gap: 25px;
+      color: #fff;
+      align-items: flex-start;
+    }
+    .endorsement-photo-wrap {
+      flex-shrink: 0;
+      width: 273px;
+      height: 273px;
+    }
+    .endorsement-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .endorsement-body { padding: 0 25px; flex: 1; }
+    .endorsement-sup {
+      font-weight: 700;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .endorsement-name {
+      font-family: 'Robson', sans-serif;
+      font-size: clamp(30px, 4.4vw, 64px);
+      line-height: 0.85;
+      margin-bottom: 10px;
+    }
+    .endorsement-qmark {
+      font-weight: 700;
+      font-size: 96px;
+      line-height: 0.65;
+      display: block;
+      height: 62px;
+      overflow: hidden;
+    }
+    .endorsement-quote { font-size: clamp(14px, 1.7vw, 24px); line-height: 1.5; }
+    .endorsement-quote p { margin-bottom: 1em; }
+    .endorsement-quote p:last-child { margin-bottom: 0; }
+
+    /* ══════════════════════════════════════════
+       GROWTH ACCELERATES
+    ══════════════════════════════════════════ */
+    .growth {
+      background: #fff;
+      padding: 50px var(--ph) 70px;
+    }
+    .growth-eyebrow {
+      font-weight: 700;
+      font-size: clamp(16px, 1.7vw, 24px);
+      margin-bottom: 8px;
+    }
+    .growth-headline {
+      font-family: 'Robson', sans-serif;
+      font-size: clamp(36px, 6.7vw, 96px);
+      line-height: 0.88;
+      margin-bottom: 50px;
+    }
+    .growth-body {
       display: flex;
       gap: 60px;
       align-items: flex-start;
     }
-    .when-left {
-      flex: 0 0 auto;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
+    .growth-text { flex: 1; font-size: clamp(15px, 1.7vw, 24px); line-height: 1.45; }
+    .growth-text strong { font-weight: 700; }
+    .growth-text p { margin-bottom: 1.2em; }
+    .growth-text p:last-child { margin-bottom: 0; }
+
+    /* Pentagon diagram */
+    .diagram-wrap {
+      flex-shrink: 0;
+      width: 480px;
+      position: relative;
     }
-    .text-block-title--white { color: var(--white); }
-    .text-block-body--white  { color: rgba(255,255,255,0.65); }
-    .when-right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      min-width: 0;
+    .diagram-inner {
+      position: relative;
+      width: 100%;
     }
+    .diagram-inner img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════════
+       HOW READY  (dark bg)
+    ══════════════════════════════════════════ */
+    .how-ready {
+      background: #424242;
+      padding: 99px var(--ph);
+      color: #fff;
+    }
+    .how-ready-eyebrow {
+      font-weight: 700;
+      font-size: clamp(16px, 1.7vw, 24px);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .how-ready-headline {
+      font-family: 'Robson', sans-serif;
+      font-size: clamp(36px, 6.7vw, 96px);
+      line-height: 0.88;
+      color: #faf002;
+      margin-bottom: 50px;
+    }
+    .how-ready-cols {
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+    }
+    .how-ready-left { flex: 1; font-size: clamp(14px, 1.1vw, 16px); line-height: 1.6; }
+    .how-ready-left p { margin-bottom: 1.2em; }
+    .how-ready-left strong { font-weight: 700; }
+    .how-ready-right { flex: 1; color: #fff; }
     .big-stat {
       font-family: 'Robson', sans-serif;
-      font-size: clamp(64px, 12vw, 180px);
-      line-height: 0.85;
-      color: var(--yellow);
-      text-transform: uppercase;
+      font-size: clamp(80px, 17.4vw, 250px);
+      line-height: 0.88;
+      color: #faf002;
     }
-    .big-stat-note {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: rgba(255,255,255,0.5);
-      max-width: 400px;
-      line-height: 1.5;
+    .big-stat-desc {
+      font-size: clamp(12px, 1.1vw, 16px);
+      line-height: 1.55;
+      margin-bottom: 30px;
+      margin-top: 8px;
     }
-    .stat-row {
-      display: flex;
-      gap: 48px;
-      flex-wrap: wrap;
-    }
-    .stat-block { flex: 1; min-width: 160px; }
-    .stat-qualifier {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 4px;
-    }
-    .stat-value {
+    .stats-row { display: flex; gap: 50px; }
+    .stat-block { flex: 1; }
+    .stat-number {
       font-family: 'Robson', sans-serif;
-      font-size: clamp(52px, 8vw, 96px);
-      line-height: 0.85;
-      color: var(--white);
+      font-size: clamp(52px, 8.9vw, 128px);
+      line-height: 0.88;
       text-transform: uppercase;
     }
-    .stat-note {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: rgba(255,255,255,0.45);
-      line-height: 1.5;
+    .stat-desc {
+      font-size: clamp(12px, 1.1vw, 16px);
+      line-height: 1.55;
       margin-top: 8px;
     }
 
-    /* ───────────────────────────────────────────────────────────
-       TEAM SECTIONS
-    ─────────────────────────────────────────────────────────── */
-    .team-section {
-      padding: var(--pad-v) var(--pad-h);
+    /* ══════════════════════════════════════════
+       FROM / TO SECTIONS  (Sustainability, Brand, Business)
+    ══════════════════════════════════════════ */
+    .ft-section {
+      padding: 99px var(--ph);
+    }
+    .ft-section--yellow { background: #faf002; color: #424242; }
+    .ft-section--white  { background: #fff;    color: #424242; }
+
+    .ft-label {
+      font-weight: 700;
+      font-size: clamp(16px, 1.7vw, 24px);
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+    .ft-cols {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0;
+    }
+    .ft-col { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
+    .ft-dir {
+      font-size: clamp(16px, 1.7vw, 24px);
+      text-transform: uppercase;
+    }
+    .ft-title {
+      font-family: 'Robson', sans-serif;
+      font-size: clamp(44px, 6.7vw, 96px);
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+    .ft-subtitle {
+      font-weight: 700;
+      font-size: clamp(16px, 1.7vw, 24px);
+    }
+    .ft-body { font-size: clamp(15px, 1.7vw, 24px); line-height: 1.45; }
+    .ft-body p  { margin-bottom: .8em; }
+    .ft-body ul { list-style: disc; padding-left: 36px; }
+    .ft-body li { margin-bottom: 4px; line-height: 1.45; }
+
+    .ft-mid {
+      width: 380px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 32px;
+      justify-content: flex-end;   /* image sits at bottom of its column */
+      min-height: 350px;
     }
-    .team-section--yellow { background: var(--yellow); }
-    .team-section--white  { background: var(--white); }
+    .ft-mid img { max-height: 490px; width: auto; object-fit: contain; }
 
-    .team-illus-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-    .team-illus { height: 260px; width: auto; object-fit: contain; }
-    .team-label {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      text-transform: uppercase;
-      color: var(--dark);
-      text-align: center;
-      letter-spacing: 0.05em;
-    }
-
-    .team-transform {
-      display: flex;
-      gap: 48px;
-      width: 100%;
-      max-width: 900px;
-      justify-content: center;
-      text-align: center;
-      flex-wrap: wrap;
-    }
-    .transform-col { flex: 1; min-width: 220px; }
-    .transform-dir {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 16px;
-      text-transform: uppercase;
-      color: rgba(47,42,42,0.55);
-      margin-bottom: 6px;
-    }
-    .transform-label {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(36px, 5vw, 64px);
-      line-height: 0.85;
-      color: var(--dark);
-      text-transform: uppercase;
-    }
-    .transform-note {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--dark);
-      margin-top: 8px;
-    }
-
-    /* ───────────────────────────────────────────────────────────
-       FOOTER CTA (dark)
-    ─────────────────────────────────────────────────────────── */
-    .footer-cta {
-      background: var(--dark);
-      padding: var(--pad-v) var(--pad-h);
+    /* Brand section hangers stacked */
+    .hangers {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      align-items: center;
+      padding-bottom: 50px;
     }
-    .footer-logo { height: 72px; width: auto; object-fit: contain; object-position: left; filter: brightness(0) invert(1); }
-    .footer-sub {
-      font-family: 'Open Sans', sans-serif;
+    .hanger-1 { transform: rotate(-18deg); margin-bottom: -50px; width: 256px; }
+    .hanger-2 { transform: rotate(13deg);  width: 278px; }
+
+    /* ══════════════════════════════════════════
+       FOOTER CTA
+    ══════════════════════════════════════════ */
+    .footer-cta {
+      background: #424242;
+      padding: 50px var(--ph);
+      color: #fff;
+    }
+    .footer-logo { height: 108px; width: auto; margin-bottom: 21px; }
+    .footer-headline {
       font-weight: 700;
-      font-size: clamp(18px, 2.5vw, 28px);
-      text-transform: uppercase;
-      color: var(--white);
+      font-size: clamp(20px, 2.5vw, 36px);
+      margin-bottom: 21px;
+    }
+    .footer-sub { margin-top: 12px; font-size: 16px; }
+
+    /* ══════════════════════════════════════════
+       UNIFIED BODY COPY — desktop (matches how-ready style)
+    ══════════════════════════════════════════ */
+    @media (min-width: 961px) {
+      .endorsement-quote,
+      .growth-text,
+      .how-ready-left,
+      .ft-body {
+        font-size: 16px;
+        line-height: 1.6;
+      }
     }
 
-    /* ───────────────────────────────────────────────────────────
+    /* ══════════════════════════════════════════
        RESPONSIVE
-    ─────────────────────────────────────────────────────────── */
+    ══════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .diagram-wrap { width: 380px; }
+    }
+
     @media (max-width: 960px) {
-      .hero          { flex-direction: column; align-items: flex-start; padding-bottom: 48px; }
-      .hero-right    { width: 100%; justify-content: center; }
-      .hero-mockup-wrap { max-width: 340px; }
-      .how-ready-body { flex-direction: column; }
-      .how-ready-text { max-width: 100%; }
-      .pentagon-wrap svg { max-width: 380px; }
-      .when-body     { flex-direction: column; }
-      .when-left     { max-width: 100%; }
+      .nav-by   { display: none; }
+      .nav-right { gap: 20px; }
+
+      .endorsement-card  { flex-direction: column; }
+      .endorsement-photo-wrap { width: 180px; height: 180px; margin: 0 auto; }
+
+      .growth-body { flex-direction: column; }
+      .diagram-wrap { width: 100%; max-width: 420px; }
+
+      .how-ready-cols { flex-direction: column; }
+      .stats-row { flex-direction: column; gap: 28px; }
+
+      .ft-cols { flex-direction: column; align-items: flex-start; gap: 40px; }
+      .ft-col  { width: 100%; }
+      .ft-mid  { width: 100%; min-height: 200px; justify-content: center; }
     }
 
     @media (max-width: 600px) {
-      .hero-logo     { height: 60px; }
-      .hero-mockup-wrap { max-width: 260px; }
-      .team-illus    { height: 200px; }
-      .team-transform { gap: 24px; }
-      .stat-row      { gap: 28px; }
+      .nav { min-height: auto; padding: 14px var(--ph); }
+      .nav-logo      { height: 44px; }
+      .nav-interrupt { height: 36px; }
+      .nav-likeso    { height: 36px; }
+      .btn           { font-size: 17px; min-width: unset; width: 100%; max-width: 380px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════════════════
-       HEADER
-  ══════════════════════════════════════════════════════════ -->
-  <header class="header">
-    <!-- EDIT: logo images -->
-    <img src="/landing/interrupt-logo-white.png" alt="Interrupt" />
-    <span class="sep">×</span>
-    <img src="/landing/likeso-logo-white.png" alt="Like So" />
-  </header>
+  <!-- ═══ NAV — constrained ═══ -->
+  <div class="page-wrap">
+  <nav class="nav">
+    <img class="nav-logo"
+         src="app/public/landing/interplay-logo-grey.png"
+         alt="Interplay Lab" />
+    <div class="nav-right">
+      <span class="nav-by">Interplay method by</span>
+      <img class="nav-interrupt"
+           src="app/public/landing/interrupt-logo-dark.png"
+           alt="Interrupt" />
+      <span class="nav-x">X</span>
+      <img class="nav-likeso"
+           src="app/public/landing/likeso-logo-white.png"
+           alt="Like So" />
+    </div>
+  </nav>
+  </div><!-- /.page-wrap (nav) -->
 
-  <!-- ══════════════════════════════════════════════════════════
-       HERO
-  ══════════════════════════════════════════════════════════ -->
+  <!-- ═══ HERO — full-bleed video, constrained content ═══ -->
   <section class="hero">
-    <div class="hero-left">
-      <!-- EDIT: Interplay Lab logo -->
-      <img class="hero-logo" src="/landing/interplay-logo.png" alt="Interplay Lab" />
-
-      <!-- EDIT: main headline -->
-      <h1 class="hero-heading">Are you prepared<br>for sustainable<br>growth?</h1>
-
-      <!-- EDIT: sub-headline -->
-      <p class="hero-sub">Get your personalised<br>Interplay Report</p>
-
-      <!-- EDIT: button label + link (href) -->
-      <div class="cta-wrap">
-        <a class="btn" href="/start">Run your assessment →</a>
-        <!-- EDIT: button sub-note -->
-        <span class="cta-note">Takes 30 seconds</span>
-      </div>
+    <video class="hero-video" autoplay loop muted playsinline>
+      <source src="app/public/landing/blobsvideo.mov" type="video/quicktime">
+      <source src="app/public/landing/blobsvideo.mov" type="video/mp4">
+    </video>
+    <div class="hero-content">
+      <p class="hero-eyebrow">WANT TO KNOW YOUR</p>
+      <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
+      <a class="btn btn--dark" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
+      <p class="hero-sub">Get personalised Interplay report</p>
     </div>
+  </section>
 
-    <div class="hero-right">
-      <!-- EDIT: report preview image -->
-      <div class="hero-mockup-wrap">
-        <img class="hero-mockup" src="/landing/report-preview.png" alt="Example Interplay Report" />
+  <!-- ═══ REST OF PAGE — constrained ═══ -->
+  <div class="page-wrap">
+
+  <!-- ═══ ENDORSEMENT ═══ -->
+  <section class="endorsement">
+    <div class="endorsement-card">
+      <div class="endorsement-photo-wrap">
+        <img src="app/public/landing/darsh-circle.png"
+             alt="Darshana Myronidis" />
+      </div>
+      <div class="endorsement-body">
+        <p class="endorsement-sup">Interplay is supported by</p>
+        <p class="endorsement-name">Darshana Myronidis, Global Leader in Sustainability</p>
+        <span class="endorsement-qmark">&ldquo;</span>
+        <div class="endorsement-quote">
+          <p><strong><em>I&rsquo;m delighted to be supporting this ground breaking benchmark.</em></strong></p>
+          <p><em>Sustainability has never been more important &ndash; or more misunderstood.</em></p>
+          <p><em>After years working at the intersection of business, brand and sustainability, I&rsquo;ve seen first-hand how much value gets lost when these functions operate in isolation. The commitments are real. The ambition is there. But too often, sustainability remains trapped in a compliance silo &ndash; disconnected from the commercial decisions that would give it real power and scale.</em></p>
+          <p><em>That&rsquo;s why this study matters. The Interplay Method asks exactly the right question: not whether organisations care about sustainability, but whether they are truly built to grow through it. This is exactly what is needed. And not a moment too soon.</em></p>
+          <p><em>Darshana Myrondis</em></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════════════════════
-       HOW READY
-  ══════════════════════════════════════════════════════════ -->
+  <!-- ═══ GROWTH ACCELERATES ═══ -->
+  <section class="growth">
+    <p class="growth-eyebrow">Growth accelerates when</p>
+    <h2 class="growth-headline">Sustainability + Business + Brand Interplay</h2>
+    <div class="growth-body">
+      <div class="growth-text">
+        <p><strong>Sign up to an Interplay assessment</strong><br>
+        Join a growing number of brands taking part in this ground-breaking, industry-first study.</p>
+        <p>In just 30 minutes, we&rsquo;ll assess how effectively sustainability is connected across your organisation &ndash; and uncover your growth potential.</p>
+        <p><strong>Get your Interplay score</strong><br>
+        Understand your organisation&rsquo;s sustainability-driven growth potential, with clear insights across five key pillars &ndash; including where you&rsquo;re strong and where you can improve.</p>
+        <p><strong>Receive your personalised Interplay Report</strong><br>
+        Receive tailored insights and practical recommendations to help you unlock growth and strengthen sustainability outcomes.</p>
+      </div>
+
+      <!-- Hexagon illustration -->
+      <div class="diagram-wrap">
+        <div class="diagram-inner">
+          <img src="app/public/landing/hexagon.png" alt="Interplay hexagon diagram" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HOW READY — dark bg ═══ -->
   <section class="how-ready">
-    <!-- EDIT: section heading -->
-    <h2 class="section-heading">How ready is your organisation to turn<br>sustainability from cost to growth?</h2>
-
-    <div class="how-ready-body">
-      <div class="how-ready-text">
-
-        <!-- EDIT: block 1 -->
-        <div>
-          <p class="text-block-title">Sign up to an Interplay interview</p>
-          <p class="text-block-body">We'll assess how connected sustainability is to the rest of your organisation – and reveal your growth potential score – it takes 30 minutes.</p>
-        </div>
-
-        <!-- EDIT: block 2 -->
-        <div>
-          <p class="text-block-title">Receive a bespoke Interplay Report</p>
-          <p class="text-block-body">Join the growing number of brands taking part in this ground-breaking industry-first study and receive your bespoke report – along with tailored insights and recommendations.</p>
-        </div>
-
+    <p class="how-ready-eyebrow">How ready is your organisation to</p>
+    <h2 class="how-ready-headline">TURN SUSTAINABILITY FROM COST TO GROWTH?</h2>
+    <div class="how-ready-cols">
+      <div class="how-ready-left">
+        <p><strong>The value opportunity</strong><br>
+        There is huge value in sustainability, but it&rsquo;s usually sitting in a compliance silo &ndash; disconnected from the business and brand commercials.</p>
+        <p>Losing you pricing power, relevance, market differentiation &ndash; and financial backing.</p>
+        <p><strong>Our diagnostic tool</strong><br>
+        We will identify the gaps and opportunities between your sustainability, business and brand &ndash; and where their interplay can unlock triple value.</p>
       </div>
-
-      <!-- Pentagon radar diagram (edit scores/labels below) -->
-      <div class="pentagon-wrap">
-        <svg viewBox="-40 0 580 480" aria-label="Interplay score diagram" role="img">
-          <!-- Pentagon fill -->
-          <path d="M250,110 L383,207 L332,363 L168,363 L117,207 Z"
-                fill="#faf000" stroke="#2f2a2a" stroke-width="2" />
-
-          <!-- Spokes -->
-          <line x1="250" y1="250" x2="250" y2="110"  stroke="#2f2a2a" stroke-width="1" opacity="0.2"/>
-          <line x1="250" y1="250" x2="383" y2="207"  stroke="#2f2a2a" stroke-width="1" opacity="0.2"/>
-          <line x1="250" y1="250" x2="332" y2="363"  stroke="#2f2a2a" stroke-width="1" opacity="0.2"/>
-          <line x1="250" y1="250" x2="168" y2="363"  stroke="#2f2a2a" stroke-width="1" opacity="0.2"/>
-          <line x1="250" y1="250" x2="117" y2="207"  stroke="#2f2a2a" stroke-width="1" opacity="0.2"/>
-
-          <!-- Vertex dots -->
-          <circle cx="250" cy="110" r="5" fill="#f4821f"/>
-          <circle cx="383" cy="207" r="5" fill="#49a0f5"/>
-          <circle cx="332" cy="363" r="5" fill="#3dcf6f"/>
-          <circle cx="168" cy="363" r="5" fill="#a955f7"/>
-          <circle cx="117" cy="207" r="5" fill="#eab304"/>
-
-          <!-- Centre score -->
-          <text x="250" y="258" text-anchor="middle" font-family="Robson, sans-serif"
-                font-size="22" font-weight="bold" fill="#2f2a2a">32%</text>
-
-          <!-- EDIT: labels & scores for each vertex -->
-          <!-- Appetite (top) -->
-          <text x="250" y="80"  text-anchor="middle" font-family="Open Sans, sans-serif" font-weight="600" font-size="14" fill="#f4821f">APPETITE</text>
-          <text x="250" y="97"  text-anchor="middle" font-family="Open Sans, sans-serif" font-size="12"   fill="#2f2a2a" opacity="0.7">38%</text>
-
-          <!-- Scale & AI (top-right) -->
-          <text x="410" y="192" text-anchor="start"  font-family="Open Sans, sans-serif" font-weight="600" font-size="14" fill="#49a0f5">SCALE &amp; AI</text>
-          <text x="410" y="208" text-anchor="start"  font-family="Open Sans, sans-serif" font-size="12"   fill="#2f2a2a" opacity="0.7">42%</text>
-
-          <!-- Sustainability (bottom-right) -->
-          <text x="352" y="408" text-anchor="middle" font-family="Open Sans, sans-serif" font-weight="600" font-size="14" fill="#3dcf6f">SUSTAINABILITY</text>
-          <text x="352" y="424" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="12"   fill="#2f2a2a" opacity="0.7">31%</text>
-
-          <!-- Brand (bottom-left) -->
-          <text x="148" y="408" text-anchor="middle" font-family="Open Sans, sans-serif" font-weight="600" font-size="14" fill="#a955f7">BRAND</text>
-          <text x="148" y="424" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="12"   fill="#2f2a2a" opacity="0.7">32%</text>
-
-          <!-- Business (top-left) -->
-          <text x="92"  y="192" text-anchor="end"    font-family="Open Sans, sans-serif" font-weight="600" font-size="14" fill="#eab304">BUSINESS</text>
-          <text x="92"  y="208" text-anchor="end"    font-family="Open Sans, sans-serif" font-size="12"   fill="#2f2a2a" opacity="0.7">23%</text>
-        </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════
-       WHEN INTERPLAY (dark)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="when-interplay">
-    <!-- EDIT: section heading -->
-    <h2 class="section-heading section-heading--yellow">When sustainability + business + brand interplay, growth accelerates</h2>
-
-    <div class="when-body">
-      <div class="when-left">
-
-        <!-- EDIT: left block 1 -->
-        <div>
-          <p class="text-block-title text-block-title--white">Our diagnostic tool</p>
-          <p class="text-block-body text-block-body--white">Will reveal the gaps and opportunity between your sustainability, business and brand – and where their interplay can unlock triple value.</p>
-        </div>
-
-        <!-- EDIT: left block 2 -->
-        <div>
-          <p class="text-block-title text-block-title--white">The value opportunity</p>
-          <p class="text-block-body text-block-body--white">There is a huge value in sustainability but it's mostly stuck in a compliance silo – disconnected from the commercials. Losing you pricing power, peer differentiation – and financial backing.</p>
-        </div>
-
-      </div>
-
-      <div class="when-right">
-        <!-- EDIT: big stat -->
-        <div>
-          <p class="big-stat">$2.7tn</p>
-          <!-- EDIT: big stat note -->
-          <p class="big-stat-note">Sustainability's contribution to the brand value of the global Top 100 at $0.2TN today, and $2.7TN by 2040</p>
-        </div>
-
-        <div class="stat-row">
-          <!-- EDIT: stat 1 -->
+      <div class="how-ready-right">
+        <p class="big-stat">$2.7tn</p>
+        <p class="big-stat-desc">Sustainability&rsquo;s contribution to the brand value of the global Top 100 at $0.2TN today, and $2.7TN by 2040</p>
+        <div class="stats-row">
           <div class="stat-block">
-            <p class="stat-qualifier">Value add</p>
-            <p class="stat-value">1.4X</p>
-            <p class="stat-note">Companies incorporating sustainability are 1.4× more likely to experience innovative breakthroughs (Boston Consulting Group)</p>
+            <p class="stat-number">1.4X</p>
+            <p class="stat-desc">Companies incorporating sustainability are 1.4 times more likely to experience innovative breakthroughs (Boston Consulting Group)</p>
           </div>
-          <!-- EDIT: stat 2 -->
           <div class="stat-block">
-            <p class="stat-qualifier">Value lost</p>
-            <p class="stat-value">43%</p>
-            <p class="stat-note">When sustainability is treated as a compliance exercise, companies spend 43% more on reporting than on innovation</p>
+            <p class="stat-number">43%</p>
+            <p class="stat-desc">When sustainability is treated as a compliance exercise rather than an operational strategy, companies spend 43% more on reporting than on innovation</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════════════════════
-       TEAM: SUSTAINABILITY (yellow)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="team-section team-section--yellow">
-    <div class="team-illus-wrap">
-      <!-- EDIT: illustration image -->
-      <img class="team-illus" src="/landing/team-sustainability.png" alt="Sustainability teams illustration" />
-      <!-- EDIT: team label -->
-      <p class="team-label">Sustainability teams</p>
-    </div>
-    <div class="team-transform">
-      <div class="transform-col">
-        <p class="transform-dir">From</p>
-        <!-- EDIT: from label -->
-        <p class="transform-label">Compliance cost</p>
+  <!-- ═══ SUSTAINABILITY: FROM → TO ═══ -->
+  <section class="ft-section ft-section--yellow">
+    <p class="ft-label">Sustainability</p>
+    <div class="ft-cols">
+      <div class="ft-col">
+        <p class="ft-dir">From</p>
+        <h3 class="ft-title">COMPLIANCE COST</h3>
+        <div class="ft-body">
+          <p>Does sustainability feel like a separate compliance function with limited influence?</p>
+          <p>Struggling to build real alignment and buy-in across your organisation?</p>
+        </div>
       </div>
-      <div class="transform-col">
-        <p class="transform-dir">To</p>
-        <!-- EDIT: to label + note -->
-        <p class="transform-label">Action &amp; Advantage</p>
-        <p class="transform-note">(without losing credibility)</p>
+      <div class="ft-mid">
+        <img src="app/public/landing/tanoy-speaker.png"
+             alt="Speaker illustration" style="max-height:487px;" />
       </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════
-       TEAM: BRAND (white)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="team-section team-section--white">
-    <div class="team-illus-wrap">
-      <img class="team-illus" src="/landing/team-brand.png" alt="Brand teams illustration" />
-      <p class="team-label">Brand teams</p>
-    </div>
-    <div class="team-transform">
-      <div class="transform-col">
-        <p class="transform-dir">From</p>
-        <p class="transform-label">A cost to sales</p>
-      </div>
-      <div class="transform-col">
-        <p class="transform-dir">To</p>
-        <p class="transform-label">Driving sales</p>
-        <p class="transform-note">(without greenwashing)</p>
+      <div class="ft-col">
+        <p class="ft-dir">To</p>
+        <h3 class="ft-title">ACTION &amp; ADVANTAGE</h3>
+        <p class="ft-subtitle">(without losing credibility)</p>
+        <div class="ft-body">
+          <p>Interplay to mobilise your whole organisation</p>
+          <ul>
+            <li>Make sustainability an easy sell</li>
+            <li>Become strategic partners</li>
+            <li>Position sustainability as a central business driver</li>
+            <li>Become the innovation hub</li>
+            <li>Align priorities</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════════════════════
-       TEAM: BUSINESS (yellow)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="team-section team-section--yellow">
-    <div class="team-illus-wrap">
-      <img class="team-illus" src="/landing/team-business.png" alt="Business teams illustration" />
-      <p class="team-label">Business teams</p>
-    </div>
-    <div class="team-transform">
-      <div class="transform-col">
-        <p class="transform-dir">From</p>
-        <p class="transform-label">Cost centre</p>
+  <!-- ═══ BRAND: FROM → TO ═══ -->
+  <section class="ft-section ft-section--white">
+    <p class="ft-label">Brand</p>
+    <div class="ft-cols">
+      <div class="ft-col">
+        <p class="ft-dir">From</p>
+        <h3 class="ft-title">COST TO SALES</h3>
+        <div class="ft-body">
+          <p>Investing in sustainability but not seeing it translate into brand value?</p>
+          <p>Consumers say they care &mdash; but don&rsquo;t act.</p>
+        </div>
       </div>
-      <div class="transform-col">
-        <p class="transform-dir">To</p>
-        <p class="transform-label">Capital</p>
-        <p class="transform-note">(without reputational risk)</p>
+      <div class="ft-mid">
+        <div class="hangers">
+          <img class="hanger-1"
+               src="app/public/landing/hanger-black.png"
+               alt="" />
+          <img class="hanger-2"
+               src="app/public/landing/hanger-black.png"
+               alt="" />
+        </div>
+      </div>
+      <div class="ft-col">
+        <p class="ft-dir">To</p>
+        <h3 class="ft-title">DRIVING SALES</h3>
+        <p class="ft-subtitle">(without greenwashing)</p>
+        <div class="ft-body">
+          <p>Interplay to increase competitive advantage and drive sales</p>
+          <ul>
+            <li>Increase brand desirability</li>
+            <li>Build customer relevance</li>
+            <li>Strengthen peer differentiation</li>
+            <li>Increased loyalty</li>
+            <li>Market share</li>
+            <li>Protect brand reputation</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════════════════════
-       FOOTER CTA (dark)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="footer-cta">
-    <img class="footer-logo" src="/landing/interplay-logo.png" alt="Interplay Lab" />
-    <!-- EDIT: footer sub-heading -->
-    <p class="footer-sub">Get your personalised Interplay Report</p>
-    <div class="cta-wrap">
-      <!-- EDIT: button label + link -->
-      <a class="btn btn--yellow" href="/start">Run your assessment →</a>
-      <span class="cta-note" style="color:rgba(255,255,255,0.5)">Takes 30 seconds</span>
+  <!-- ═══ BUSINESS: FROM → TO ═══ -->
+  <section class="ft-section ft-section--yellow">
+    <p class="ft-label">BUSINESS</p>
+    <div class="ft-cols">
+      <div class="ft-col">
+        <p class="ft-dir">From</p>
+        <h3 class="ft-title">COST CENTRE</h3>
+        <div class="ft-body">
+          <p>Struggling to see the commercial value of sustainability?</p>
+          <p>Does it drive up costs and squeeze your margins?</p>
+        </div>
+      </div>
+      <div class="ft-mid">
+        <img src="app/public/landing/balloon.png"
+             alt="Balloon illustration" style="max-height:416px;" />
+      </div>
+      <div class="ft-col">
+        <p class="ft-dir">To</p>
+        <h3 class="ft-title">CAPITAL</h3>
+        <p class="ft-subtitle">(without reputational risk)</p>
+        <div class="ft-body">
+          <p>Interplay to increase margins and revenue streams</p>
+          <ul>
+            <li>Create efficiencies &ndash; and cut costs</li>
+            <li>Identify new revenue streams</li>
+            <li>Find new ways to upsell</li>
+            <li>Create pricing power</li>
+            <li>Adapt to regulations to win regionally</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
+  <!-- ═══ FOOTER CTA ═══ -->
+  <footer class="footer-cta">
+    <img class="footer-logo"
+         src="app/public/landing/interplay-logo-yellow.png"
+         alt="Interplay Lab" />
+    <h2 class="footer-headline">GET YOUR PERSONALISED INTERPLAY REPORT</h2>
+    <a class="btn btn--white" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
+    <p class="footer-sub">Takes 30 seconds</p>
+  </footer>
+
+</div><!-- /.page-wrap -->
 </body>
 </html>
