@@ -106,6 +106,15 @@
       max-width: 1440px;
       margin: 0 auto;
       padding: 0 var(--ph);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .hero-text { flex: 1; }
+    .hero-logo-img {
+      width: 595px;
+      flex-shrink: 0;
     }
     .hero-eyebrow {
       font-family: 'Almarai', sans-serif;
@@ -480,6 +489,8 @@
     }
 
     @media (max-width: 960px) {
+      .hero-logo-img { display: none; }
+
       .nav-by   { display: none; }
       .nav-right { gap: 20px; }
 
@@ -532,10 +543,15 @@
       <source src="app/public/landing/blobsvideo.mov" type="video/mp4">
     </video>
     <div class="hero-content">
-      <p class="hero-eyebrow">WANT TO KNOW YOUR</p>
-      <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
-      <a class="btn btn--dark" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
-      <p class="hero-sub">Get personalised Interplay report</p>
+      <div class="hero-text">
+        <p class="hero-eyebrow">WANT TO KNOW YOUR</p>
+        <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
+        <a class="btn btn--dark" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
+        <p class="hero-sub">Get personalised Interplay report</p>
+      </div>
+      <img class="hero-logo-img"
+           src="app/public/landing/interplay-logo-grey.png"
+           alt="Interplay Lab" />
     </div>
   </section>
 
