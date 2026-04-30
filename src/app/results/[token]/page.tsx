@@ -122,14 +122,6 @@ function ProgressBar({
   onNext: () => void
   token: string
 }) {
-  const [pdfLoading, setPdfLoading] = useState(false)
-
-  function handlePdf() {
-    setPdfLoading(true)
-    window.open(`/api/results/${token}/pdf`, '_blank')
-    setTimeout(() => setPdfLoading(false), 5000)
-  }
-
   return (
     <div
       style={{
@@ -231,28 +223,6 @@ function ProgressBar({
           Next →
         </button>
 
-        {/* Divider */}
-        <div style={{ width: '1px', height: '20px', backgroundColor: 'rgba(255,255,255,0.12)', flexShrink: 0 }} />
-
-        {/* PDF download */}
-        <button
-          onClick={handlePdf}
-          disabled={pdfLoading}
-          style={{
-            fontFamily: 'Almarai, sans-serif',
-            fontSize: '11px',
-            letterSpacing: '0.08em',
-            color: pdfLoading ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.55)',
-            background: 'none',
-            border: 'none',
-            cursor: pdfLoading ? 'wait' : 'pointer',
-            padding: '4px 8px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {pdfLoading ? '⋯' : '↓ PDF'}
-        </button>
 
       </div>
 
@@ -302,7 +272,7 @@ function StepWelcome() {
       <div className="space-y-5 max-w-2xl">
         {INTRO.welcome.map((p, i) => (
           <p key={i} className="text-base leading-relaxed"
-            style={{ color: i === 1 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
+            style={{ color: i === 1 ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.95)', fontFamily: 'Open Sans, sans-serif' }}>
             {i === 1 ? (
               <>
                 This ground-breaking industry first study is based on the premise that:{' '}
@@ -336,7 +306,7 @@ function StepInReport() {
               {item.title}
             </p>
             <p className="text-sm leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+              style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Open Sans, sans-serif' }}>
               {item.desc}
             </p>
           </div>
@@ -356,7 +326,7 @@ function StepPillars() {
         How we measure
       </h2>
       <p className="text-sm leading-relaxed mb-10 max-w-2xl"
-        style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Open Sans, sans-serif' }}>
         {INTRO.pillarsIntro}
       </p>
       <div className="space-y-5">
@@ -365,7 +335,7 @@ function StepPillars() {
             style={{ borderLeft: `2px solid ${p.color}`, paddingLeft: '1.25rem' }}>
             <p className="text-sm leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               <strong style={{ color: p.color, fontSize: '1rem' }}>{p.num}. {p.name} </strong>
-              <span style={{ color: 'rgba(255,255,255,0.6)' }}>{p.desc}</span>
+              <span style={{ color: 'rgba(255,255,255,0.9)' }}>{p.desc}</span>
             </p>
           </div>
         ))}
@@ -391,9 +361,9 @@ function StepRating() {
               <span className="text-sm font-bold uppercase" style={{ color: '#faf000', fontFamily: 'Open Sans, sans-serif' }}>
                 {b.label}
               </span>
-              <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{b.range}</span>
+              <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>{b.range}</span>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)', fontFamily: 'Open Sans, sans-serif' }}>
               {b.desc}
             </p>
           </div>
@@ -463,7 +433,7 @@ function HowWeCanHelpContent({ band, color }: { band: HowWeCanHelpBand; color: s
     <>
       {band.intro?.trim() && (
         <p className="text-sm leading-relaxed mb-4"
-          style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Open Sans, sans-serif' }}>
+          style={{ color: 'rgba(255,255,255,0.92)', fontFamily: 'Open Sans, sans-serif' }}>
           {band.intro}
         </p>
       )}
@@ -479,7 +449,7 @@ function HowWeCanHelpContent({ band, color }: { band: HowWeCanHelpBand; color: s
               )}
               {item.content && (
                 <p className="text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+                  style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Open Sans, sans-serif' }}>
                   {item.content}
                 </p>
               )}
@@ -521,7 +491,7 @@ function RadarChart({
   benchmark: Record<string, number>
   benchmarkN: number
 }) {
-  const cx = 260, cy = 260, R = 175
+  const cx = 350, cy = 350, R = 175
   const GRID = [0.25, 0.5, 0.75, 1]
 
   function scorePolygon(pctMap: Record<string, number>) {
@@ -537,7 +507,7 @@ function RadarChart({
   const outerPts = PENTAGON_ORDER.map((_, i) => pentagonPoint(cx, cy, R, i))
 
   return (
-    <svg viewBox="0 0 520 520" className="w-full max-w-[520px] mx-auto" aria-label="Interplay radar chart">
+    <svg viewBox="0 0 700 700" className="w-full max-w-[580px] mx-auto" aria-label="Interplay radar chart">
       {/* Dark background fill */}
       <polygon points={pointsToStr(outerPts)} fill="#1e1b1b" stroke="none" />
 
@@ -560,7 +530,7 @@ function RadarChart({
         const pt = pentagonPoint(cx, cy, R * level, 1)
         return (
           <text key={level} x={pt.x + 4} y={pt.y - 3}
-            fontSize="9" fill="#ffffff" fillOpacity="0.25" fontFamily="Almarai, sans-serif">
+            fontSize="13" fill="#ffffff" fillOpacity="0.25" fontFamily="Almarai, sans-serif">
             {Math.round(level * 100)}
           </text>
         )
@@ -589,20 +559,20 @@ function RadarChart({
       {outerPts.map((outer, i) => {
         const slug = PENTAGON_ORDER[i]
         const meta = SECTION_META[slug]
-        const labelR = R + 32
+        const labelR = R + 62
         const pt = pentagonPoint(cx, cy, labelR, i)
         const cosA = Math.cos(outer.angle)
         const anchor = Math.abs(cosA) < 0.15 ? 'middle' : cosA > 0 ? 'start' : 'end'
         const score = myPctMap[slug] ?? 0
         return (
           <g key={slug}>
-            <text x={pt.x} y={pt.y - 6} textAnchor={anchor} dominantBaseline="auto"
-              fontSize="10" fill={meta?.color ?? '#faf000'} fillOpacity="0.9"
-              fontFamily="Almarai, sans-serif" letterSpacing="0.1em">
+            <text x={pt.x} y={pt.y - 8} textAnchor={anchor} dominantBaseline="auto"
+              fontSize="20" fill={meta?.color ?? '#faf000'} fillOpacity="0.95"
+              fontFamily="Almarai, sans-serif" letterSpacing="0.08em">
               {meta?.shortName ?? slug.toUpperCase()}
             </text>
-            <text x={pt.x} y={pt.y + 10} textAnchor={anchor} dominantBaseline="auto"
-              fontSize="15" fill="#ffffff" fillOpacity="0.85"
+            <text x={pt.x} y={pt.y + 22} textAnchor={anchor} dominantBaseline="auto"
+              fontSize="30" fill="#ffffff" fillOpacity="0.92"
               fontFamily="Robson, Open Sans, sans-serif" fontWeight="400">
               {score}%
             </text>
@@ -619,7 +589,7 @@ function FinancialSummary({ model }: { model: FinancialModel }) {
   const { annualRevenue, currencySymbol, totals, totalsAsPercentOfRevenue } = model
   const fmt = (n: number) => formatCurrency(n, currencySymbol)
   const scenarios = [
-    { label: 'Conservative', value: totals.conservative, pct: totalsAsPercentOfRevenue.conservative, color: 'rgba(255,255,255,0.4)' },
+    { label: 'Conservative', value: totals.conservative, pct: totalsAsPercentOfRevenue.conservative, color: 'rgba(255,255,255,0.78)' },
     { label: 'Moderate',     value: totals.moderate,     pct: totalsAsPercentOfRevenue.moderate,     color: '#f4821f' },
     { label: 'Optimistic',   value: totals.optimistic,   pct: totalsAsPercentOfRevenue.optimistic,   color: '#3ecf6e' },
   ]
@@ -632,11 +602,11 @@ function FinancialSummary({ model }: { model: FinancialModel }) {
             style={{ color: '#faf000', fontFamily: 'Almarai, sans-serif' }}>
             Financial Opportunity
           </p>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Open Sans, sans-serif' }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Open Sans, sans-serif' }}>
             Based on {fmt(annualRevenue)} annual revenue
           </p>
         </div>
-        <p className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        <p className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.55)' }}>
           Across all 5 capability areas
         </p>
       </div>
@@ -649,13 +619,13 @@ function FinancialSummary({ model }: { model: FinancialModel }) {
             <p className="text-2xl font-black tabular-nums" style={{ color: '#fff' }}>
               {fmt(s.value)}
             </p>
-            <p className="text-[11px] font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <p className="text-[11px] font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {s.pct} of revenue
             </p>
           </div>
         ))}
       </div>
-      <p className="text-xs mt-5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Open Sans, sans-serif' }}>
+      <p className="text-xs mt-5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
         The moderate scenario assumes focused but realistic improvement across all five Interplay capability areas.
       </p>
     </div>
@@ -680,7 +650,7 @@ function ScoreRing({ pct, animate }: { pct: number; animate: boolean }) {
       </svg>
       <div className="absolute text-center">
         <span className="text-3xl font-black tabular-nums" style={{ color: '#fff' }}>{pct}</span>
-        <span className="text-sm font-mono block" style={{ color: 'rgba(255,255,255,0.35)' }}>/ 100</span>
+        <span className="text-sm font-mono block" style={{ color: 'rgba(255,255,255,0.68)' }}>/ 100</span>
       </div>
     </div>
   )
@@ -711,7 +681,7 @@ function StepResults({
         {respondent.company}
       </h1>
       <div className="flex items-center gap-3 flex-wrap mb-10"
-        style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Open Sans, sans-serif', fontSize: '13px' }}>
+        style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Open Sans, sans-serif', fontSize: '13px' }}>
         {respondent.role && <span>{respondent.role}</span>}
         {respondent.sector && <><span style={{ opacity: 0.4 }}>·</span><span>{respondent.sector}</span></>}
         {completedAt && <><span style={{ opacity: 0.4 }}>·</span><span className="font-mono text-xs">{formatDate(completedAt)}</span></>}
@@ -722,14 +692,14 @@ function StepResults({
         <ScoreRing pct={scores.overall} animate={animate} />
         <div>
           <p className="text-xs font-mono uppercase tracking-[0.2em] mb-1"
-            style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Almarai, sans-serif' }}>
+            style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Almarai, sans-serif' }}>
             Overall Interplay Score
           </p>
           <p className="text-4xl font-black uppercase tracking-tight" style={{ color: '#faf000', fontFamily: 'Robson, sans-serif' }}>
             {overallBand.label}
           </p>
           {benchmarkN >= 2 && (
-            <p className="text-xs font-mono mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <p className="text-xs font-mono mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Benchmarked against {benchmarkN} other respondent{benchmarkN !== 1 ? 's' : ''}
             </p>
           )}
@@ -749,7 +719,7 @@ function StepResults({
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: meta?.color }} />
                   <span className="text-xs font-mono uppercase tracking-[0.1em]"
-                    style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Almarai, sans-serif' }}>
+                    style={{ color: 'rgba(255,255,255,0.88)', fontFamily: 'Almarai, sans-serif' }}>
                     {meta?.shortName ?? section.name}
                   </span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm"
@@ -792,16 +762,16 @@ function StepMap({ data }: { data: ResultsData }) {
         Where you stand
       </h2>
       <p className="text-sm leading-relaxed mb-3 max-w-2xl"
-        style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Open Sans, sans-serif' }}>
         Each of the five axes represents one pillar of the Interplay Method. The further your score extends toward the outer edge, the greater your organisation&apos;s integration and growth potential in that dimension.
       </p>
       <p className="text-sm leading-relaxed mb-8 max-w-2xl"
-        style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Open Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Open Sans, sans-serif' }}>
         A compact, centre-weighted shape indicates siloed sustainability. A wide, balanced shape indicates strong interplay — and accelerating growth potential.
       </p>
       {benchmarkN >= 2 && (
         <div className="flex items-center gap-6 text-xs mb-6"
-          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.4)' }}>
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.78)' }}>
           <div className="flex items-center gap-2">
             <span className="w-6 h-0.5 inline-block rounded" style={{ backgroundColor: '#3ecf6e' }} />
             You
@@ -827,7 +797,7 @@ function ScoreContributionBar({ points, maxPoints, color }: { points: number; ma
         <div className="absolute inset-y-0 left-0 rounded-full"
           style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
-      <span className="text-[10px] font-mono tabular-nums shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }}>
+      <span className="text-[10px] font-mono tabular-nums shrink-0" style={{ color: 'rgba(255,255,255,0.68)' }}>
         {points} / {maxPoints} pts
       </span>
     </div>
@@ -862,8 +832,8 @@ function AnswersPanel({ responses, color, sectionRaw, sectionMax, sectionPct }: 
                 <div key={q.id} className="p-3 rounded"
                   style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <div className="flex items-start gap-2 mb-2">
-                    <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Q{i + 1}</span>
-                    <p className="text-xs leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{q.text}</p>
+                    <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>Q{i + 1}</span>
+                    <p className="text-xs leading-snug" style={{ color: 'rgba(255,255,255,0.85)' }}>{q.text}</p>
                   </div>
                   <div className="inline-block text-sm font-medium px-3 py-1.5 rounded mb-1"
                     style={{ backgroundColor: `${color}25`, color: '#fff', borderLeft: `2px solid ${color}` }}>
@@ -871,7 +841,7 @@ function AnswersPanel({ responses, color, sectionRaw, sectionMax, sectionPct }: 
                   </div>
                   <ScoreContributionBar points={q.points!} maxPoints={q.maxPoints!} color={color} />
                   {q.followUp && (
-                    <p className="text-xs italic mt-2 pl-1" style={{ color: 'rgba(255,255,255,0.35)' }}>"{q.followUp}"</p>
+                    <p className="text-xs italic mt-2 pl-1" style={{ color: 'rgba(255,255,255,0.68)' }}>"{q.followUp}"</p>
                   )}
                 </div>
               ))}
@@ -882,7 +852,7 @@ function AnswersPanel({ responses, color, sectionRaw, sectionMax, sectionPct }: 
               style={{ backgroundColor: `${color}15`, border: `1px solid ${color}35` }}>
               <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color }}>Section total</span>
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <span className="text-xs font-mono tabular-nums" style={{ color: 'rgba(255,255,255,0.78)' }}>
                   {sectionRaw} / {sectionMax} pts
                 </span>
                 <span className="text-base font-black tabular-nums" style={{ color }}>{sectionPct}%</span>
@@ -891,19 +861,19 @@ function AnswersPanel({ responses, color, sectionRaw, sectionMax, sectionPct }: 
           )}
           {unscored.length > 0 && (
             <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Open responses
               </p>
               <div className="space-y-3">
                 {unscored.map(q => (
                   <div key={q.id}>
-                    <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{q.text}</p>
+                    <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.78)' }}>{q.text}</p>
                     <p className="text-sm px-3 py-1.5 rounded italic"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.65)', borderLeft: '2px solid rgba(255,255,255,0.15)' }}>
+                      style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.92)', borderLeft: '2px solid rgba(255,255,255,0.15)' }}>
                       {q.answer}
                     </p>
                     {q.followUp && (
-                      <p className="text-xs italic mt-1 pl-4" style={{ color: 'rgba(255,255,255,0.3)' }}>"{q.followUp}"</p>
+                      <p className="text-xs italic mt-1 pl-4" style={{ color: 'rgba(255,255,255,0.6)' }}>"{q.followUp}"</p>
                     )}
                   </div>
                 ))}
@@ -943,7 +913,7 @@ function StepSection({
   if (!section || !band || !cms) {
     return (
       <StepWrap eyebrow={meta?.shortName ?? slug}>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Open Sans, sans-serif' }}>
+        <p style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Open Sans, sans-serif' }}>
           No data available for this section.
         </p>
       </StepWrap>
@@ -980,7 +950,7 @@ function StepSection({
           )}
         </div>
         {bm != null && (
-          <p className="text-xs font-mono mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-xs font-mono mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Benchmark avg: {bm}%
           </p>
         )}
@@ -1033,14 +1003,14 @@ function StepSection({
             <span className="text-xl font-black tabular-nums" style={{ color: '#fff' }}>
               {formatCurrency(financialSection.opportunity.conservative, data.financial?.currencySymbol)}
             </span>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>conservative</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>conservative</span>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>—</span>
             <span className="text-xl font-black tabular-nums" style={{ color: '#fff' }}>
               {formatCurrency(financialSection.opportunity.optimistic, data.financial?.currencySymbol)}
             </span>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>optimistic</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>optimistic</span>
           </div>
-          <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.68)' }}>
             {financialSection.driver} · {financialSection.evidence}
           </p>
         </div>
@@ -1082,7 +1052,7 @@ function StepEvidence({ evidence }: { evidence?: string[] }) {
           <div key={i} className="flex gap-4"
             style={{ borderLeft: '2px solid rgba(250,240,0,0.25)', paddingLeft: '1.25rem' }}>
             <p className="text-sm leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Open Sans, sans-serif' }}>
+              style={{ color: 'rgba(255,255,255,0.88)', fontFamily: 'Open Sans, sans-serif' }}>
               <span style={{ color: 'rgba(250,240,0,0.5)', fontFamily: 'Almarai, sans-serif', marginRight: '0.5rem' }}>
                 [{i + 1}]
               </span>
@@ -1105,7 +1075,7 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
         Your growth roadmap
       </h2>
       <p className="text-sm leading-relaxed mb-10 max-w-2xl"
-        style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Open Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
         Based on your results, here is how Interrupt × Like So can support your organisation across each of the five Interplay pillars.
       </p>
       <div className="space-y-5">
@@ -1126,7 +1096,7 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
                 <p className="text-xs font-mono uppercase tracking-widest" style={{ color }}>
                   {meta?.shortName ?? section.slug}
                 </p>
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {section.pct}% · {band.label}
                 </span>
               </div>
@@ -1149,7 +1119,7 @@ function StepWhatsNext() {
         Ready to improve<br />your Interplay?
       </h2>
       <p className="text-base leading-relaxed mb-6 max-w-xl"
-        style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Open Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.92)', fontFamily: 'Open Sans, sans-serif' }}>
         Interrupt × Like So work with organisations to close the gap between sustainability, brand and business strategy — unlocking triple value.
       </p>
       <div className="mt-10 p-6 rounded-xl"
@@ -1157,7 +1127,7 @@ function StepWhatsNext() {
         <p className="text-xs font-mono uppercase tracking-widest mb-1" style={{ color: 'rgba(250,240,0,0.5)' }}>
           Get in touch
         </p>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Open Sans, sans-serif' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
           interruptconsultancy.com · likeso.com
         </p>
       </div>

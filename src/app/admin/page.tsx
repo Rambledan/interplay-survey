@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { ResponseEntry, AdminStats } from '@/app/api/admin/responses/route'
 import type { ReferralRow } from '@/lib/db'
 import type { SurveySection } from '@/types/survey'
+import { computeAllSectionScores, getScoreBand } from '@/lib/score'
 
 // ── Section colour palette (light-mode readable) ───────────────────────────
 
@@ -496,6 +497,13 @@ function ResultsLinkPanel({ respondentName, password }: { respondentName: string
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(62,207,110,0.4)'; e.currentTarget.style.color = '#22a855' }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'; e.currentTarget.style.color = 'rgba(13,20,16,0.55)' }}>
                         Preview ↗
+                      </button>
+                      <button onClick={() => window.open(`${window.location.origin}/api/results/${t.token}/pdf`, '_blank')}
+                        className="text-xs font-mono px-2 py-1 transition-colors"
+                        style={{ border: '1px solid rgba(13,20,16,0.15)', color: 'rgba(13,20,16,0.55)' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(74,159,245,0.5)'; e.currentTarget.style.color = '#4a9ff5' }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'; e.currentTarget.style.color = 'rgba(13,20,16,0.55)' }}>
+                        PDF ↓
                       </button>
                       {confirmRevoke === t.token ? (
                         <>
@@ -1367,6 +1375,579 @@ function RespondentCard({
   )
 }
 
+// ── Dashboard helpers ──────────────────────────────────────────────────────
+
+function buildAnswerMap(sections: ResponseEntry[]): Record<string, string> {
+  const map: Record<string, string> = {}
+  for (const section of sections) {
+    for (const a of section.answers) {
+      if (a.answer) map[a.questionId] = a.answer
+    }
+  }
+  return map
+}
+
+const BAND_COLORS = ['#dc2626', '#d97706', '#3b82f6', '#22a855']
+const BAND_LABELS = ['Early Stage', 'Developing', 'Maturing', 'Leading']
+
+// Simple horizontal bar (used for pillar averages, sector counts, etc.)
+function HBar({
+  label, value, max = 100, color, labelWidth = 110, unit = '%',
+}: { label: string; value: number; max?: number; color: string; labelWidth?: number; unit?: string }) {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0
+  return (
+    <div className="flex items-center gap-3 py-1.5">
+      <span className="font-mono uppercase tracking-wider text-right shrink-0 truncate"
+        style={{ width: labelWidth, color: 'rgba(13,20,16,0.5)', fontSize: '11px' }}>
+        {label}
+      </span>
+      <div className="relative h-6 flex-1 rounded-sm overflow-hidden" style={{ backgroundColor: 'rgba(13,20,16,0.04)', minWidth: 0 }}>
+        <div style={{ width: `${pct}%`, height: '100%', backgroundColor: color, opacity: 0.82, transition: 'width 0.5s ease' }} />
+        <span className="absolute right-2 inset-y-0 flex items-center font-mono text-xs"
+          style={{ color: 'rgba(13,20,16,0.55)' }}>
+          {value}{unit === '%' ? '%' : unit === 'n' ? '' : unit}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// Micro score chip shown in the respondent table
+function ScoreChip({ pct, color }: { pct: number | null; color: string }) {
+  if (pct === null) return <span style={{ color: 'rgba(13,20,16,0.2)', fontFamily: 'monospace' }}>—</span>
+  const { label } = getScoreBand(pct)
+  return (
+    <span title={label} style={{
+      display: 'inline-block',
+      fontFamily: 'monospace', fontSize: '12px', fontWeight: 600,
+      color, minWidth: 36, textAlign: 'center',
+    }}>
+      {pct}%
+    </span>
+  )
+}
+
+// Pentagon SVG for a respondent's scores
+function MiniPentagon({ scores, size = 72 }: { scores: Record<string, number>; size?: number }) {
+  const cx = size / 2, cy = size / 2, r = size * 0.38
+  const slugs = SECTION_SLUGS_ORDERED
+  const pts = slugs.map((_, i) => {
+    const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) }
+  })
+  const outerPoly = pts.map(p => `${p.x},${p.y}`).join(' ')
+  const innerPts = slugs.map((slug, i) => {
+    const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2
+    const pct = (scores[slug] ?? 0) / 100
+    return { x: cx + r * pct * Math.cos(angle), y: cy + r * pct * Math.sin(angle) }
+  })
+  const innerPoly = innerPts.map(p => `${p.x},${p.y}`).join(' ')
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <polygon points={outerPoly} fill="rgba(13,20,16,0.05)" stroke="rgba(13,20,16,0.12)" strokeWidth="0.8" />
+      {slugs.map((_, i) => (
+        <line key={i} x1={cx} y1={cy} x2={pts[i].x} y2={pts[i].y}
+          stroke="rgba(13,20,16,0.08)" strokeWidth="0.6" />
+      ))}
+      <polygon points={innerPoly} fill="rgba(250,240,0,0.55)" stroke="#d4c000" strokeWidth="0.8" />
+      {slugs.map((slug, i) => (
+        <circle key={slug} cx={innerPts[i].x} cy={innerPts[i].y} r="2.5"
+          fill={SECTION_COLORS[slug]} />
+      ))}
+    </svg>
+  )
+}
+
+// ── Main Dashboard Panel ───────────────────────────────────────────────────
+
+// ── Question-level response breakdown ─────────────────────────────────────
+
+function QuestionInsightsSection({
+  allSections,
+  respondentGroups,
+}: {
+  allSections: SurveySection[]
+  respondentGroups: RespondentGroup[]
+}) {
+  const firstSlug = allSections[0]?.slug ?? null
+  const [openSlug, setOpenSlug] = useState<string | null>(firstSlug)
+
+  const sectionData = useMemo(() => {
+    return allSections.map(section => {
+      // Use latest submission per respondent for this section
+      const submissions = respondentGroups.flatMap(group => {
+        const latest = group.sections
+          .filter(r => r.sectionSlug === section.slug)
+          .sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0]
+        return latest ? [latest.answers] : []
+      })
+      const total = submissions.length
+
+      const qCounts: Record<string, Record<string, number>> = {}
+      const qTexts: Record<string, string[]> = {}
+      const qFollowUps: Record<string, string[]> = {}
+
+      for (const answers of submissions) {
+        for (const a of answers) {
+          if (a.type === 'open-answer' || a.type === 'revenue-input') {
+            if (a.answer) { (qTexts[a.questionId] ??= []).push(a.answer) }
+          } else if (a.answer) {
+            qCounts[a.questionId] ??= {}
+            const vals = a.type === 'multiple-select'
+              ? a.answer.split(',').map(s => s.trim()).filter(Boolean)
+              : [a.answer]
+            for (const v of vals) qCounts[a.questionId][v] = (qCounts[a.questionId][v] ?? 0) + 1
+          }
+          if (a.followUp) { (qFollowUps[a.questionId] ??= []).push(a.followUp) }
+        }
+      }
+
+      return { section, total, qCounts, qTexts, qFollowUps }
+    }).filter(d => d.total > 0)
+  }, [allSections, respondentGroups])
+
+  return (
+    <div className="flex flex-col gap-3 mt-6">
+      <h3 className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.4)' }}>
+        Question-level response breakdown
+      </h3>
+      {sectionData.map(({ section, total, qCounts, qTexts, qFollowUps }) => {
+        const color = SECTION_COLORS[section.slug] ?? '#3ecf6e'
+        const isOpen = openSlug === section.slug
+        return (
+          <div key={section.slug} style={{ backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }}>
+            {/* Section header toggle */}
+            <button
+              className="w-full text-left px-6 py-4 flex items-center gap-3"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setOpenSlug(isOpen ? null : section.slug)}
+            >
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+              <span className="font-mono uppercase tracking-[0.12em] text-sm font-bold" style={{ color }}>
+                {SECTION_SHORT_NAMES[section.slug] ?? section.name}
+              </span>
+              <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+                {total} respondent{total !== 1 ? 's' : ''}
+              </span>
+              <span className="ml-auto text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+                {isOpen ? '▲' : '▼'}
+              </span>
+            </button>
+
+            {isOpen && (
+              <div style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+                {section.questions.map((q, qi) => {
+                  if (q.type === 'revenue-input') return null
+                  const counts = qCounts[q.id] ?? {}
+                  const texts = qTexts[q.id] ?? []
+                  const followUps = qFollowUps[q.id] ?? []
+                  const opts = q.options ?? []
+                  const isClosedQ = q.type !== 'open-answer'
+                  const maxCount = Math.max(1, ...Object.values(counts))
+                  const mostCommonCount = Math.max(0, ...Object.values(counts))
+                  // How many respondents answered this question at all
+                  const answeredN = q.type === 'multiple-select'
+                    ? Object.values(counts).reduce((a, b) => a + b, 0)  // sum of all selections
+                    : Object.values(counts).reduce((a, b) => a + b, 0)
+                  const uniqueAnswers = isClosedQ ? (
+                    q.type === 'multiple-select' ? answeredN : Object.values(counts).reduce((a, b) => a + b, 0)
+                  ) : texts.length
+
+                  return (
+                    <div key={q.id} className="px-6 py-5"
+                      style={{ borderTop: qi === 0 ? 'none' : '1px solid rgba(13,20,16,0.05)' }}>
+                      {/* Question text */}
+                      <div className="flex gap-2 mb-3">
+                        <span className="text-xs font-mono shrink-0 pt-0.5"
+                          style={{ color: color, opacity: 0.7, minWidth: 22, fontWeight: 700 }}>
+                          Q{qi + 1}
+                        </span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium" style={{ color: '#0d1410', lineHeight: 1.5 }}>{q.text}</p>
+                          {q.type === 'multiple-select' && (
+                            <p className="text-xs mt-0.5 font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>Multi-select — respondents could choose more than one</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Closed question — response bars */}
+                      {isClosedQ && (
+                        <div className="ml-7 flex flex-col gap-1">
+                          {/* Options in questions.json order */}
+                          {opts.map(opt => {
+                            const count = counts[opt] ?? 0
+                            const pct = total > 0 ? Math.round((count / total) * 100) : 0
+                            const isTop = count === mostCommonCount && count > 0
+                            return (
+                              <div key={opt} className="flex items-center gap-3">
+                                <div className="relative flex-1 rounded-sm overflow-hidden"
+                                  style={{ height: 32, backgroundColor: 'rgba(13,20,16,0.03)', minWidth: 0 }}>
+                                  <div style={{
+                                    position: 'absolute', inset: 0, right: 'auto',
+                                    width: `${maxCount > 0 ? (count / maxCount) * 100 : 0}%`,
+                                    backgroundColor: color,
+                                    opacity: isTop ? 0.18 : 0.07,
+                                  }} />
+                                  {isTop && (
+                                    <div style={{
+                                      position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+                                      backgroundColor: color, opacity: 0.9,
+                                    }} />
+                                  )}
+                                  <span className="absolute inset-y-0 left-3 right-20 flex items-center text-xs truncate"
+                                    style={{ color: isTop ? '#0d1410' : 'rgba(13,20,16,0.55)', fontWeight: isTop ? 600 : 400 }}>
+                                    {opt}
+                                  </span>
+                                </div>
+                                {/* Count chip */}
+                                <div className="shrink-0 flex items-center gap-2" style={{ minWidth: 80 }}>
+                                  <span className="font-mono text-sm font-bold"
+                                    style={{ color: isTop ? '#0d1410' : 'rgba(13,20,16,0.35)', minWidth: 20, textAlign: 'right' }}>
+                                    {count}
+                                  </span>
+                                  <span className="font-mono text-xs"
+                                    style={{ color: isTop ? 'rgba(13,20,16,0.55)' : 'rgba(13,20,16,0.25)', minWidth: 36 }}>
+                                    {pct}%
+                                  </span>
+                                </div>
+                              </div>
+                            )
+                          })}
+                          {/* Footer: answered / no response */}
+                          <div className="flex justify-between items-center mt-1 pt-1">
+                            <span className="text-[10px] font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>
+                              {q.type === 'multiple-select'
+                                ? `${answeredN} selections from ${total} respondents`
+                                : `${uniqueAnswers}/${total} answered`}
+                            </span>
+                            {mostCommonCount > 0 && q.type !== 'multiple-select' && (
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm"
+                                style={{ backgroundColor: `${color}15`, color, fontWeight: 600 }}>
+                                Most common: {Math.round((mostCommonCount / total) * 100)}% chose the same answer
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Open-answer — show text responses */}
+                      {q.type === 'open-answer' && (
+                        <div className="ml-7">
+                          {texts.length === 0 ? (
+                            <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>No responses.</span>
+                          ) : (
+                            <div className="flex flex-col gap-1.5">
+                              {texts.map((text, ti) => (
+                                <div key={ti} className="px-3 py-2 text-sm rounded-sm"
+                                  style={{ backgroundColor: `${color}0d`, borderLeft: `2px solid ${color}50`, color: '#0d1410', lineHeight: 1.55 }}>
+                                  {text}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Follow-up notes */}
+                      {followUps.length > 0 && (
+                        <div className="ml-7 mt-2">
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-1.5" style={{ color: 'rgba(13,20,16,0.35)' }}>
+                            Follow-up notes ({followUps.length})
+                          </p>
+                          <div className="flex flex-col gap-1">
+                            {followUps.map((fu, fi) => (
+                              <div key={fi} className="px-3 py-1.5 text-xs italic rounded-sm"
+                                style={{ backgroundColor: 'rgba(13,20,16,0.03)', borderLeft: '2px solid rgba(13,20,16,0.1)', color: 'rgba(13,20,16,0.6)', lineHeight: 1.5 }}>
+                                {fu}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Dashboard Panel ────────────────────────────────────────────────────────
+
+function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]; allSections: SurveySection[] }) {
+  const respondentGroups = useMemo(() => groupByRespondent(responses), [responses])
+
+  const respondentData = useMemo(() =>
+    respondentGroups.map(group => ({
+      group,
+      scores: computeAllSectionScores(buildAnswerMap(group.sections)),
+    })), [respondentGroups])
+
+  // KPIs
+  const totalRespondents = respondentGroups.length
+  const completedAll = useMemo(() =>
+    respondentData.filter(d => {
+      const slugs = new Set(d.group.sections.map(s => s.sectionSlug))
+      return SECTION_SLUGS_ORDERED.every(s => slugs.has(s))
+    }).length, [respondentData])
+
+  const avgOverall = useMemo(() =>
+    respondentData.length > 0
+      ? Math.round(respondentData.reduce((sum, d) => sum + d.scores.overall, 0) / respondentData.length)
+      : 0, [respondentData])
+
+  // Section averages (mean pct across respondents who answered each section)
+  const sectionAvgs = useMemo(() => {
+    const totals: Record<string, number[]> = {}
+    for (const { scores } of respondentData) {
+      for (const s of scores.sections) {
+        if (s.max > 0 && s.answeredCount > 0) {
+          ;(totals[s.slug] ??= []).push(s.pct)
+        }
+      }
+    }
+    return Object.fromEntries(
+      SECTION_SLUGS_ORDERED.map(slug => [
+        slug,
+        totals[slug]?.length
+          ? Math.round(totals[slug].reduce((a, b) => a + b, 0) / totals[slug].length)
+          : 0,
+      ])
+    )
+  }, [respondentData])
+
+  // Band distribution [EARLY, DEVELOPING, MATURING, LEADING] counts per section
+  const bandDist = useMemo(() => {
+    const dist: Record<string, [number, number, number, number]> = {}
+    for (const slug of SECTION_SLUGS_ORDERED) dist[slug] = [0, 0, 0, 0]
+    for (const { scores } of respondentData) {
+      for (const s of scores.sections) {
+        if (s.max > 0 && s.answeredCount > 0) {
+          dist[s.slug][getScoreBand(s.pct).index]++
+        }
+      }
+    }
+    return dist
+  }, [respondentData])
+
+  // Export scores as CSV
+  function handleExportScores() {
+    const header = ['Name', 'Company', 'Role', 'Sector', 'Type',
+      'Appetite%', 'Scale%', 'Sustainability%', 'Brand%', 'Business%', 'Overall%'].join(',')
+    const rows = respondentData
+      .sort((a, b) => b.scores.overall - a.scores.overall)
+      .map(({ group, scores }) => {
+        const bySlug = Object.fromEntries(scores.sections.map(s => [s.slug, s.pct]))
+        return [
+          `"${group.name}"`, `"${group.company}"`, `"${group.role}"`,
+          `"${group.sector}"`, `"${group.companyType}"`,
+          bySlug['appetite'] ?? '',
+          bySlug['scale-and-delivery'] ?? '',
+          bySlug['capability-sustainability'] ?? '',
+          bySlug['capability-brand'] ?? '',
+          bySlug['capability-business'] ?? '',
+          scores.overall,
+        ].join(',')
+      })
+    const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `interplay-scores-${new Date().toISOString().slice(0, 10)}.csv`; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  if (totalRespondents === 0) {
+    return (
+      <div className="px-6 py-16 text-center" style={{ backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }}>
+        <p className="text-sm" style={{ color: 'rgba(13,20,16,0.5)' }}>No responses yet — analytics will appear here once the first survey is submitted.</p>
+      </div>
+    )
+  }
+
+  const cardStyle: React.CSSProperties = { backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }
+
+  return (
+    <div id="dashboard-print">
+      {/* Action bar */}
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3 no-print">
+        <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.4)' }}>
+          {totalRespondents} respondent{totalRespondents !== 1 ? 's' : ''} · {responses.length} section submission{responses.length !== 1 ? 's' : ''}
+        </span>
+        <div className="flex gap-3">
+          <button onClick={handleExportScores}
+            className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+            style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(62,207,110,0.4)'; e.currentTarget.style.color = '#22a855' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+            Export scores CSV ↓
+          </button>
+          <button onClick={() => window.print()}
+            className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+            style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.3)'; e.currentTarget.style.color = '#0d1410' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+            Print / Save PDF ⎙
+          </button>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Respondents</span>
+          <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>{totalRespondents}</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Avg overall score</span>
+          <span className="text-3xl font-bold" style={{ color: avgOverall >= 60 ? '#22a855' : avgOverall >= 40 ? '#d97706' : '#dc2626' }}>{avgOverall}%</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Fully completed</span>
+          <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>{completedAll}</span>
+          <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>of {totalRespondents} · all 5 pillars</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Completion rate</span>
+          <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>
+            {totalRespondents > 0 ? Math.round((completedAll / totalRespondents) * 100) : 0}%
+          </span>
+        </div>
+      </div>
+
+      {/* Charts row 1: pillar averages + band distribution */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Pillar averages */}
+        <div className="p-6" style={cardStyle}>
+          <h3 className="text-xs font-mono uppercase tracking-[0.15em] mb-5" style={{ color: 'rgba(13,20,16,0.4)' }}>
+            Average score by pillar
+          </h3>
+          {SECTION_SLUGS_ORDERED.map(slug => (
+            <HBar key={slug} label={SECTION_SHORT_NAMES[slug]} value={sectionAvgs[slug] ?? 0}
+              color={SECTION_COLORS[slug]} />
+          ))}
+          {/* Benchmark line overlay description */}
+          <div className="mt-4 pt-4 flex gap-6 flex-wrap" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+            {[{ pct: 0, label: 'Early Stage', color: BAND_COLORS[0] }, { pct: 40, label: 'Developing', color: BAND_COLORS[1] }, { pct: 60, label: 'Maturing', color: BAND_COLORS[2] }, { pct: 80, label: 'Leading', color: BAND_COLORS[3] }].map(b => (
+              <div key={b.pct} className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: b.color }} />
+                <span className="text-[10px] font-mono uppercase" style={{ color: 'rgba(13,20,16,0.45)' }}>{b.label}</span>
+                <span className="text-[10px] font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>{b.pct === 0 ? '< 40%' : b.pct === 40 ? '40–59%' : b.pct === 60 ? '60–79%' : '80%+'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Band distribution */}
+        <div className="p-6" style={cardStyle}>
+          <h3 className="text-xs font-mono uppercase tracking-[0.15em] mb-5" style={{ color: 'rgba(13,20,16,0.4)' }}>
+            Score band distribution by pillar
+          </h3>
+          {SECTION_SLUGS_ORDERED.map(slug => {
+            const dist = bandDist[slug] ?? [0, 0, 0, 0]
+            const total = dist.reduce((a, b) => a + b, 0)
+            return (
+              <div key={slug} className="flex items-center gap-3 py-1.5">
+                <span className="font-mono uppercase tracking-wider text-right shrink-0"
+                  style={{ width: 110, color: 'rgba(13,20,16,0.5)', fontSize: '11px' }}>
+                  {SECTION_SHORT_NAMES[slug]}
+                </span>
+                <div className="flex-1 h-6 flex rounded-sm overflow-hidden" style={{ backgroundColor: 'rgba(13,20,16,0.04)', minWidth: 0 }}>
+                  {total > 0 ? dist.map((count, i) =>
+                    count > 0 ? (
+                      <div key={i} title={`${BAND_LABELS[i]}: ${count} respondent${count > 1 ? 's' : ''}`}
+                        style={{ width: `${(count / total) * 100}%`, height: '100%', backgroundColor: BAND_COLORS[i], opacity: 0.85, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 18 }}>
+                        <span style={{ color: '#fff', fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>{count}</span>
+                      </div>
+                    ) : null
+                  ) : (
+                    <span className="font-mono px-3 flex items-center text-xs" style={{ color: 'rgba(13,20,16,0.3)' }}>—</span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+          <div className="flex gap-4 mt-4 pt-4 flex-wrap" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+            {BAND_LABELS.map((label, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: BAND_COLORS[i] }} />
+                <span className="text-[10px] font-mono uppercase" style={{ color: 'rgba(13,20,16,0.5)' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Respondent scores table */}
+      <div className="p-6" style={cardStyle}>
+        <h3 className="text-xs font-mono uppercase tracking-[0.15em] mb-5" style={{ color: 'rgba(13,20,16,0.4)' }}>
+          All respondents — scores
+        </h3>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: 680 }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid rgba(13,20,16,0.08)' }}>
+                <th className="text-left pb-3 pr-4 font-mono uppercase tracking-wider text-xs" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Name</th>
+                <th className="text-left pb-3 pr-4 font-mono uppercase tracking-wider text-xs" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Company</th>
+                <th className="text-left pb-3 pr-4 font-mono uppercase tracking-wider text-xs" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}>Sector</th>
+                {SECTION_SLUGS_ORDERED.map(slug => (
+                  <th key={slug} className="text-center pb-3 px-2 font-mono uppercase tracking-wider text-xs"
+                    style={{ color: SECTION_COLORS[slug], fontWeight: 600, minWidth: 58 }}>
+                    {SECTION_SHORT_NAMES[slug].split(' ')[0]}
+                  </th>
+                ))}
+                <th className="text-center pb-3 px-2 font-mono uppercase tracking-wider text-xs" style={{ color: 'rgba(13,20,16,0.7)', fontWeight: 700 }}>OVR</th>
+                <th className="pb-3 pl-3 font-mono uppercase tracking-wider text-xs no-print" style={{ color: 'rgba(13,20,16,0.4)', fontWeight: 500 }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {respondentData
+                .sort((a, b) => b.scores.overall - a.scores.overall)
+                .map(({ group, scores }) => {
+                  const bySlug = Object.fromEntries(scores.sections.map(s => [s.slug, s]))
+                  const scoreMap = Object.fromEntries(
+                    SECTION_SLUGS_ORDERED.map(slug => {
+                      const s = bySlug[slug]
+                      return [slug, s?.max > 0 && s?.answeredCount > 0 ? s.pct : null]
+                    })
+                  )
+                  return (
+                    <tr key={group.name} style={{ borderBottom: '1px solid rgba(13,20,16,0.04)' }}>
+                      <td className="py-3 pr-4 text-sm font-medium" style={{ color: '#0d1410' }}>{group.name}</td>
+                      <td className="py-3 pr-4 text-xs" style={{ color: 'rgba(13,20,16,0.55)' }}>{group.company || '—'}</td>
+                      <td className="py-3 pr-4 text-xs font-mono" style={{ color: 'rgba(13,20,16,0.45)' }}>{group.sector || '—'}</td>
+                      {SECTION_SLUGS_ORDERED.map(slug => (
+                        <td key={slug} className="py-3 px-2 text-center">
+                          <ScoreChip pct={scoreMap[slug] as number | null} color={SECTION_COLORS[slug]} />
+                        </td>
+                      ))}
+                      <td className="py-3 px-2 text-center">
+                        <span style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: 700, color: scores.overall > 0 ? '#0d1410' : 'rgba(13,20,16,0.2)' }}>
+                          {scores.overall > 0 ? `${scores.overall}%` : '—'}
+                        </span>
+                      </td>
+                      <td className="py-3 pl-3 no-print">
+                        <MiniPentagon size={48} scores={Object.fromEntries(
+                          SECTION_SLUGS_ORDERED.map(slug => [slug, scoreMap[slug] ?? 0])
+                        ) as Record<string, number>} />
+                      </td>
+                    </tr>
+                  )
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Question-level response breakdown */}
+      <QuestionInsightsSection allSections={allSections} respondentGroups={respondentGroups} />
+    </div>
+  )
+}
+
 // ── Login screen ───────────────────────────────────────────────────────────
 
 function LoginScreen({ onSuccess }: { onSuccess: (pw: string) => void }) {
@@ -1441,6 +2022,7 @@ export default function AdminPage() {
   const [expandedSectionId, setExpandedSectionId] = useState<string | null>(null)
   const [deletingRespondent, setDeletingRespondent] = useState<string | null>(null)
   const [allSections, setAllSections] = useState<SurveySection[]>([])
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'responses' | 'cms'>('dashboard')
 
   const fetchData = useCallback(async (pw: string) => {
     setLoading(true)
@@ -1522,137 +2104,163 @@ export default function AdminPage() {
     ? respondentGroups
     : respondentGroups.filter(g => g.sections.some(s => s.sectionSlug === activeSection))
 
+  const tabStyle = (tab: string): React.CSSProperties => ({
+    padding: '8px 16px',
+    fontSize: '12px',
+    fontFamily: 'monospace',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    border: 'none',
+    borderBottom: activeTab === tab ? '2px solid #3ecf6e' : '2px solid transparent',
+    color: activeTab === tab ? '#22a855' : 'rgba(13,20,16,0.45)',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    transition: 'color 0.15s',
+  })
+
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f6f8f6' }}>
-      {/* Header */}
-      <header className="px-6 py-5 flex items-center justify-between"
-        style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Interrupt</span>
-          <span style={{ color: 'rgba(13,20,16,0.2)' }}>×</span>
-          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Like So</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>
-            Admin — Response Review
-          </span>
-          <button onClick={() => fetchData(password)}
-            className="text-xs font-mono transition-colors"
-            style={{ color: 'rgba(13,20,16,0.4)' }}
-            title="Refresh"
-            onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.4)'}>
-            ↺
-          </button>
-          <button onClick={handleLogout}
-            className="text-xs font-mono transition-colors"
-            style={{ color: 'rgba(13,20,16,0.4)' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.4)'}>
-            Sign out
-          </button>
-        </div>
-      </header>
+    <>
+      {/* Print-only styles */}
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+          #dashboard-print { display: block !important; }
+        }
+        @media screen {
+          .print-only { display: none !important; }
+        }
+      `}</style>
 
-      <main className="flex-1 px-6 py-8 max-w-4xl mx-auto w-full">
-
-        {/* Stats */}
-        {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-            <StatCard label="Total responses" value={stats.total} />
-            <StatCard label="Unique respondents" value={stats.uniqueRespondents} />
-            <StatCard label="Sections covered" value={Object.keys(stats.bySection).length} />
-            <StatCard
-              label="Last submission"
-              value={stats.lastSubmission ? formatDate(stats.lastSubmission).split(',')[0] : '—'}
-            />
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f6f8f6' }}>
+        {/* Header */}
+        <header className="px-6 py-4 flex items-center justify-between no-print"
+          style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Interrupt</span>
+            <span style={{ color: 'rgba(13,20,16,0.2)' }}>×</span>
+            <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Like So</span>
+            <span className="ml-4 text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>Admin</span>
           </div>
-        )}
-
-        {/* Global report templates */}
-        <GlobalTemplatePanel password={password} />
-
-        {/* Section tabs + export */}
-        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setActiveSection('all')}
-              className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
-              style={{
-                borderColor: activeSection === 'all' ? '#3ecf6e' : 'rgba(13,20,16,0.12)',
-                color: activeSection === 'all' ? '#22a855' : 'rgba(13,20,16,0.5)',
-                backgroundColor: activeSection === 'all' ? 'rgba(62,207,110,0.07)' : 'transparent',
-              }}>
-              All ({respondentGroups.length} respondents)
+          <div className="flex items-center gap-4">
+            <button onClick={() => fetchData(password)}
+              className="text-xs font-mono transition-colors"
+              style={{ color: 'rgba(13,20,16,0.4)' }}
+              title="Refresh data"
+              onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.4)'}>
+              ↺ Refresh
             </button>
-
-            {sections.map(([slug, name]) => {
-              const count = stats?.bySection[slug] ?? 0
-              const color = getSectionColor(slug)
-              const isActive = activeSection === slug
-              return (
-                <button
-                  key={slug}
-                  onClick={() => setActiveSection(slug)}
-                  className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
-                  style={{
-                    borderColor: isActive ? `${color}60` : 'rgba(13,20,16,0.12)',
-                    color: isActive ? color : 'rgba(13,20,16,0.5)',
-                    backgroundColor: isActive ? `${color}0d` : 'transparent',
-                  }}>
-                  {name} ({count})
-                </button>
-              )
-            })}
+            <button onClick={handleLogout}
+              className="text-xs font-mono transition-colors"
+              style={{ color: 'rgba(13,20,16,0.4)' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.4)'}>
+              Sign out
+            </button>
           </div>
+        </header>
 
-          <button
-            onClick={handleExport}
-            className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
-            style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(62,207,110,0.4)'; e.currentTarget.style.color = '#22a855' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
-            Export CSV ↓
-          </button>
+        {/* Tab nav */}
+        <div className="flex px-6 no-print" style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
+          <button style={tabStyle('dashboard')} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
+          <button style={tabStyle('responses')} onClick={() => setActiveTab('responses')}>Responses</button>
+          <button style={tabStyle('cms')} onClick={() => setActiveTab('cms')}>CMS</button>
         </div>
 
-        {/* Respondent list */}
-        {loading ? (
-          <p className="text-sm font-mono animate-pulse" style={{ color: 'rgba(13,20,16,0.4)' }}>Loading responses…</p>
-        ) : visibleGroups.length === 0 ? (
-          <div className="px-6 py-12 text-center"
-            style={{ backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }}>
-            <p className="text-sm" style={{ color: 'rgba(13,20,16,0.5)' }}>No responses yet.</p>
-            <p className="text-xs mt-1 font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>
-              Responses will appear here after the first survey submission.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {visibleGroups.map(group => (
-              <RespondentCard
-                key={group.name.toLowerCase()}
-                group={group}
-                password={password}
-                activeSection={activeSection}
-                expandedSectionId={expandedSectionId}
-                onToggleSection={(id) => setExpandedSectionId(expandedSectionId === id ? null : id)}
-                onDelete={handleDelete}
-                deleting={deletingRespondent === group.name}
-                allSections={allSections}
-                onRefresh={() => fetchData(password)}
-                referrals={referralsByRespondent[group.name.toLowerCase()] ?? []}
-              />
-            ))}
-          </div>
-        )}
-      </main>
+        <main className="flex-1 px-6 py-8 w-full" style={{ maxWidth: activeTab === 'dashboard' ? 1200 : 900, margin: '0 auto' }}>
 
-      <footer className="px-6 py-4 max-w-4xl mx-auto w-full" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
-        <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
-          Responses stored in Postgres — edit <code>data/questions.json</code> to update the survey.
-        </p>
-      </footer>
-    </div>
+          {loading && (
+            <p className="text-sm font-mono animate-pulse mb-6" style={{ color: 'rgba(13,20,16,0.4)' }}>Loading…</p>
+          )}
+
+          {/* ── Dashboard tab ── */}
+          {activeTab === 'dashboard' && (
+            <DashboardPanel responses={responses} allSections={allSections} />
+          )}
+
+          {/* ── Responses tab ── */}
+          {activeTab === 'responses' && (
+            <>
+              {/* Section filter tabs + CSV export */}
+              <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => setActiveSection('all')}
+                    className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+                    style={{
+                      borderColor: activeSection === 'all' ? '#3ecf6e' : 'rgba(13,20,16,0.12)',
+                      color: activeSection === 'all' ? '#22a855' : 'rgba(13,20,16,0.5)',
+                      backgroundColor: activeSection === 'all' ? 'rgba(62,207,110,0.07)' : 'transparent',
+                    }}>
+                    All ({respondentGroups.length} respondents)
+                  </button>
+                  {sections.map(([slug, name]) => {
+                    const count = stats?.bySection[slug] ?? 0
+                    const color = getSectionColor(slug)
+                    const isActive = activeSection === slug
+                    return (
+                      <button key={slug} onClick={() => setActiveSection(slug)}
+                        className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+                        style={{
+                          borderColor: isActive ? `${color}60` : 'rgba(13,20,16,0.12)',
+                          color: isActive ? color : 'rgba(13,20,16,0.5)',
+                          backgroundColor: isActive ? `${color}0d` : 'transparent',
+                        }}>
+                        {name} ({count})
+                      </button>
+                    )
+                  })}
+                </div>
+                <button onClick={handleExport}
+                  className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+                  style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(62,207,110,0.4)'; e.currentTarget.style.color = '#22a855' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+                  Export raw CSV ↓
+                </button>
+              </div>
+
+              {visibleGroups.length === 0 ? (
+                <div className="px-6 py-12 text-center" style={{ backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }}>
+                  <p className="text-sm" style={{ color: 'rgba(13,20,16,0.5)' }}>No responses yet.</p>
+                  <p className="text-xs mt-1 font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>Responses will appear here after the first survey submission.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {visibleGroups.map(group => (
+                    <RespondentCard
+                      key={group.name.toLowerCase()}
+                      group={group}
+                      password={password}
+                      activeSection={activeSection}
+                      expandedSectionId={expandedSectionId}
+                      onToggleSection={(id) => setExpandedSectionId(expandedSectionId === id ? null : id)}
+                      onDelete={handleDelete}
+                      deleting={deletingRespondent === group.name}
+                      allSections={allSections}
+                      onRefresh={() => fetchData(password)}
+                      referrals={referralsByRespondent[group.name.toLowerCase()] ?? []}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── CMS tab ── */}
+          {activeTab === 'cms' && (
+            <GlobalTemplatePanel password={password} />
+          )}
+
+        </main>
+
+        <footer className="px-6 py-4 no-print" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
+          <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+            Interplay Admin · Responses stored in Postgres
+          </p>
+        </footer>
+      </div>
+    </>
   )
 }
