@@ -103,18 +103,18 @@ export default function SectionPage({ params }: SectionPageProps) {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#faf9f5' }}>
-        <div className="text-sm animate-pulse" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.4)' }}>Loading…</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#2f2a2a' }}>
+        <div className="text-sm animate-pulse" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.4)' }}>Loading…</div>
       </div>
     )
   }
 
   if (status === 'error' || !currentSection) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: '#faf9f5' }}>
+      <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: '#2f2a2a' }}>
         <div className="max-w-sm text-center">
           <p className="text-sm mb-4" style={{ color: '#dc2626' }}>{errorMsg ?? `Section "${sectionSlug}" not found.`}</p>
-          <button onClick={() => router.push('/')} className="text-sm underline" style={{ color: '#2f2a2a' }}>
+          <button onClick={() => router.push('/')} className="text-sm underline" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Return to start
           </button>
         </div>
@@ -143,15 +143,15 @@ export default function SectionPage({ params }: SectionPageProps) {
           </div>
         )}
 
-        <div className="flex justify-between items-center pt-4" style={{ borderTop: '1px solid rgba(47,42,42,0.1)' }}>
+        <div className="flex justify-between items-center pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           {currentIndex > 0 ? (
             <button
               type="button"
               onClick={() => router.push(`/survey/${sections[currentIndex - 1].slug}`)}
-              className="text-sm transition-colors hover:opacity-100"
-              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.45)' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#2f2a2a'}
-              onMouseLeave={e => e.currentTarget.style.color = 'rgba(47,42,42,0.45)'}
+              className="text-sm transition-colors"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.35)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.35)'}
             >
               ← Back
             </button>

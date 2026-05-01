@@ -10,9 +10,9 @@ const inputCls = [
 ].join(' ')
 
 const inputStyle = {
-  backgroundColor: '#fff',
-  border: '1px solid rgba(47,42,42,0.15)',
-  color: '#2f2a2a',
+  backgroundColor: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  color: 'rgba(255,255,255,0.88)',
   borderRadius: '4px',
 }
 
@@ -58,42 +58,46 @@ export default function IntroPage() {
   }
 
   function focusBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    e.currentTarget.style.borderColor = '#2f2a2a'
+    e.currentTarget.style.borderColor = 'rgba(250,240,0,0.5)'
   }
   function blurBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    e.currentTarget.style.borderColor = 'rgba(47,42,42,0.15)'
+    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f8faf5' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#2f2a2a', color: 'rgba(255,255,255,0.92)' }}>
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
-        style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(47,42,42,0.1)' }}>
+        style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
         <div className="flex items-center gap-4">
-          <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto' }} />
-          <span style={{ color: 'rgba(47,42,42,0.25)' }}>×</span>
-          <img src="/LS.png" alt="Like So" style={{ height: '31px', width: 'auto' }} />
+          <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
+          <span style={{ color: 'rgba(255,255,255,0.2)' }}>×</span>
+          <img src="/LS.png" alt="Like So" style={{ height: '31px', width: 'auto', filter: 'invert(1)' }} />
         </div>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 max-w-2xl mx-auto w-full">
 
         {/* Tagline */}
-        <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', display: 'inline-block', padding: '4px 10px' }}>
+        <p className="text-xs uppercase tracking-[0.3em] mb-6"
+          style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', display: 'inline-block', padding: '4px 10px' }}>
           Interplay Method — Diagnostic
         </p>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-5xl uppercase leading-none mb-6" style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', fontWeight: 400 }}>
+        <h1 className="text-5xl md:text-5xl uppercase leading-none mb-6"
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.92)', fontWeight: 400 }}>
           Where do you sit in<br />
-          <span style={{ color: '#2f2a2a', WebkitTextStroke: '0px #2f2a2a' }}>the interplay?</span>
+          the interplay?
         </h1>
 
         {/* Intro text */}
-        <p className="text-base leading-relaxed mb-4 max-w-lg" style={{ color: 'rgba(47,42,42,0.65)' }}>
+        <p className="text-base leading-relaxed mb-4 max-w-lg"
+          style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
           Most organisations solve sustainability in silos. Brand teams, sustainability teams, and business teams — all expert, all disconnected.
         </p>
-        <p className="text-base leading-relaxed mb-10 max-w-lg" style={{ color: 'rgba(47,42,42,0.65)' }}>
+        <p className="text-base leading-relaxed mb-10 max-w-lg"
+          style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
           This diagnostic reveals the gaps and opportunities between your sustainability, brand and business strategies — and where the interplay can unlock triple value.
         </p>
 
@@ -113,7 +117,7 @@ export default function IntroPage() {
             ].map(({ id, label, value, set, placeholder }) => (
               <div key={id}>
                 <label htmlFor={id} className="block text-xs uppercase tracking-widest mb-2"
-                  style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.5)' }}>
+                  style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
                   {label}
                 </label>
                 <input
@@ -124,7 +128,7 @@ export default function IntroPage() {
                   placeholder={placeholder}
                   required
                   className={inputCls}
-                  style={{ ...inputStyle, caretColor: '#faf000' }}
+                  style={{ ...inputStyle, caretColor: '#faf000', colorScheme: 'dark' }}
                   onFocus={focusBorder}
                   onBlur={blurBorder}
                 />
@@ -133,7 +137,7 @@ export default function IntroPage() {
 
             <div>
               <label htmlFor="companyType" className="block text-xs uppercase tracking-widest mb-2"
-                style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.5)' }}>
+                style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
                 Company type
               </label>
               <select
@@ -142,7 +146,7 @@ export default function IntroPage() {
                 onChange={(e) => setCompanyType(e.target.value)}
                 required
                 className={`${inputCls} appearance-none`}
-                style={{ ...inputStyle, color: companyType ? '#2f2a2a' : 'rgba(47,42,42,0.4)' }}
+                style={{ ...inputStyle, color: companyType ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.3)', colorScheme: 'dark' }}
                 onFocus={focusBorder}
                 onBlur={blurBorder}
               >
@@ -158,23 +162,23 @@ export default function IntroPage() {
                 type="submit"
                 disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading}
                 className="w-full font-bold uppercase tracking-widest py-4 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                style={{ backgroundColor: '#000', color: '#fff', borderRadius: '12px' }}
-                onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#2f2a2a' }}
-                onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#000' }}
+                style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px' }}
+                onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#e8df00' }}
+                onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#faf000' }}
               >
                 {loading ? 'Starting…' : 'Begin the diagnostic →'}
               </button>
             </div>
 
-            <p className="text-xs text-center pt-1" style={{ color: 'rgba(47,42,42,0.4)' }}>
+            <p className="text-xs text-center pt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
               Takes approximately 10–15 minutes. Multiple sections.
             </p>
           </form>
         )}
       </main>
 
-      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(47,42,42,0.1)' }}>
-        <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(47,42,42,0.4)' }}>
+      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.25)' }}>
           Interrupt × Like So — The Interplay Method®
         </p>
       </footer>

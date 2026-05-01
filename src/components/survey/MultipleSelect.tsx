@@ -4,7 +4,7 @@ interface MultipleSelectProps {
   questionId: string
   label: string
   options: string[]
-  value: string        // comma-separated selected values
+  value: string
   onChange: (value: string) => void
   accentColor?: string
 }
@@ -28,18 +28,18 @@ export function MultipleSelect({ questionId, options, value, onChange, accentCol
             key={option}
             type="button"
             onClick={() => toggle(option)}
-            className="w-full text-left px-4 py-3 text-sm transition-colors flex items-center gap-3"
+            className="w-full text-left px-4 py-3 text-sm transition-all duration-150 flex items-center gap-3"
             style={{
-              border: `1px solid ${isSelected ? accentColor : 'rgba(47,42,42,0.12)'}`,
-              backgroundColor: isSelected ? `rgba(250,240,0,0.12)` : '#fff',
-              color: '#2f2a2a',
+              border: `1px solid ${isSelected ? 'rgba(250,240,0,0.5)' : 'rgba(255,255,255,0.1)'}`,
+              backgroundColor: isSelected ? 'rgba(250,240,0,0.1)' : 'rgba(255,255,255,0.04)',
+              color: isSelected ? '#faf000' : 'rgba(255,255,255,0.65)',
               borderRadius: '4px',
             }}
           >
             <span
               className="flex-shrink-0 w-4 h-4 rounded-sm flex items-center justify-center"
               style={{
-                border: `1.5px solid ${isSelected ? accentColor : 'rgba(47,42,42,0.3)'}`,
+                border: `1.5px solid ${isSelected ? accentColor : 'rgba(255,255,255,0.2)'}`,
                 backgroundColor: isSelected ? accentColor : 'transparent',
               }}
             >

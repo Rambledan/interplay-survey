@@ -27,7 +27,7 @@ export function QuestionRenderer({
 
   return (
     <div className="mb-10">
-      <p className="text-base mb-5 leading-relaxed" style={{ color: '#0d1410' }}>{text}</p>
+      <p className="text-base mb-5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)', lineHeight: 1.65, letterSpacing: '0.01em' }}>{text}</p>
 
       {type === 'percentage' && (
         <PercentageScale

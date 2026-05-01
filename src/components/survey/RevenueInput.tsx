@@ -47,7 +47,11 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
     }
   }
 
-  const borderColor = focused ? '#3ecf6e' : 'rgba(13,20,16,0.12)'
+  const borderColor = focused ? 'rgba(250,240,0,0.5)' : 'rgba(255,255,255,0.1)'
+  const inputStyle = {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    color: 'rgba(255,255,255,0.88)',
+  }
 
   return (
     <div className="flex items-stretch gap-0 max-w-sm" id={questionId}>
@@ -56,12 +60,12 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
         <select
           value={currency}
           onChange={e => { setCurrency(e.target.value); update(e.target.value, figure, scale) }}
-          className="appearance-none h-full pl-3 pr-7 text-sm font-medium rounded-l-lg outline-none cursor-pointer transition-colors"
+          className="appearance-none h-full pl-3 pr-7 text-sm font-medium outline-none cursor-pointer transition-colors"
           style={{
-            backgroundColor: '#ffffff',
+            ...inputStyle,
             border: `1px solid ${borderColor}`,
             borderRight: 'none',
-            color: '#0d1410',
+            borderRadius: '4px 0 0 4px',
             minWidth: '3.5rem',
           }}
         >
@@ -69,8 +73,7 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        {/* Chevron */}
-        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: 'rgba(13,20,16,0.35)' }}>▾</span>
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>▾</span>
       </div>
 
       {/* Numeric input */}
@@ -86,11 +89,10 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
         onChange={e => { setFigure(e.target.value); update(currency, e.target.value, scale) }}
         className="flex-1 px-3 py-3 text-sm outline-none transition-colors min-w-0"
         style={{
-          backgroundColor: '#ffffff',
+          ...inputStyle,
           border: `1px solid ${borderColor}`,
           borderLeft: 'none',
           borderRight: 'none',
-          color: '#0d1410',
         }}
       />
 
@@ -99,12 +101,12 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
         <select
           value={scale}
           onChange={e => { setScale(e.target.value); update(currency, figure, e.target.value) }}
-          className="appearance-none h-full pl-3 pr-7 text-sm font-medium rounded-r-lg outline-none cursor-pointer transition-colors"
+          className="appearance-none h-full pl-3 pr-7 text-sm font-medium outline-none cursor-pointer transition-colors"
           style={{
-            backgroundColor: '#ffffff',
+            ...inputStyle,
             border: `1px solid ${borderColor}`,
             borderLeft: 'none',
-            color: '#0d1410',
+            borderRadius: '0 4px 4px 0',
             minWidth: '4rem',
           }}
         >
@@ -112,7 +114,7 @@ export function RevenueInput({ questionId, value, onChange }: RevenueInputProps)
             <option key={s} value={s}>{s === 'K' ? 'Thousands' : s === 'Mn' ? 'Millions' : 'Billions'}</option>
           ))}
         </select>
-        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: 'rgba(13,20,16,0.35)' }}>▾</span>
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>▾</span>
       </div>
     </div>
   )

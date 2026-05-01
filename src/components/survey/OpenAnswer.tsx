@@ -21,13 +21,13 @@ export function OpenAnswer({ questionId, label, value, onChange, placeholder }: 
         rows={4}
         className="w-full px-4 py-3 text-sm resize-none focus:outline-none transition-colors"
         style={{
-          backgroundColor: '#fff',
-          border: '1px solid rgba(47,42,42,0.25)',
-          color: '#3a3a3a',
+          backgroundColor: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          color: 'rgba(255,255,255,0.88)',
           borderRadius: '4px',
         }}
-        onFocus={e => e.currentTarget.style.borderColor = '#faf000'}
-        onBlur={e => e.currentTarget.style.borderColor = 'rgba(47,42,42,0.25)'}
+        onFocus={e => e.currentTarget.style.borderColor = 'rgba(250,240,0,0.5)'}
+        onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
       />
     </div>
   )

@@ -21,17 +21,17 @@ export function TextOptions({ questionId, label, options, value, onChange }: Tex
             <label
               key={option}
               htmlFor={id}
-              className="flex items-center gap-3 cursor-pointer px-5 py-3.5 border transition-all duration-150"
+              className="flex items-center gap-3 cursor-pointer px-5 py-3.5 transition-all duration-150"
               style={{
-                borderColor: selected ? '#faf000' : 'rgba(47,42,42,0.12)',
-                backgroundColor: selected ? 'rgba(250,240,0,0.12)' : '#fff',
-                color: selected ? '#2f2a2a' : 'rgba(47,42,42,0.65)',
+                border: `1px solid ${selected ? 'rgba(250,240,0,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                backgroundColor: selected ? 'rgba(250,240,0,0.1)' : 'rgba(255,255,255,0.04)',
+                color: selected ? '#faf000' : 'rgba(255,255,255,0.65)',
                 borderRadius: '4px',
               }}
             >
               <span
                 className="flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center"
-                style={{ borderColor: selected ? '#faf000' : 'rgba(47,42,42,0.2)' }}
+                style={{ borderColor: selected ? '#faf000' : 'rgba(255,255,255,0.2)' }}
                 aria-hidden
               >
                 {selected && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#faf000' }} />}
