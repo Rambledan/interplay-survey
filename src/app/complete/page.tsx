@@ -33,8 +33,8 @@ export default function CompletePage() {
         <div className="flex gap-3">
           {[
             { label: 'Sustainability Value', desc: 'Impact on society and planet', color: '#3ecf6e' },
-            { label: 'Brand Value',          desc: 'Desirability and differentiation', color: '#f4821f' },
-            { label: 'Business Value',       desc: 'Margins and growth', color: '#4a9ff5' },
+            { label: 'Brand Value',          desc: 'Desirability and differentiation', color: '#E8626D' },
+            { label: 'Business Value',       desc: 'Margins and growth', color: '#5F9FDF' },
           ].map(({ label, desc, color }) => (
             <div key={label} className="flex-1 px-3 py-4"
               style={{ border: `1px solid ${color}40`, color }}>

@@ -65,11 +65,11 @@ const C = {
   border:   '#e5e7eb',
   green:    '#3ecf6e',
   yellow:   '#faf000',
-  appetite: '#f4821f',
-  scale:    '#4a9ff5',
+  appetite: '#FF883E',
+  scale:    '#9D5AEF',
   sustain:  '#3ecf6e',
-  brand:    '#a855f7',
-  business: '#eab308',
+  brand:    '#E8626D',
+  business: '#5F9FDF',
 }
 
 const SECTION_COLORS: Record<string, string> = {
@@ -347,7 +347,7 @@ const PDF_INTRO = {
   ],
 }
 
-const PILLAR_COLORS = ['#f4821f', '#4a9ff5', '#3ecf6e', '#a855f7', '#eab308']
+const PILLAR_COLORS = ['#FF883E', '#9D5AEF', '#3ecf6e', '#E8626D', '#5F9FDF']
 
 function IntroductionPage({ data }: { data: ReportData }) {
   return (

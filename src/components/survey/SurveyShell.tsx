@@ -10,11 +10,11 @@ interface SurveyShellProps {
 }
 
 const sectionColors: Record<string, string> = {
-  'appetite':                  '#f4821f',
-  'scale-and-delivery':        '#4a9ff5',
+  'appetite':                  '#FF883E',
+  'scale-and-delivery':        '#9D5AEF',
   'capability-sustainability':  '#3ecf6e',
-  'capability-brand':           '#a855f7',
-  'capability-business':        '#eab308',
+  'capability-brand':           '#E8626D',
+  'capability-business':        '#5F9FDF',
 }
 
 export function SurveyShell({ sections, currentSection, children }: SurveyShellProps) {

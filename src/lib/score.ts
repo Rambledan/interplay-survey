@@ -134,7 +134,7 @@ export const SECTION_META: Record<string, {
 }> = {
   'appetite': {
     shortName: 'APPETITE',
-    color: '#f4821f',
+    color: '#FF883E',
     insights: [
       'Sustainability is not yet integrated into commercial thinking. Linking sustainability initiatives to revenue narratives is a high-value unlock for budget and board-level support.',
       'There is growing recognition that sustainability can drive value, but the connection to commercial outcomes remains inconsistent. Building a clear ROI story will accelerate internal buy-in.',
@@ -172,7 +172,7 @@ export const SECTION_META: Record<string, {
   },
   'scale-and-delivery': {
     shortName: 'SCALE & AI',
-    color: '#4a9ff5',
+    color: '#9D5AEF',
     insights: [
       'AI is not yet embedded in your sustainability work. Even simple tools — automated reporting, LLM-assisted analysis — could meaningfully reduce compliance burden and free capacity.',
       'There is some AI access, but it is not systematically applied to sustainability. Identifying two or three high-impact AI use cases would unlock disproportionate value.',
@@ -242,7 +242,7 @@ export const SECTION_META: Record<string, {
   },
   'capability-brand': {
     shortName: 'BRAND',
-    color: '#a855f7',
+    color: '#E8626D',
     insights: [
       'Brand and sustainability are operating largely in parallel. This is a significant missed opportunity — sustainability claims without brand integration create greenwashing risk.',
       'Some alignment exists but the connection between brand and sustainability is not yet systematic. Earlier involvement of sustainability teams in brand work would reduce risk and increase impact.',
@@ -283,7 +283,7 @@ export const SECTION_META: Record<string, {
   },
   'capability-business': {
     shortName: 'BUSINESS',
-    color: '#eab308',
+    color: '#5F9FDF',
     insights: [
       'Business and sustainability strategies are largely separate. Integrating sustainability into financial planning, capital allocation, and decision-making frameworks is the critical unlock.',
       'Sustainability is considered in business planning but not fully embedded. Establishing regular cross-functional meetings and financial performance measurement would close this gap.',

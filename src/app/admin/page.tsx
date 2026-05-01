@@ -9,11 +9,11 @@ import { computeAllSectionScores, getScoreBand } from '@/lib/score'
 // ── Section colour palette (light-mode readable) ───────────────────────────
 
 const SECTION_COLORS: Record<string, string> = {
-  'appetite':                  '#f4821f',
-  'scale-and-delivery':        '#4a9ff5',
+  'appetite':                  '#FF883E',
+  'scale-and-delivery':        '#9D5AEF',
   'capability-sustainability':  '#3ecf6e',
-  'capability-brand':           '#a855f7',
-  'capability-business':        '#d97706',  // amber instead of yellow for contrast
+  'capability-brand':           '#E8626D',
+  'capability-business':        '#5F9FDF',
 }
 
 // ── Report template CMS constants ─────────────────────────────────────────
@@ -501,7 +501,7 @@ function ResultsLinkPanel({ respondentName, password }: { respondentName: string
                       <button onClick={() => window.open(`${window.location.origin}/api/results/${t.token}/pdf`, '_blank')}
                         className="text-xs font-mono px-2 py-1 transition-colors"
                         style={{ border: '1px solid rgba(13,20,16,0.15)', color: 'rgba(13,20,16,0.55)' }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(74,159,245,0.5)'; e.currentTarget.style.color = '#4a9ff5' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,159,223,0.5)'; e.currentTarget.style.color = '#5F9FDF' }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'; e.currentTarget.style.color = 'rgba(13,20,16,0.55)' }}>
                         PDF ↓
                       </button>

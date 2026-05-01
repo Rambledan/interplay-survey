@@ -37,11 +37,11 @@ const INTRO = {
   pillarsIntro: 'The interview questions have been structured around 5 pillars, to enable you to see exactly where your strengths and weaknesses lie. Pillar one measures appetite for growth. Pillars 2–5 indicate your current ability to grow through interplay.',
   pillars: [
     {
-      num: '1', name: 'Appetite', color: '#f4821f',
+      num: '1', name: 'Appetite', color: '#FF883E',
       desc: 'Gauges your organisation\'s sentiment around sustainability, as a cost centre or a growth driver. This is important because growth needs to be led from the top.',
     },
     {
-      num: '2', name: 'Scale and AI', color: '#4a9ff5',
+      num: '2', name: 'Scale and AI', color: '#9D5AEF',
       desc: 'Measures your current ability to grow with AI as the accelerator. Your capability in leveraging sustainability for growth relies in part on your digital innovation capability.',
     },
     {
@@ -49,11 +49,11 @@ const INTRO = {
       desc: 'Measures the connectivity between sustainability activity and your business and brand.',
     },
     {
-      num: '4', name: 'Brand', color: '#a855f7',
+      num: '4', name: 'Brand', color: '#E8626D',
       desc: 'Measures the connectivity between brand (through campaigns, products and services etc) and your sustainability function.',
     },
     {
-      num: '5', name: 'Business', color: '#eab308',
+      num: '5', name: 'Business', color: '#5F9FDF',
       desc: 'Measures how central sustainability is to the business strategy, decisions and capital allocation.',
     },
   ],
@@ -590,7 +590,7 @@ function FinancialSummary({ model }: { model: FinancialModel }) {
   const fmt = (n: number) => formatCurrency(n, currencySymbol)
   const scenarios = [
     { label: 'Conservative', value: totals.conservative, pct: totalsAsPercentOfRevenue.conservative, color: 'rgba(255,255,255,0.78)' },
-    { label: 'Moderate',     value: totals.moderate,     pct: totalsAsPercentOfRevenue.moderate,     color: '#f4821f' },
+    { label: 'Moderate',     value: totals.moderate,     pct: totalsAsPercentOfRevenue.moderate,     color: '#FF883E' },
     { label: 'Optimistic',   value: totals.optimistic,   pct: totalsAsPercentOfRevenue.optimistic,   color: '#3ecf6e' },
   ]
   return (
@@ -1200,7 +1200,7 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
   if (status === 'error' || !data) {
     return (
       <div style={pageStyle} className="flex items-center justify-center px-6">
-        <p className="text-sm" style={{ color: '#f4821f' }}>Something went wrong loading your results. Please try again.</p>
+        <p className="text-sm" style={{ color: '#FF883E' }}>Something went wrong loading your results. Please try again.</p>
       </div>
     )
   }

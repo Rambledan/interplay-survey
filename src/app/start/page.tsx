@@ -66,6 +66,7 @@ export default function IntroPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#2f2a2a', color: 'rgba(255,255,255,0.92)' }}>
+
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
@@ -76,38 +77,34 @@ export default function IntroPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col justify-center px-6 py-16 max-w-2xl mx-auto w-full">
+      <main className="flex-1 px-6 py-16 max-w-2xl mx-auto w-full">
 
-        {/* Tagline */}
-        <p className="text-xs uppercase tracking-[0.3em] mb-6"
-          style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', display: 'inline-block', padding: '4px 10px' }}>
-          Interplay Method — Diagnostic
+        {/* Eyebrow */}
+        <p className="text-xs uppercase tracking-[0.25em] mb-6"
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
+          Where do you sit in the interplay?
         </p>
 
-        {/* Headline */}
-        <h1 className="text-5xl md:text-5xl uppercase leading-none mb-6"
-          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.92)', fontWeight: 400 }}>
-          Where do you sit in<br />
-          the interplay?
+        {/* Main headline — Robson */}
+        <h1 className="uppercase leading-none mb-10"
+          style={{
+            fontFamily: 'Robson, sans-serif',
+            fontSize: 'clamp(2.4rem, 5.5vw, 3.75rem)',
+            color: 'rgba(255,255,255,0.95)',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+          }}>
+          Test your sustainability<br />
+          growth potential
         </h1>
-
-        {/* Intro text */}
-        <p className="text-base leading-relaxed mb-4 max-w-lg"
-          style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-          Most organisations solve sustainability in silos. Brand teams, sustainability teams, and business teams — all expert, all disconnected.
-        </p>
-        <p className="text-base leading-relaxed mb-10 max-w-lg"
-          style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-          This diagnostic reveals the gaps and opportunities between your sustainability, brand and business strategies — and where the interplay can unlock triple value.
-        </p>
 
         {/* Form */}
         {fetchError ? (
-          <div className="px-5 py-4 text-sm" style={{ border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.06)', color: '#dc2626' }}>
+          <div className="px-5 py-4 text-sm mb-14" style={{ border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.06)', color: '#dc2626' }}>
             Failed to load survey. Please refresh the page.
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mb-16">
 
             {[
               { id: 'name',    label: 'Your name',  value: name,    set: setName,    placeholder: 'Jane Smith' },
@@ -157,7 +154,7 @@ export default function IntroPage() {
               </select>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-4">
               <button
                 type="submit"
                 disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading}
@@ -175,6 +172,85 @@ export default function IntroPage() {
             </p>
           </form>
         )}
+
+        {/* Divider */}
+        <div className="mb-14" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
+
+        {/* Value prop — Robson subheading */}
+        <p className="mb-8"
+          style={{
+            fontFamily: 'Robson, sans-serif',
+            fontSize: 'clamp(1.05rem, 2.2vw, 1.3rem)',
+            color: '#faf000',
+            fontWeight: 400,
+            lineHeight: 1.35,
+            letterSpacing: '0.01em',
+          }}>
+          Growth accelerates when sustainability + business + brand interplay
+        </p>
+
+        {/* Body paragraphs */}
+        <div className="space-y-4 max-w-xl mb-14">
+          <p className="text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+            There is huge value in sustainability, but it's mostly sitting in a compliance silo — disconnected from business and brand commercials.
+          </p>
+          <p className="text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+            This disconnect can limit pricing power, reduce relevance, weaken differentiation, and restrict investment.
+          </p>
+          <p className="text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+            This diagnostic reveals the gaps — and opportunities — between your sustainability, business and brand, and where their interplay can unlock triple value.
+          </p>
+        </div>
+
+        {/* Info sections */}
+        <div className="space-y-10">
+
+          {/* Pillars */}
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] mb-3"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
+              Built around 5 pillars
+            </p>
+            <p className="text-sm leading-relaxed max-w-lg"
+              style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
+              This interview is structured across five key pillars, helping you clearly identify where you're strong — and where there's room to grow.
+            </p>
+          </div>
+
+          {/* Deliverables */}
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] mb-3"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
+              What you'll receive
+            </p>
+            <p className="text-sm mb-5"
+              style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
+              At the end, you'll get a personalised report including:
+            </p>
+            <div className="space-y-3 max-w-sm">
+              {[
+                'Interplay score',
+                'Value opportunity predictions',
+                'Key recommendations to accelerate growth',
+              ].map(item => (
+                <div key={item}
+                  className="px-4 py-3 text-sm"
+                  style={{
+                    borderLeft: '2px solid rgba(250,240,0,0.5)',
+                    backgroundColor: 'rgba(250,240,0,0.04)',
+                    color: 'rgba(255,255,255,0.75)',
+                    letterSpacing: '0.01em',
+                  }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </main>
 
       <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
