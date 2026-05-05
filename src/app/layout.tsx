@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Interplay Method — Diagnostic Survey',
   description: 'Discover how your brand, sustainability, and business strategies align. The Interplay Method diagnostic by Interrupt × Like So.',
+  icons: {
+    icon: '/favicon.png',
+  },
   openGraph: {
     title: 'Interplay Method — Diagnostic Survey',
     description: 'Discover where the interplay between your sustainability, brand and business strategies creates triple value.',
