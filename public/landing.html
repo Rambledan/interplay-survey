@@ -363,7 +363,7 @@
     /* ════════════════════════════════════════════
        REPORT
     ════════════════════════════════════════════ */
-    .report-section { background: #fff; color: var(--ink); padding: 120px 32px; }
+    .report-section { background: #fff; color: var(--ink); padding: 120px 32px; overflow: hidden; }
     .report-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 16px; }
     .report-h2 {
       font-family: var(--display); font-size: clamp(56px, 7.5vw, 124px);
@@ -550,6 +550,14 @@
       .pillar-left { padding: 40px 24px; }
       .pillar-right { padding: 40px 24px; }
       .darshana-quote-side { padding: 48px 32px; }
+
+      /* Report section – prevent left-edge clipping on mobile */
+      .report-section { padding: 72px 20px; overflow: hidden; }
+      .report-h2 { font-size: clamp(32px, 9vw, 56px); margin-bottom: 40px; }
+      .report-card { padding: 20px; }
+      .report-card-head { flex-wrap: wrap; gap: 6px; }
+      .report-fin-value { font-size: 20px; }
+      .report-fin-cell { padding: 12px 10px; }
     }
   </style>
 </head>
