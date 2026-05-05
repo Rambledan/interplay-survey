@@ -119,7 +119,7 @@
       border-bottom: 1.5px solid var(--ink);
     }
     .nav-left { display: flex; align-items: center; gap: 18px; }
-    .nav-logo { height: 38px; width: auto; display: block; }
+    .nav-logo { height: 38px; width: auto; display: block; flex-shrink: 0; }
     .nav-divider { display: inline-block; width: 1px; height: 22px; background: rgba(0,0,0,0.25); flex-shrink: 0; }
     .nav-partner { font-size: 12px; color: rgba(0,0,0,0.6); font-weight: 500; }
     .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
@@ -136,6 +136,16 @@
       object-fit: cover; z-index: 0;
       mix-blend-mode: multiply; opacity: 0.55;
       pointer-events: none;
+    }
+    /* Suppress native video play overlays on all browsers */
+    .hero-video::-webkit-media-controls,
+    .hero-video::-webkit-media-controls-panel,
+    .hero-video::-webkit-media-controls-play-button,
+    .hero-video::-webkit-media-controls-start-playback-button,
+    .hero-video::-webkit-media-controls-overlay-play-button,
+    .hero-video::-internal-media-controls-overlay-cast-button {
+      display: none !important;
+      -webkit-appearance: none;
     }
     .hero-content-wrap { position: relative; z-index: 1; }
     .hero-grid {
@@ -168,7 +178,7 @@
       position: relative; display: flex; flex-direction: column;
       align-items: flex-start; align-self: flex-start; margin-top: 51px;
     }
-    .hero-logo-img { width: 100%; max-width: 560px; display: block; }
+    .hero-logo-img { width: 100%; max-width: 560px; height: auto; display: block; }
     .darsh-top {
       display: inline-flex; align-items: center; gap: 14px;
       padding: 8px 16px 8px 8px; margin-top: 117px; align-self: flex-start;
@@ -566,7 +576,7 @@
 
 <!-- ═══════ HERO ═══════ -->
 <section id="top" class="hero">
-  <video class="hero-video" autoplay muted loop playsinline preload="none">
+  <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture x-webkit-airplay="deny">
     <source src="app/public/landing/blobsvideo.mov" type="video/mp4">
   </video>
   <div class="hero-content-wrap">
