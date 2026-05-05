@@ -1,755 +1,948 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interplay Method — Are you prepared for sustainable growth?</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interplay — Sustainability Growth Potential</title>
 
-  <!-- Open Sans with italic variants from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
-    /* ── Robson display font ── */
+    /* ═══════════════════════════════════════════
+       ROBSON DISPLAY FONT
+    ═══════════════════════════════════════════ */
     @font-face {
       font-family: 'Robson';
-      src: url('/fonts/Robson-Bold.otf') format('opentype');
+      src: url('https://static1.squarespace.com/static/682b2f3ea7f48706efc43f77/t/682b4014d25ba40735d78d7e/1747664916554/Robson.otf') format('opentype');
       font-weight: 700;
       font-style: normal;
+      font-display: swap;
     }
 
-    /* ── Reset ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; overflow-x: hidden; background: #fff; }
-    img { display: block; max-width: 100%; }
-    a { text-decoration: none; }
-
-    /* ── 1440px page constraint ── */
-    .page-wrap {
-      max-width: 1440px;
-      margin: 0 auto;
-      background: #fff;
-      overflow: hidden;
-    }
-
-    /* ── Design tokens ── */
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════ */
     :root {
-      --yellow: #faf002;
-      --dark:   #2E2929;
-      --white:  #ffffff;
-      --ph:     clamp(24px, 6.9vw, 100px);   /* horizontal padding up to 1440px */
-      /* Beyond 1440px, padding grows to keep content in the same 1240px column */
-      --sph:    max(var(--ph), calc((100vw - 1240px) / 2));
+      --yellow:          #FFE600;
+      --paper:           #F5F0E0;
+      --ink:             #303030;
+      --ink-line:        rgba(48,48,48,0.15);
+      --on-yellow-mute:  rgba(0,0,0,0.55);
+      --on-yellow-quiet: rgba(0,0,0,0.4);
+      --on-ink-mute:     rgba(245,240,224,0.7);
+      --on-ink-quiet:    rgba(245,240,224,0.45);
+      --display:        'Robson', 'Anton', 'Bebas Neue', Impact, sans-serif;
+      --body:           'Open Sans', system-ui, -apple-system, sans-serif;
+      --mono:           'JetBrains Mono', ui-monospace, monospace;
     }
 
-    body { font-family: 'Open Sans', sans-serif; color: #2E2929; letter-spacing: 0.01em; }
+    /* ═══════════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--paper); color: var(--ink);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
 
-    /* ══════════════════════════════════════════
-       NAV
-    ══════════════════════════════════════════ */
-    .nav {
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px var(--sph);
-      min-height: 109px;
+    /* ═══════════════════════════════════════════
+       TYPOGRAPHY UTILITIES
+    ═══════════════════════════════════════════ */
+    .display {
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: 0.005em;
+      line-height: 0.86;
+      text-transform: uppercase;
     }
-    .nav-logo      { height: 67px; width: auto; }
-    .nav-right     { display: flex; align-items: center; gap: 38px; }
-    .nav-by        { font-size: 16px; color: #2E2929; white-space: nowrap; }
-    .nav-interrupt { height: 54px; width: auto; }
-    .nav-x         { font-weight: 700; font-size: 16px; color: #2E2929; }
-    .nav-likeso    { height: 53px; width: auto; filter: invert(1); }
-
-    /* ══════════════════════════════════════════
-       SHARED BUTTON
-    ══════════════════════════════════════════ */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Open Sans', sans-serif;
-      font-size: 20px;
-      padding: 12px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 4px rgba(0,0,0,0.15);
-      white-space: nowrap;
-      transition: opacity .15s;
-    }
-    .btn:hover { opacity: .88; }
-    .btn--dark  { background: #2E2929; color: #fff; min-width: 320px; }
-    .btn--white { background: #fff;    color: #2E2929; min-width: 280px; }
-
-    /* ══════════════════════════════════════════
-       HERO
-    ══════════════════════════════════════════ */
-    .hero {
-      background: #fff;
-      padding: 50px 0 70px;
-      position: relative;
-    }
-    .hero-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 0 var(--ph);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 40px;
-    }
-    .hero-text { flex: 1; }
-    .hero-logo-img {
-      width: 595px;
-      flex-shrink: 0;
-    }
-    .hero-eyebrow {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
+    .eyebrow {
+      font-family: var(--mono);
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(46,41,41,0.5);
-      margin-bottom: 16px;
+    }
+
+    /* ═══════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--body); font-weight: 600;
+      font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 16px 24px;
+      border: 1.5px solid currentColor;
+      background: transparent; color: inherit;
+      cursor: pointer; text-decoration: none;
+      transition: transform .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover { transform: translate(-2px, -2px); }
+    .btn .arrow { display: inline-block; transition: transform .2s ease; }
+    .btn:hover .arrow { transform: translateX(3px); }
+
+    .btn-fill-yellow { background: var(--yellow); color: var(--ink); border-color: var(--ink); }
+    .btn-fill-yellow:hover { box-shadow: 4px 4px 0 var(--ink); }
+    .btn-fill-ink { background: var(--ink); color: var(--yellow); border-color: var(--ink); }
+    .btn-fill-ink:hover { box-shadow: 4px 4px 0 var(--yellow); }
+    .btn-ghost-on-yellow { color: var(--ink); border-color: var(--ink); }
+    .btn-ghost-on-yellow:hover { background: var(--ink); color: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
+    .btn-ghost-on-ink { color: var(--paper); border-color: var(--paper); }
+    .btn-ghost-on-ink:hover { background: var(--paper); color: var(--ink); box-shadow: 4px 4px 0 var(--yellow); }
+
+    /* ═══════════════════════════════════════════
+       MARQUEE
+    ═══════════════════════════════════════════ */
+    @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee { overflow: hidden; white-space: nowrap; }
+    .marquee-track { display: inline-flex; animation: scroll-x 40s linear infinite; }
+    .marquee-item { padding: 0 32px; display: inline-flex; align-items: center; gap: 32px; }
+
+    /* ═══════════════════════════════════════════
+       FOCUS
+    ═══════════════════════════════════════════ */
+    :focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+
+    /* ════════════════════════════════════════════
+       NAV
+    ════════════════════════════════════════════ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      padding: 14px 32px;
+      background: #fff;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .nav-left { display: flex; align-items: center; gap: 18px; }
+    .nav-logo { height: 38px; width: auto; display: block; }
+    .nav-divider { display: inline-block; width: 1px; height: 22px; background: rgba(0,0,0,0.25); flex-shrink: 0; }
+    .nav-partner { font-size: 12px; color: rgba(0,0,0,0.6); font-weight: 500; }
+    .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
+    .nav-links a { color: var(--ink); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 1; transition: opacity .15s; }
+    .nav-links a:hover { opacity: 0.55; }
+
+
+    /* ════════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════════ */
+    .hero { background: var(--yellow); color: var(--ink); padding: 32px 32px 0; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: start;
+      min-height: calc(100vh - 220px); padding-bottom: 80px;
+    }
+    .hero-eyebrow { color: rgba(0,0,0,0.6); margin-bottom: 28px; }
+    .hero-pre {
+      font-family: var(--display); font-size: clamp(20px, 1.8vw, 28px);
+      color: var(--ink); text-transform: uppercase; letter-spacing: 0.02em;
+      margin-bottom: 8px; line-height: 1; font-weight: 700;
     }
     .hero-headline {
-      font-family: 'Robson', sans-serif;
-      font-weight: 700;
-      font-size: clamp(54px, 8.9vw, 128px);
-      line-height: 0.85;
-      color: #2E2929;
-      margin-bottom: 36px;
+      font-family: var(--display); font-size: clamp(72px, 9vw, 148px);
+      color: var(--ink); margin-bottom: 32px; line-height: 0.78;
+      letter-spacing: -0.005em; font-weight: 700; text-transform: uppercase;
     }
     .hero-sub {
-      margin-top: 14px;
-      font-family: 'Almarai', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(46,41,41,0.5);
+      font-size: 17px; line-height: 1.55; max-width: 520px;
+      color: rgba(0,0,0,0.72); margin-bottom: 32px;
+    }
+    .hero-cta-row { display: flex; flex-wrap: nowrap; gap: 12px; margin-bottom: 36px; }
+    .hero-meta {
+      list-style: none; display: flex; gap: 32px;
+      padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.2);
+      font-size: 13px; color: rgba(0,0,0,0.7);
     }
 
-    /* ══════════════════════════════════════════
-       ENDORSEMENT
-    ══════════════════════════════════════════ */
-    .endorsement {
-      background: #fff;
-      padding: 50px var(--ph);
-      max-width: 1440px;
-      margin: 0 auto;
+    .hero-right {
+      position: relative; display: flex; flex-direction: column;
+      align-items: flex-start; align-self: flex-start; margin-top: 51px;
     }
-    .endorsement-card {
-      background: #2E2929;
-      border-radius: 60px;
-      padding: 50px;
-      display: flex;
-      gap: 25px;
-      color: #fff;
-      align-items: flex-start;
+    .hero-logo-img { width: 100%; max-width: 560px; display: block; }
+    .darsh-top {
+      display: inline-flex; align-items: center; gap: 14px;
+      padding: 8px 16px 8px 8px; margin-top: 117px; align-self: flex-start;
     }
-    .endorsement-photo-wrap {
-      flex-shrink: 0;
-      width: 273px;
-      height: 273px;
+    .darsh-avatar-wrap { width: 176px; height: 176px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .darsh-avatar {
+      width: 148%; height: 148%; object-fit: cover; object-position: center 25%;
+      display: block; margin-left: -24%; margin-top: -18%;
     }
-    .endorsement-photo-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .endorsement-body { padding: 0 25px; flex: 1; }
-    .endorsement-sup {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(250,240,0,0.6);
-      margin-bottom: 14px;
-    }
-    .endorsement-name {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(30px, 4.4vw, 64px);
-      line-height: 0.85;
-      margin-bottom: 30px;
-    }
-    .endorsement-qmark {
-      font-weight: 700;
-      font-size: 96px;
-      line-height: 0.65;
-      display: block;
-      height: 32px;
-      overflow: hidden;
-    }
-    .endorsement-quote { font-size: clamp(14px, 1.1vw, 16px); line-height: 1.65; letter-spacing: 0.01em; color: rgba(255,255,255,0.88); }
-    .endorsement-quote p { margin-bottom: 1em; }
-    .endorsement-quote p:last-child { margin-bottom: 0; }
+    .darsh-copy { display: flex; flex-direction: column; line-height: 1.2; }
+    .darsh-intro { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.55); }
+    .darsh-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 4px; }
 
-    /* ══════════════════════════════════════════
-       GROWTH ACCELERATES
-    ══════════════════════════════════════════ */
-    .growth {
-      background: #fff;
-      padding: 50px var(--sph) 70px;
+    .hero-marquee {
+      margin: 0 -32px;
+      background: var(--ink); color: var(--yellow);
+      padding: 14px 0; border-top: 1.5px solid var(--ink);
     }
-    .growth-eyebrow {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(46,41,41,0.45);
-      margin-bottom: 12px;
-    }
-    .growth-headline {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(36px, 6.7vw, 96px);
-      line-height: 0.88;
-      margin-bottom: 50px;
-    }
-    .growth-body {
-      display: flex;
-      gap: 60px;
-      align-items: flex-start;
-    }
-    .growth-text { flex: 1; font-size: clamp(14px, 1.1vw, 16px); line-height: 1.65; color: rgba(46,41,41,0.75); letter-spacing: 0.01em; }
-    .growth-text strong { font-weight: 700; }
-    .growth-text p { margin-bottom: 1.2em; }
-    .growth-text p:last-child { margin-bottom: 0; }
+    .hero-marquee .marquee-item { color: var(--yellow); }
+    .hero-marquee .marquee-dot { display: inline-block; width: 8px; height: 8px; background: var(--yellow); }
 
-    /* Pentagon diagram */
-    .diagram-wrap {
-      flex-shrink: 0;
-      width: 480px;
-      position: relative;
+
+    /* ════════════════════════════════════════════
+       PREMISE
+    ════════════════════════════════════════════ */
+    .premise {
+      background: #303030; color: var(--paper);
+      padding: 120px 32px; text-align: center;
     }
-    .diagram-inner {
-      position: relative;
-      width: 100%;
+    .premise-eyebrow { color: rgba(245,240,224,0.55); margin-bottom: 18px; }
+    .premise-h2 {
+      font-family: var(--display); font-size: clamp(56px, 8vw, 132px);
+      line-height: 0.84; color: #fff;
+      max-width: 1200px; margin: 0 auto 28px;
+      font-weight: 700; text-transform: uppercase;
     }
-    .diagram-inner img {
-      width: 100%;
-      height: auto;
-      display: block;
+    .premise-sub {
+      font-size: 17px; line-height: 1.65; color: rgba(245,240,224,0.7);
+      max-width: 620px; margin: 0 auto 32px;
+    }
+    .premise-stat {
+      font-family: var(--display); font-size: clamp(120px, 18vw, 240px);
+      line-height: 0.85; color: var(--yellow); margin: 24px 0 8px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.005em;
+    }
+    .premise-stat-label {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: rgba(245,240,224,0.5);
+      max-width: 520px; margin: 24px auto 0;
     }
 
-    /* ══════════════════════════════════════════
-       HOW READY  (dark bg)
-    ══════════════════════════════════════════ */
-    .how-ready {
-      background: #2E2929;
-      padding: 99px var(--sph);
-      color: #fff;
+
+    /* ════════════════════════════════════════════
+       METHOD
+    ════════════════════════════════════════════ */
+    .method-section { background: #fff; color: var(--ink); padding: 120px 32px; }
+    .method-grid {
+      max-width: 1440px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center;
     }
-    .how-ready-eyebrow {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 12px;
+    .method-eyebrow { color: #303030; margin-bottom: 16px; }
+    .method-h2 {
+      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
+      color: var(--ink); margin-bottom: 32px; line-height: 0.84;
+      font-weight: 700; text-transform: uppercase;
     }
-    .how-ready-headline {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(36px, 6.7vw, 96px);
-      line-height: 0.88;
-      color: #faf002;
-      margin-bottom: 50px;
+    .method-body { font-size: 16px; line-height: 1.75; color: rgba(0,0,0,0.7); margin-bottom: 18px; max-width: 540px; }
+    .method-involves-tag {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: rgba(0,0,0,0.5);
+      margin-top: 24px; margin-bottom: 12px;
     }
-    .how-ready-cols {
-      display: flex;
-      gap: 60px;
-      align-items: flex-start;
+    .method-list {
+      list-style: none; padding: 0; margin: 0; max-width: 540px;
+      border-top: 1px solid rgba(0,0,0,0.15);
     }
-    .how-ready-left { flex: 1; font-size: clamp(14px, 1.1vw, 16px); line-height: 1.65; color: rgba(255,255,255,0.82); letter-spacing: 0.01em; }
-    .how-ready-left p { margin-bottom: 1.2em; }
-    .how-ready-left strong { font-weight: 700; }
-    .how-ready-right { flex: 1; color: #fff; }
-    .big-stat {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(80px, 17.4vw, 250px);
-      line-height: 0.88;
-      color: #faf002;
+    .method-list li {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.15);
+      font-size: 15px; line-height: 1.5; color: rgba(0,0,0,0.85);
     }
-    .big-stat-desc {
-      font-size: clamp(12px, 1.1vw, 16px);
-      line-height: 1.55;
-      margin-bottom: 30px;
-      margin-top: 8px;
+    .method-list-num {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+      color: rgba(0,0,0,0.5); min-width: 28px; flex-shrink: 0;
     }
-    .stats-row { display: flex; gap: 50px; }
-    .stat-block { flex: 1; }
-    .stat-number {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(52px, 8.9vw, 128px);
-      line-height: 0.88;
-      text-transform: uppercase;
+    .method-mark-col { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .method-diagram { width: 100%; max-width: 520px; display: block; }
+    .method-stat-row { display: flex; gap: 32px; margin-top: 48px; width: 100%; max-width: 520px; }
+    .method-stat-item { flex: 1; }
+    .method-stat-num {
+      font-family: var(--display); font-size: clamp(48px, 4.5vw, 72px);
+      color: #303030; display: block; line-height: 1; margin-bottom: 10px; font-weight: 700;
     }
-    .stat-desc {
-      font-size: clamp(12px, 1.1vw, 16px);
-      line-height: 1.55;
-      margin-top: 8px;
+    .method-stat-desc { font-size: 13px; color: rgba(0,0,0,0.6); line-height: 1.5; }
+    .method-stat-src { color: rgba(0,0,0,0.4); }
+
+
+    /* ════════════════════════════════════════════
+       DARSHANA
+    ════════════════════════════════════════════ */
+    .darshana-section { background: #fff; color: var(--ink); }
+    .darshana-grid { display: grid; grid-template-columns: 1fr 1fr; min-height: 720px; }
+    .darshana-img-side { position: relative; overflow: hidden; background: var(--ink); }
+    .darshana-bg-img {
+      position: absolute; top: -80px; left: 50%;
+      height: 120%; width: auto; min-width: 100%;
+      transform: translateX(calc(-50% + 60px));
+      object-fit: cover; object-position: center top;
+      filter: grayscale(100%) contrast(1.05);
+    }
+    .darshana-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%);
+    }
+    .darshana-overlay { position: absolute; top: 36px; left: 36px; right: 36px; }
+    .darshana-overlay-text {
+      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
+      color: #fff; line-height: 0.72;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+      font-weight: 700; text-transform: uppercase; display: block;
+    }
+    .darshana-quote-side {
+      padding: 80px 64px; display: flex; flex-direction: column; justify-content: center;
+      background: var(--yellow); border-left: 1.5px solid var(--ink);
+    }
+    .darshana-eyebrow { color: #303030; margin-bottom: 24px; }
+    .darshana-quote { font-size: 19px; line-height: 1.55; color: var(--ink); margin-bottom: 18px; max-width: 540px; }
+    .darshana-attrib { margin-top: 32px; display: flex; align-items: center; gap: 18px; }
+    .darshana-attrib-rule { width: 48px; height: 2px; background: var(--ink); flex-shrink: 0; }
+    .darshana-attrib-name {
+      font-family: var(--display); font-size: 22px; letter-spacing: 0.02em;
+      color: var(--ink); font-weight: 700;
+    }
+    .darshana-attrib-role {
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(0,0,0,0.55); margin-top: 4px;
     }
 
-    /* ══════════════════════════════════════════
-       FROM / TO SECTIONS  (Sustainability, Brand, Business)
-    ══════════════════════════════════════════ */
-    .ft-section {
-      padding: 99px var(--sph);
-    }
-    .ft-section--yellow { background: #faf002; color: #2E2929; }
-    .ft-section--white  { background: #fff;    color: #2E2929; }
 
-    .ft-label {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(46,41,41,0.45);
-      margin-bottom: 50px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(46,41,41,0.15);
-      display: inline-block;
+    /* ════════════════════════════════════════════
+       SCORE
+    ════════════════════════════════════════════ */
+    .score-section {
+      background: #0a0a0a; color: var(--paper);
+      padding: 120px 32px; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
     }
-    .ft-cols {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 0;
+    .score-eyebrow { color: var(--yellow); margin-bottom: 16px; }
+    .score-h2 {
+      font-family: var(--display); font-size: clamp(64px, 8vw, 132px);
+      color: #fff; margin-bottom: 28px; line-height: 0.84; font-weight: 700; text-transform: uppercase;
     }
-    .ft-col { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
-    .ft-dir {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(46,41,41,0.45);
+    .score-body {
+      font-size: 17px; line-height: 1.6; color: rgba(245,240,224,0.65);
+      max-width: 520px; margin-bottom: 48px;
     }
-    .ft-title {
-      font-family: 'Robson', sans-serif;
-      font-size: clamp(44px, 6.7vw, 96px);
-      line-height: 0.95;
-      text-transform: uppercase;
+    .score-donut { display: block; margin: 0 auto 40px; }
+    .score-band-row {
+      display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr));
+      width: 100%; max-width: 720px;
+      border: 1px solid rgba(245,240,224,0.18);
+      margin-bottom: 48px; overflow: hidden;
     }
-    .ft-subtitle {
-      font-family: 'Almarai', sans-serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(46,41,41,0.4);
-      font-style: normal;
-      margin-top: -12px;
+    .score-band {
+      padding: 18px 16px; text-align: left;
+      border-right: 1px solid rgba(245,240,224,0.18);
+      background: transparent;
     }
-    .ft-body { font-size: clamp(14px, 1.1vw, 16px); line-height: 1.65; color: rgba(46,41,41,0.75); letter-spacing: 0.01em; }
-    .ft-body p  { margin-bottom: .8em; }
-    .ft-body ul { list-style: disc; padding-left: 36px; }
-    .ft-body li { margin-bottom: 4px; line-height: 1.65; }
+    .score-band:last-child { border-right: 0; }
+    .score-band.active { background: rgba(255,224,75,0.08); box-shadow: inset 0 2px 0 var(--yellow); }
+    .score-band-label {
+      font-family: var(--display); font-size: 13px; letter-spacing: 0.06em;
+      margin-bottom: 4px; font-weight: 700;
+      color: rgba(245,240,224,0.92);
+    }
+    .score-band.active .score-band-label { color: var(--yellow); }
+    .score-band-range { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: rgba(245,240,224,0.5); }
+    .score-band.active .score-band-range { color: rgba(255,224,75,0.85); }
 
-    .ft-mid {
-      width: 380px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;   /* image sits at bottom of its column */
-      min-height: 350px;
-    }
-    .ft-mid img { max-height: 490px; width: auto; object-fit: contain; }
 
-    /* Brand section hangers stacked */
-    .hangers {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 50px;
+    /* ════════════════════════════════════════════
+       REPORT
+    ════════════════════════════════════════════ */
+    .report-section { background: #fff; color: var(--ink); padding: 120px 32px; }
+    .report-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 16px; }
+    .report-h2 {
+      font-family: var(--display); font-size: clamp(56px, 7.5vw, 124px);
+      line-height: 0.84; color: var(--ink);
+      margin: 0 auto 64px; max-width: 1440px;
+      font-weight: 700; text-transform: uppercase;
     }
-    .hanger-1 { transform: rotate(-18deg); margin-bottom: -50px; width: 256px; }
-    .hanger-2 { transform: rotate(13deg);  width: 278px; }
+    .report-grid {
+      max-width: 1440px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.15fr; gap: 64px; align-items: center;
+    }
+    .report-body { font-size: 17px; line-height: 1.7; color: rgba(0,0,0,0.65); margin-bottom: 24px; max-width: 480px; }
+    .report-includes { list-style: none; padding: 0; }
+    .report-includes li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.12);
+      font-size: 15px; line-height: 1.5; color: rgba(0,0,0,0.78);
+    }
+    .report-includes li::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--ink); border-radius: 50%;
+      flex-shrink: 0; margin-top: 8px;
+    }
+    /* Report card */
+    .report-card {
+      background: #0f0f0f; border: 1px solid rgba(245,240,224,0.12);
+      padding: 32px; color: var(--paper);
+    }
+    .report-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .report-card-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+    .report-card-meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: rgba(245,240,224,0.45); }
+    .report-score-head { display: flex; align-items: center; gap: 24px; }
+    .report-score-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: rgba(245,240,224,0.5); margin-bottom: 6px; text-transform: uppercase; }
+    .report-score-band { font-family: var(--display); font-size: 36px; color: var(--paper); line-height: 1; margin-bottom: 6px; font-weight: 700; }
+    .report-score-bench { font-family: var(--mono); font-size: 12px; color: rgba(245,240,224,0.5); }
+    .report-divider { height: 1px; background: rgba(245,240,224,0.1); margin: 24px 0; }
+    .report-bars { display: flex; flex-direction: column; gap: 10px; }
+    .report-bar-row { display: grid; grid-template-columns: 110px 1fr 44px 100px; align-items: center; gap: 14px; }
+    .report-bar-label { font-size: 13px; color: rgba(245,240,224,0.85); }
+    .report-bar-track { height: 8px; background: rgba(245,240,224,0.08); }
+    .report-bar-fill { height: 100%; background: var(--yellow); }
+    .report-bar-pct { font-family: var(--mono); font-size: 12px; color: rgba(245,240,224,0.6); text-align: right; }
+    .report-bar-band { font-family: var(--display); font-size: 12px; letter-spacing: 0.06em; color: var(--yellow); font-weight: 700; }
+    .report-fin-tag {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+      color: rgba(245,240,224,0.45); margin-bottom: 14px; text-transform: uppercase;
+    }
+    .report-fin-row { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(245,240,224,0.12); }
+    .report-fin-cell { padding: 16px 18px; border-right: 1px solid rgba(245,240,224,0.12); }
+    .report-fin-cell:last-child { border-right: 0; }
+    .report-fin-tier { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: rgba(245,240,224,0.5); margin-bottom: 6px; text-transform: uppercase; }
+    .report-fin-value { font-family: var(--display); font-size: 30px; color: var(--yellow); line-height: 1; font-weight: 700; }
 
-    /* ══════════════════════════════════════════
-       FOOTER CTA
-    ══════════════════════════════════════════ */
-    .footer-cta {
-      background: #2E2929;
-      padding: 50px var(--sph);
-      color: #fff;
-    }
-    .footer-logo { height: 108px; width: auto; margin-bottom: 21px; }
-    .footer-headline {
-      font-weight: 700;
-      font-size: clamp(20px, 2.5vw, 36px);
-      margin-bottom: 21px;
-    }
-    .footer-sub {
-      margin-top: 12px;
-      font-family: 'Almarai', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-    }
 
-    /* ══════════════════════════════════════════
-       UNIFIED BODY COPY — desktop
-    ══════════════════════════════════════════ */
-    @media (min-width: 961px) {
-      .endorsement-quote,
-      .growth-text,
-      .how-ready-left,
-      .ft-body {
-        font-size: 16px;
-        line-height: 1.65;
-        letter-spacing: 0.01em;
-      }
+    /* ════════════════════════════════════════════
+       PILLARS / OPPORTUNITIES
+    ════════════════════════════════════════════ */
+    .pillars-section { background: var(--yellow); color: var(--ink); }
+    .pillars-head { padding: 96px 48px 32px; max-width: 1440px; margin: 0 auto; }
+    .pillars-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 16px; }
+    .pillars-h2 {
+      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
+      line-height: 0.84; color: var(--ink); margin-bottom: 32px;
+      font-weight: 700; text-transform: uppercase;
     }
 
-    /* ══════════════════════════════════════════
-       PARAGRAPH TITLES — report-style (CAPS + left accent)
-    ══════════════════════════════════════════ */
-
-    /* Light-bg paragraphs with a bold lead-in title */
-    .growth-text p > strong:first-child {
-      display: block;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #2E2929;
-      font-weight: 700;
-      font-family: 'Open Sans', sans-serif;
-      padding-top: 1.4em;
-      padding-bottom: 0.25em;
-      margin-bottom: 0;
+    .pillar-row {
+      display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      border-top: 1.5px solid var(--ink);
     }
-    .growth-text p:first-child > strong:first-child { padding-top: 0; }
-
-    /* Left-border accent on those paragraphs (matches report item style) */
-    .growth-text p:has(> strong:first-child) {
-      border-left: 2px solid rgba(250,240,2,0.7);
-      padding-left: 1rem;
-      margin-bottom: 1.4em;
+    .pillar-left { padding: 64px 48px 64px max(48px, calc(50vw - 800px)); }
+    .pillar-tag { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .pillar-num-chip {
+      font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 0.05em;
+      padding: 4px 10px; background: var(--ink); color: var(--yellow);
     }
-
-    /* Dark-bg (how-ready) paragraph titles → yellow */
-    .how-ready-left p > strong:first-child {
-      display: block;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #faf002;
-      font-weight: 700;
-      font-family: 'Open Sans', sans-serif;
-      padding-top: 1.4em;
-      padding-bottom: 0.25em;
+    .pillar-label-text { font-family: var(--display); font-size: 28px; letter-spacing: 0.02em; font-weight: 700; text-transform: uppercase; }
+    .pillar-head-stage {
+      display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
+      gap: 32px; align-items: start; min-height: 460px;
     }
-    .how-ready-left p:first-child > strong:first-child { padding-top: 0; }
-    .how-ready-left p:has(> strong:first-child) {
-      border-left: 2px solid rgba(250,240,0,0.35);
-      padding-left: 1rem;
-      margin-bottom: 1.4em;
+    .pillar-headline {
+      font-family: var(--display); font-size: clamp(80px, 10vw, 168px);
+      line-height: 0.78; color: var(--ink);
+      display: flex; flex-direction: column;
+      font-weight: 700; text-transform: uppercase;
+    }
+    .pillar-art {
+      width: 100%; max-width: 380px; height: auto;
+      display: block; justify-self: center; align-self: center;
+    }
+    .pillar-right { padding: 64px; }
+    .pillar-challenge-label { color: rgba(0,0,0,0.5); margin-bottom: 12px; }
+    .pillar-question { font-size: 20px; line-height: 1.45; color: var(--ink); max-width: 520px; font-weight: 500; margin-bottom: 8px; }
+    .pillar-interplay-label { color: rgba(0,0,0,0.5); margin-bottom: 12px; margin-top: 32px; }
+    .pillar-list { list-style: none; padding: 0; margin: 0; }
+    .pillar-list li {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 15px; padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+    }
+    .pillar-bullet { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .pillars-cta-row { padding: 64px 32px 96px; text-align: center; border-top: 1.5px solid var(--ink); }
+
+    @media (max-width: 1180px) {
+      .pillar-art { transform: translateX(0) !important; }
     }
 
-    /* ft-section: first paragraph of body copy acts as a lead sentence */
-    .ft-body > p:first-child {
-      font-weight: 700;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #2E2929;
-      line-height: 1.4;
-      margin-bottom: 1em;
-    }
-    /* On white sections the lead sentence gets a yellow left accent */
-    .ft-section--white .ft-body > p:first-child {
-      border-left: 2px solid rgba(250,240,2,0.7);
-      padding-left: 0.875rem;
-    }
 
-    /* ══════════════════════════════════════════
+    /* ════════════════════════════════════════════
+       TEAM
+    ════════════════════════════════════════════ */
+    .team-section { background: #0a0a0a; color: var(--paper); padding: 120px 32px; }
+    .team-eyebrow { color: var(--yellow); margin-bottom: 16px; }
+    .team-h2 {
+      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
+      line-height: 0.84; color: #fff;
+      max-width: 1440px; margin: 0 auto 56px;
+      font-weight: 700; text-transform: uppercase;
+    }
+    .team-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+    .team-card { border-top: 2px solid var(--yellow); padding-top: 32px; }
+    .team-name { font-family: var(--display); font-size: 36px; color: var(--yellow); margin-bottom: 6px; line-height: 1; font-weight: 700; text-transform: uppercase; }
+    .team-role { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,224,0.4); margin-bottom: 20px; }
+    .team-bio { font-size: 15px; line-height: 1.65; color: rgba(245,240,224,0.65); }
+    .team-portrait { width: 100%; display: block; margin-top: 32px; filter: grayscale(100%); }
+
+
+    /* ════════════════════════════════════════════
+       FINAL CTA
+    ════════════════════════════════════════════ */
+    .final-section { background: var(--yellow); color: var(--ink); padding: 120px 64px; }
+    .final-h2 {
+      font-family: var(--display); font-size: clamp(64px, 8vw, 144px);
+      line-height: 0.84; color: var(--ink);
+      margin-bottom: 32px; max-width: 1440px; margin-left: auto; margin-right: auto;
+      font-weight: 700; text-transform: uppercase;
+    }
+    .final-body {
+      font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.62);
+      max-width: 460px; margin: 0 0 40px max(0px, calc(50% - 720px));
+    }
+    .final-cta-row { display: flex; gap: 16px; flex-wrap: wrap; max-width: 1440px; margin: 0 auto 56px; }
+    .final-contact { max-width: 1440px; margin: 0 auto; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.18); }
+    .final-contact-tag { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(0,0,0,0.45); margin-bottom: 14px; }
+    .final-contact-row { display: flex; flex-wrap: wrap; gap: 48px; }
+    .final-contact-link { color: var(--ink); font-size: 14px; }
+    .final-contact-link strong { font-weight: 700; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+
+
+    /* ════════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════════ */
+    .footer {
+      background: var(--ink); color: var(--paper);
+      padding: 32px; display: flex;
+      justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+      border-top: 1px solid rgba(245,240,224,0.08);
+    }
+    .footer-logo { font-family: var(--display); font-size: 22px; color: var(--yellow); letter-spacing: 0.05em; font-weight: 700; text-transform: uppercase; }
+    .footer-meta { font-size: 12px; color: rgba(245,240,224,0.35); }
+
+
+    /* ════════════════════════════════════════════
        RESPONSIVE
-    ══════════════════════════════════════════ */
-    @media (max-width: 1100px) {
-      .diagram-wrap { width: 380px; }
-    }
-
+    ════════════════════════════════════════════ */
     @media (max-width: 960px) {
-      .hero-logo-img { display: none; }
-
-      .nav-by   { display: none; }
-      .nav-right { gap: 20px; }
-
-      .endorsement-card  { flex-direction: column; }
-      .endorsement-photo-wrap { width: 180px; height: 180px; margin: 0 auto; }
-
-      .growth-body { flex-direction: column; }
-      .diagram-wrap { width: 100%; max-width: 420px; }
-
-      .how-ready-cols { flex-direction: column; }
-      .stats-row { flex-direction: column; gap: 28px; }
-
-      .ft-cols { flex-direction: column; align-items: flex-start; gap: 40px; }
-      .ft-col  { width: 100%; }
-      .ft-mid  { width: 100%; min-height: 200px; justify-content: center; }
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; min-height: auto; }
+      .hero-right { display: none; }
+      .method-grid { grid-template-columns: 1fr; gap: 48px; }
+      .darshana-grid { grid-template-columns: 1fr; min-height: auto; }
+      .darshana-img-side { min-height: 400px; }
+      .darshana-quote-side { border-left: none; border-top: 1.5px solid var(--ink); }
+      .report-grid { grid-template-columns: 1fr; }
+      .pillar-row { grid-template-columns: 1fr; }
+      .pillar-head-stage { grid-template-columns: 1fr; min-height: auto; }
+      .team-grid { grid-template-columns: 1fr; }
+      .score-band-row { grid-template-columns: repeat(2, 1fr); }
     }
-
-    @media (max-width: 600px) {
-      .nav { min-height: auto; padding: 14px var(--ph); }
-      .nav-logo      { height: 44px; }
-      .nav-interrupt { height: 36px; }
-      .nav-likeso    { height: 36px; }
-      .btn           { font-size: 17px; min-width: unset; width: 100%; max-width: 380px; }
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .nav { padding: 14px 20px; }
+      .hero-cta-row { flex-wrap: wrap; }
+      .hero-meta { gap: 16px; }
+      .final-cta-row { flex-direction: column; }
+      .pillars-head { padding: 64px 24px 24px; }
+      .pillar-left { padding: 40px 24px; }
+      .pillar-right { padding: 40px 24px; }
+      .darshana-quote-side { padding: 48px 32px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══ NAV ═══ -->
-  <nav class="nav">
-    <img class="nav-logo"
-         src="/landing/interplay-logo-grey.png"
-         alt="Interplay Lab" />
-    <div class="nav-right">
-      <span class="nav-by">Interplay method by</span>
-      <img class="nav-interrupt"
-           src="/landing/interrupt-logo-dark.png"
-           alt="Interrupt" />
-      <span class="nav-x">X</span>
-      <img class="nav-likeso"
-           src="/landing/likeso-logo-white.png"
-           alt="Like So" />
-    </div>
-  </nav>
+<!-- ═══════ NAV ═══════ -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="#top" aria-label="Interplay home">
+      <img src="app/public/landing/interplay-lab-logo.png" alt="Interplay" class="nav-logo">
+    </a>
+    <span class="nav-divider" aria-hidden="true"></span>
+    <span class="nav-partner">A method by <strong>INTERRUPT</strong> × <strong>LIKE&nbsp;SO</strong></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#method">Method</a></li>
+    <li><a href="#opportunities">Opportunities</a></li>
+    <li><a href="#report">Report</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <a href="/start" class="btn btn-fill-ink">Take the assessment <span class="arrow">→</span></a>
+</nav>
 
-  <!-- ═══ HERO — full-bleed video, constrained content ═══ -->
-  <section class="hero">
-    <video class="hero-video" autoplay loop muted playsinline>
-      <source src="/landing/blobsvideo.mov" type="video/quicktime">
-      <source src="/landing/blobsvideo.mov" type="video/mp4">
-    </video>
-    <div class="hero-content">
-      <div class="hero-text">
-        <p class="hero-eyebrow">WANT TO KNOW YOUR</p>
-        <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
-        <a class="btn btn--dark" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
-        <p class="hero-sub">Get personalised Interplay report</p>
+
+<!-- ═══════ HERO ═══════ -->
+<section id="top" class="hero">
+  <div class="hero-grid">
+
+    <!-- Left col -->
+    <div>
+      <p class="eyebrow hero-eyebrow">The Interplay Method · Diagnostic Study</p>
+      <p class="hero-pre">Want to know your</p>
+      <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
+      <p class="hero-sub">Find out how effectively your organisation turns sustainability into commercial value – and where the biggest opportunities lie. A 30-minute diagnostic. A bespoke report. A clear plan.</p>
+      <div class="hero-cta-row">
+        <a href="/start" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+        <a href="mailto:ninapickup@interrupt-sustainability.com" class="btn btn-ghost-on-yellow">Book a power hour</a>
       </div>
-      <img class="hero-logo-img"
-           src="/landing/interplay-logo-grey.png"
-           alt="Interplay Lab" />
+      <ul class="hero-meta">
+        <li><strong>30&nbsp;min</strong> interview</li>
+        <li><strong>Interplay</strong> score</li>
+        <li><strong>Bespoke</strong> report</li>
+      </ul>
     </div>
-  </section>
 
-  <!-- ═══ GROWTH ACCELERATES ═══ -->
-  <section class="growth">
-    <p class="growth-eyebrow">Growth accelerates when</p>
-    <h2 class="growth-headline">Sustainability + Business + Brand Interplay</h2>
-    <div class="growth-body">
-      <div class="growth-text">
-        <p><strong>Sign up to an Interplay assessment</strong><br>
-        Join a growing number of brands taking part in this ground-breaking, industry-first study.
-        In just 30 minutes, we&rsquo;ll assess how effectively sustainability is connected across your organisation &ndash; and uncover your growth potential.</p>
-        <p><strong>Get your Interplay score</strong><br>
-        Understand your organisation&rsquo;s sustainability-driven growth potential, with clear insights across five key pillars &ndash; including where you&rsquo;re strong and where you can improve.</p>
-        <p><strong>Receive your personalised Interplay Report</strong><br>
-        Receive tailored insights and practical recommendations to help you unlock growth and strengthen sustainability outcomes.</p>
-      </div>
-
-      <!-- Hexagon illustration -->
-      <div class="diagram-wrap">
-        <div class="diagram-inner">
-          <img src="/landing/hexagon.png" alt="Interplay hexagon diagram" />
+    <!-- Right col -->
+    <div class="hero-right">
+      <img src="app/public/landing/interplay-lab-logo.png" alt="Interplay" class="hero-logo-img">
+      <div class="darsh-top">
+        <div class="darsh-avatar-wrap">
+          <img src="app/public/landing/darshana-bw.png" alt="Darshana Myronidis" class="darsh-avatar">
+        </div>
+        <div class="darsh-copy">
+          <span class="darsh-intro">Introducing the Interplay Method, supported by</span>
+          <span class="darsh-name">Darshana Myronidis · Global Sustainability Leader</span>
         </div>
       </div>
     </div>
+  </div>
 
-  <!-- ═══ ENDORSEMENT ═══ -->
-  <section class="endorsement">
-    <div class="endorsement-card">
-      <div class="endorsement-photo-wrap">
-        <img src="/landing/darsh-circle.png"
-             alt="Darshana Myronidis" />
+  <!-- Marquee -->
+  <div class="hero-marquee marquee">
+    <div class="marquee-track">
+      <div class="marquee-item">
+        <span class="display" style="font-size:24px">SUSTAINABILITY × BUSINESS × BRAND</span><span class="hero-marquee-dot" style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">$2.7TN OPPORTUNITY BY 2040</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">5 PILLARS · 1 SCORE</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">TURN COST INTO GROWTH</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">INTERRUPT × LIKE SO</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
       </div>
-      <div class="endorsement-body">
-        <p class="endorsement-sup">Interplay is supported by</p>
-        <p class="endorsement-name">Darshana Myronidis, Global Leader in Sustainability</p>
-        <span class="endorsement-qmark">&ldquo;</span>
-        <div class="endorsement-quote">
-          <p><strong><em>I&rsquo;m delighted to be supporting this ground breaking benchmark.</em></strong></p>
-          <p><em>Sustainability has never been more important &ndash; or more misunderstood.</em></p>
-          <p><em>Too often, sustainability remains trapped in a compliance silo &ndash; disconnected from the commercial decisions that would give it real power and scale.</em></p>
-          <p><em>The Interplay Method asks exactly the right question: not whether organisations care about sustainability, but whether they are truly built to grow through it. This is exactly what is needed. And not a moment too soon.</em></p>
-          <p><em>Darshana Myrondis</em></p>
+      <div class="marquee-item">
+        <span class="display" style="font-size:24px">SUSTAINABILITY × BUSINESS × BRAND</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">$2.7TN OPPORTUNITY BY 2040</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">5 PILLARS · 1 SCORE</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">TURN COST INTO GROWTH</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+        <span class="display" style="font-size:24px">INTERRUPT × LIKE SO</span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow)"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ PREMISE ═══════ -->
+<section class="premise">
+  <p class="eyebrow premise-eyebrow">Growth accelerates when</p>
+  <h2 class="premise-h2">
+    SUSTAINABILITY + BUSINESS + BRAND <span style="color:var(--yellow)">INTERPLAY</span>
+  </h2>
+  <p class="premise-sub">There is huge growth potential in sustainability – but it's mostly sitting in a compliance silo. Costing you pricing power, relevance, market differentiation and financial backing.</p>
+  <p class="premise-sub">Interplay to unlock your full sustainability growth potential.</p>
+  <div class="display premise-stat">$2.7TN</div>
+  <p class="premise-stat-label">Sustainability's predicted contribution to global Top 100 brand value by 2040</p>
+  <div style="margin-top:40px">
+    <a href="/start" class="btn btn-fill-yellow">Take your assessment <span class="arrow">→</span></a>
+  </div>
+</section>
+
+
+<!-- ═══════ METHOD ═══════ -->
+<section id="method" class="method-section">
+  <div class="method-grid">
+    <div>
+      <p class="eyebrow method-eyebrow">How it works</p>
+      <h2 class="method-h2">THE INTERPLAY<br>METHOD</h2>
+      <p class="method-body">Our diagnostic study is based on a simple but powerful premise: when sustainability, business and brand genuinely Interplay, growth accelerates. Not incrementally. Significantly.</p>
+      <p class="method-body">We interview your sustainability, brand and business leaders to identify exactly where the opportunities lie.</p>
+      <p class="method-involves-tag">It involves:</p>
+      <ol class="method-list">
+        <li><span class="method-list-num">01</span><span>A 30-minute interview</span></li>
+        <li><span class="method-list-num">02</span><span>Interplay scoring across 5 pillars vs benchmark</span></li>
+        <li><span class="method-list-num">03</span><span>Conservative, moderate and optimistic financial opportunity</span></li>
+        <li><span class="method-list-num">04</span><span>Bespoke recommendations and next actions</span></li>
+        <li><span class="method-list-num">05</span><span>A personalised Interplay Report – ready to share with your board</span></li>
+      </ol>
+      <div style="margin-top:32px">
+        <a href="/start" class="btn btn-fill-yellow">Take your assessment <span class="arrow">→</span></a>
+      </div>
+    </div>
+    <div class="method-mark-col">
+      <img src="app/public/landing/interplay-triangle.png" alt="The Interplay model – Sustainability × Business × Brand" class="method-diagram">
+      <div class="method-stat-row">
+        <div class="method-stat-item">
+          <span class="method-stat-num">1.4×</span>
+          <p class="method-stat-desc">More likely to achieve innovation breakthroughs when sustainability is integrated. <span class="method-stat-src">(BCG)</span></p>
+        </div>
+        <div class="method-stat-item">
+          <span class="method-stat-num">43%</span>
+          <p class="method-stat-desc">More spent on reporting than innovation when sustainability is siloed.</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
 
-  </section>
-
-  <!-- ═══ HOW READY — dark bg ═══ -->
-  <section class="how-ready">
-    <p class="how-ready-eyebrow">How ready is your organisation to</p>
-    <h2 class="how-ready-headline">TURN SUSTAINABILITY FROM COST TO GROWTH?</h2>
-    <div class="how-ready-cols">
-      <div class="how-ready-left">
-        <p><strong>The value opportunity</strong><br>
-        There is huge value in sustainability, but it&rsquo;s usually sitting in a compliance silo &ndash; disconnected from the business and brand commercials.
-        Losing you pricing power, relevance, market differentiation &ndash; and financial backing.</p>
-        <p><strong>Our diagnostic tool</strong><br>
-        We will identify the gaps and opportunities between your sustainability, business and brand &ndash; and where their interplay can unlock triple value.</p>
+<!-- ═══════ DARSHANA ═══════ -->
+<section class="darshana-section">
+  <div class="darshana-grid">
+    <div class="darshana-img-side">
+      <img src="app/public/landing/darshana-bw.png" alt="Darshana Myronidis" class="darshana-bg-img">
+      <div class="darshana-scrim" aria-hidden="true"></div>
+      <div class="darshana-overlay">
+        <span class="darshana-overlay-text">THIS IS<br>EXACTLY<br><span style="color:var(--yellow)">WHAT IS</span><br><span style="color:var(--yellow)">NEEDED</span></span>
       </div>
-      <div class="how-ready-right">
-        <p class="big-stat">$2.7tn</p>
-        <p class="big-stat-desc">Sustainability&rsquo;s contribution to the brand value of the global Top 100 at $0.2TN today, and $2.7TN by 2040</p>
-        <div class="stats-row">
-          <div class="stat-block">
-            <p class="stat-number">1.4X</p>
-            <p class="stat-desc">Companies incorporating sustainability are 1.4 times more likely to experience innovative breakthroughs (Boston Consulting Group)</p>
-          </div>
-          <div class="stat-block">
-            <p class="stat-number">43%</p>
-            <p class="stat-desc">When sustainability is treated as a compliance exercise rather than an operational strategy, companies spend 43% more on reporting than on innovation</p>
-          </div>
+    </div>
+    <div class="darshana-quote-side">
+      <p class="eyebrow darshana-eyebrow">Foreword · Global Sustainability Leader</p>
+      <p class="darshana-quote">"Sustainability remains trapped in a compliance silo – disconnected from the commercial decisions that would give it real power and scale.</p>
+      <p class="darshana-quote">The Interplay Method asks exactly the right question: not whether organisations care about sustainability, but whether they are truly built to grow through it.</p>
+      <p class="darshana-quote">This is exactly what is needed. And not a moment too soon."</p>
+      <div class="darshana-attrib">
+        <div class="darshana-attrib-rule"></div>
+        <div>
+          <p class="darshana-attrib-name">Darshana Myronidis</p>
+          <p class="darshana-attrib-role">Global Sustainability Leader</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ═══ SUSTAINABILITY: FROM → TO ═══ -->
-  <section class="ft-section ft-section--yellow">
-    <p class="ft-label">Sustainability</p>
-    <div class="ft-cols">
-      <div class="ft-col">
-        <p class="ft-dir">From</p>
-        <h3 class="ft-title">COMPLIANCE COST</h3>
-        <div class="ft-body">
-          <p>Does sustainability feel like a separate compliance function with limited influence?</p>
-          <p>Struggling to build real alignment and buy-in across your organisation?</p>
-        </div>
-      </div>
-      <div class="ft-mid">
-        <img src="/landing/tanoy-speaker.png"
-             alt="Speaker illustration" style="max-height:487px;" />
-      </div>
-      <div class="ft-col">
-        <p class="ft-dir">To</p>
-        <h3 class="ft-title">ACTION &amp; ADVANTAGE</h3>
-        <p class="ft-subtitle">(without losing credibility)</p>
-        <div class="ft-body">
-          <p>Interplay to mobilise your whole organisation</p>
-          <ul>
-            <li>Make sustainability an easy sell</li>
-            <li>Become strategic partners</li>
-            <li>Position sustainability as a central business driver</li>
-            <li>Become the innovation hub</li>
-            <li>Align priorities</li>
-          </ul>
-        </div>
+
+<!-- ═══════ SCORE ═══════ -->
+<section id="score" class="score-section">
+  <p class="eyebrow score-eyebrow">Your Interplay score</p>
+  <h2 class="score-h2">HOW DO YOU<br>MEASURE UP?</h2>
+  <p class="score-body">Your Interplay Score reveals your organisation's current sustainability growth potential. The four bands show where you sit – and how much value is still on the table.</p>
+
+  <svg viewBox="0 0 220 220" width="220" height="220" class="score-donut" aria-hidden="true">
+    <circle cx="110" cy="110" r="90" fill="none" stroke="rgba(245,240,224,0.08)" stroke-width="12"/>
+    <circle cx="110" cy="110" r="90" fill="none" stroke="#FFE600" stroke-width="12"
+      stroke-dasharray="340 565" stroke-dashoffset="141" transform="rotate(-90 110 110)"/>
+    <text x="110" y="100" text-anchor="middle" fill="rgba(245,240,224,0.4)"
+      font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="2">YOUR SCORE</text>
+    <text x="110" y="138" text-anchor="middle" fill="#FFE600"
+      font-family="Robson, Anton, Impact, sans-serif" font-size="44" font-weight="700">?%</text>
+  </svg>
+
+  <div class="score-band-row">
+    <div class="score-band"><div class="score-band-label">EMERGING</div><div class="score-band-range">0–25%</div></div>
+    <div class="score-band"><div class="score-band-label">DEVELOPING</div><div class="score-band-range">25–50%</div></div>
+    <div class="score-band active"><div class="score-band-label">MATURING</div><div class="score-band-range">50–75%</div></div>
+    <div class="score-band"><div class="score-band-label">LEADING</div><div class="score-band-range">75–100%</div></div>
+  </div>
+
+  <a href="/start" class="btn btn-fill-yellow" style="margin-top:8px">Get your Interplay score <span class="arrow">→</span></a>
+</section>
+
+
+<!-- ═══════ REPORT ═══════ -->
+<section id="report" class="report-section">
+  <p class="eyebrow report-eyebrow">Your personalised report</p>
+  <h2 class="report-h2">RECEIVE YOUR<br>INTERPLAY REPORT</h2>
+
+  <div class="report-grid">
+    <div>
+      <p class="report-body">Every organisation receives a bespoke Interplay Report designed to be shared with your sustainability, brand and business teams – and your board.</p>
+      <ul class="report-includes">
+        <li>Your overall Interplay score and benchmark comparison</li>
+        <li>Your score across all five pillars</li>
+        <li>Your financial opportunity – conservative, moderate and optimistic</li>
+        <li>Bespoke assessment and recommendations for each pillar</li>
+        <li>How Interrupt × Like So can help you unlock growth</li>
+      </ul>
+      <div style="margin-top:32px">
+        <a href="/start" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
       </div>
     </div>
-  </section>
 
-  <!-- ═══ BRAND: FROM → TO ═══ -->
-  <section class="ft-section ft-section--white">
-    <p class="ft-label">Brand</p>
-    <div class="ft-cols">
-      <div class="ft-col">
-        <p class="ft-dir">From</p>
-        <h3 class="ft-title">COST TO SALES</h3>
-        <div class="ft-body">
-          <p>Investing in sustainability but not seeing it translate into brand value?</p>
-          <p>Consumers say they care &mdash; but don&rsquo;t act.</p>
+    <!-- Report mockup card -->
+    <div class="report-card">
+      <div class="report-card-head">
+        <span class="report-card-tag"><span style="color:var(--yellow)">INTERPLAY</span><span style="color:rgba(245,240,224,0.35)"> · DIAGNOSTIC REPORT</span></span>
+        <span class="report-card-meta">32 pages · PDF · bespoke</span>
+      </div>
+
+      <div class="report-score-head">
+        <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(245,240,224,0.1)" stroke-width="6"/>
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#FFE600" stroke-width="6"
+            stroke-dasharray="137 201" stroke-dashoffset="50" transform="rotate(-90 40 40)"/>
+          <text x="40" y="45" text-anchor="middle" fill="#FFE600"
+            font-family="Robson, Anton, Impact, sans-serif" font-size="18" font-weight="700">68%</text>
+        </svg>
+        <div>
+          <p class="report-score-eyebrow">Overall Interplay Score</p>
+          <p class="report-score-band">MATURING</p>
+          <p class="report-score-bench">Benchmark avg <span style="color:rgba(245,240,224,0.85);font-weight:600">50%</span></p>
         </div>
       </div>
-      <div class="ft-mid">
-        <div class="hangers">
-          <img class="hanger-1"
-               src="/landing/hanger-black.png"
-               alt="" />
-          <img class="hanger-2"
-               src="/landing/hanger-black.png"
-               alt="" />
-        </div>
+
+      <div class="report-divider"></div>
+
+      <div class="report-bars">
+        <div class="report-bar-row"><span class="report-bar-label">Appetite</span><div class="report-bar-track"><div class="report-bar-fill" style="width:68%"></div></div><span class="report-bar-pct">68%</span><span class="report-bar-band">MATURING</span></div>
+        <div class="report-bar-row"><span class="report-bar-label">Scale & AI</span><div class="report-bar-track"><div class="report-bar-fill" style="width:76%"></div></div><span class="report-bar-pct">76%</span><span class="report-bar-band">LEADING</span></div>
+        <div class="report-bar-row"><span class="report-bar-label">Sustainability</span><div class="report-bar-track"><div class="report-bar-fill" style="width:69%"></div></div><span class="report-bar-pct">69%</span><span class="report-bar-band">MATURING</span></div>
+        <div class="report-bar-row"><span class="report-bar-label">Brand</span><div class="report-bar-track"><div class="report-bar-fill" style="width:50%"></div></div><span class="report-bar-pct">50%</span><span class="report-bar-band">MATURING</span></div>
+        <div class="report-bar-row"><span class="report-bar-label">Business</span><div class="report-bar-track"><div class="report-bar-fill" style="width:67%"></div></div><span class="report-bar-pct">67%</span><span class="report-bar-band">MATURING</span></div>
       </div>
-      <div class="ft-col">
-        <p class="ft-dir">To</p>
-        <h3 class="ft-title">DRIVING SALES</h3>
-        <p class="ft-subtitle">(without greenwashing)</p>
-        <div class="ft-body">
-          <p>Interplay to increase competitive advantage and drive sales</p>
-          <ul>
-            <li>Increase brand desirability</li>
-            <li>Build customer relevance</li>
-            <li>Strengthen peer differentiation</li>
-            <li>Increased loyalty</li>
-            <li>Market share</li>
-            <li>Protect brand reputation</li>
-          </ul>
-        </div>
+
+      <div class="report-divider"></div>
+
+      <p class="report-fin-tag">Financial Opportunity · Based on $19B Revenue</p>
+      <div class="report-fin-row">
+        <div class="report-fin-cell"><p class="report-fin-tier">Conservative</p><p class="report-fin-value">$280M</p></div>
+        <div class="report-fin-cell"><p class="report-fin-tier">Moderate</p><p class="report-fin-value">$900M</p></div>
+        <div class="report-fin-cell"><p class="report-fin-tier">Optimistic</p><p class="report-fin-value">$1.9B</p></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ═══ BUSINESS: FROM → TO ═══ -->
-  <section class="ft-section ft-section--yellow">
-    <p class="ft-label">BUSINESS</p>
-    <div class="ft-cols">
-      <div class="ft-col">
-        <p class="ft-dir">From</p>
-        <h3 class="ft-title">COST CENTRE</h3>
-        <div class="ft-body">
-          <p>Struggling to see the commercial value of sustainability?</p>
-          <p>Does it drive up costs and squeeze your margins?</p>
-        </div>
-      </div>
-      <div class="ft-mid">
-        <img src="/landing/balloon.png"
-             alt="Balloon illustration" style="max-height:416px;" />
-      </div>
-      <div class="ft-col">
-        <p class="ft-dir">To</p>
-        <h3 class="ft-title">CAPITAL</h3>
-        <p class="ft-subtitle">(without reputational risk)</p>
-        <div class="ft-body">
-          <p>Interplay to increase margins and revenue streams</p>
-          <ul>
-            <li>Create efficiencies &ndash; and cut costs</li>
-            <li>Identify new revenue streams</li>
-            <li>Find new ways to upsell</li>
-            <li>Create pricing power</li>
-            <li>Adapt to regulations to win regionally</li>
-          </ul>
-        </div>
+
+<!-- ═══════ PILLARS / OPPORTUNITIES ═══════ -->
+<section id="opportunities" class="pillars-section">
+  <div class="pillars-head">
+    <p class="eyebrow pillars-eyebrow">The three commercial opportunities</p>
+    <h2 class="pillars-h2">TURN SUSTAINABILITY<br>FROM COST INTO GROWTH</h2>
+  </div>
+
+  <!-- 01 Sustainability -->
+  <article class="pillar-row">
+    <div class="pillar-left">
+      <p class="pillar-tag">
+        <span class="pillar-num-chip">01</span>
+        <span class="pillar-label-text" style="color:#5BC8A0">SUSTAINABILITY</span>
+      </p>
+      <div class="pillar-head-stage">
+        <h3 class="pillar-headline">
+          <span>TURN</span><span>COST</span><span>INTO</span>
+          <span style="color:#5BC8A0">ACTION</span>
+        </h3>
+        <img src="app/public/landing/tanoy.png" alt="Megaphone held aloft" class="pillar-art" style="max-width:180px;transform:translateX(-70px)">
       </div>
     </div>
-  </section>
+    <div class="pillar-right">
+      <p class="eyebrow pillar-challenge-label">The challenge</p>
+      <p class="pillar-question">Do you feel like a separate compliance function, with limited authority? Struggling to get buy-in?</p>
+      <p class="eyebrow pillar-interplay-label">Interplay to</p>
+      <ul class="pillar-list">
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Mobilise your whole organisation</li>
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Make sustainability an easy sell</li>
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Become strategic partners</li>
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Make sustainability a central business driver</li>
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Align priorities</li>
+        <li><span class="pillar-bullet" style="background:#5BC8A0"></span>Become the innovation hub</li>
+      </ul>
+    </div>
+  </article>
 
-  <!-- ═══ FOOTER CTA ═══ -->
-  <footer class="footer-cta">
-    <img class="footer-logo"
-         src="/landing/interplay-logo-yellow.png"
-         alt="Interplay Lab" />
-    <h2 class="footer-headline">GET YOUR PERSONALISED INTERPLAY REPORT</h2>
-    <a class="btn btn--white" href="/start">RUN YOUR ASSESSMENT &rarr;</a>
-    <p class="footer-sub">Takes 30 seconds</p>
-  </footer>
+  <!-- 02 Brand -->
+  <article class="pillar-row">
+    <div class="pillar-left">
+      <p class="pillar-tag">
+        <span class="pillar-num-chip">02</span>
+        <span class="pillar-label-text" style="color:#F26B7A">BRAND</span>
+      </p>
+      <div class="pillar-head-stage">
+        <h3 class="pillar-headline">
+          <span>TURN</span><span>COST</span><span>INTO</span>
+          <span style="color:#F26B7A">SALES</span>
+        </h3>
+        <img src="app/public/landing/hanger.png" alt="Coat hanger" class="pillar-art" style="height:calc(clamp(80px,10vw,168px)*0.78*3*0.8);width:auto;max-width:none;align-self:start">
+      </div>
+    </div>
+    <div class="pillar-right">
+      <p class="eyebrow pillar-challenge-label">The challenge</p>
+      <p class="pillar-question">Is sustainability a drain on your marketing budget? Consumers care but don't act – so why should you?</p>
+      <p class="eyebrow pillar-interplay-label">Interplay to</p>
+      <ul class="pillar-list">
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Increase competitive advantage and drive sales</li>
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Increase brand desirability</li>
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Build customer relevance</li>
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Strengthen peer differentiation</li>
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Increase loyalty and market share</li>
+        <li><span class="pillar-bullet" style="background:#F26B7A"></span>Protect brand reputation</li>
+      </ul>
+    </div>
+  </article>
+
+  <!-- 03 Business -->
+  <article class="pillar-row">
+    <div class="pillar-left">
+      <p class="pillar-tag">
+        <span class="pillar-num-chip">03</span>
+        <span class="pillar-label-text" style="color:#5B9BFF">BUSINESS</span>
+      </p>
+      <div class="pillar-head-stage">
+        <h3 class="pillar-headline">
+          <span>TURN</span><span>COST</span><span>INTO</span>
+          <span style="color:#5B9BFF">CAPITAL</span>
+        </h3>
+        <img src="app/public/landing/balloon.png" alt="Person carried by a balloon" class="pillar-art" style="height:calc(clamp(80px,10vw,168px)*0.78*3*1.5);width:auto;max-width:none;align-self:start;transform:translateX(-70px)">
+      </div>
+    </div>
+    <div class="pillar-right">
+      <p class="eyebrow pillar-challenge-label">The challenge</p>
+      <p class="pillar-question">Do you think sustainability isn't commercial enough? Does it push up product prices and squeeze your margins?</p>
+      <p class="eyebrow pillar-interplay-label">Interplay to</p>
+      <ul class="pillar-list">
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Increase margins and revenue streams</li>
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Create efficiencies – and cut costs</li>
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Identify new revenue streams</li>
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Find new ways to upsell</li>
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Adapt to regulations to win regionally</li>
+        <li><span class="pillar-bullet" style="background:#5B9BFF"></span>Strengthen resilience and derisk the business</li>
+      </ul>
+    </div>
+  </article>
+
+  <div class="pillars-cta-row">
+    <a href="/start" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+  </div>
+</section>
+
+
+<!-- ═══════ TEAM ═══════ -->
+<section id="team" class="team-section">
+  <p class="eyebrow team-eyebrow">The team behind Interplay</p>
+  <h2 class="team-h2">TURNING SUSTAINABILITY<br><span style="color:var(--yellow)">FROM COST INTO COMMERCIALS</span></h2>
+  <div class="team-grid">
+    <article class="team-card">
+      <p class="team-name">Nina Pickup</p>
+      <p class="team-role">Founder, INTERRUPT</p>
+      <p class="team-bio">Seventeen years sitting at the intersection of sustainability, business and brand taught me one thing: the problem was never ambition. It was disconnection. <span style="color:var(--yellow)">Interplay</span> was built to change that.</p>
+      <img src="app/public/landing/nina-pickup.png" alt="Nina Pickup" class="team-portrait">
+    </article>
+    <article class="team-card">
+      <p class="team-name">Dan Harris</p>
+      <p class="team-role">Co-founder, Like So</p>
+      <p class="team-bio">Turning sustainability into commercial value isn't just a strategic challenge – it's a product and innovation challenge. Together, we don't just identify where the value is. We build it.</p>
+      <img src="app/public/landing/dan-harris.png" alt="Dan Harris" class="team-portrait">
+    </article>
+  </div>
+</section>
+
+
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="final-section">
+  <h2 class="final-h2">
+    READY TO UNLOCK<br>YOUR SUSTAINABILITY<br>GROWTH POTENTIAL?
+  </h2>
+  <p class="final-body">Take your Interplay assessment and receive your personalised report – or book a Power Hour to start unlocking value straight away.</p>
+  <div class="final-cta-row">
+    <a href="/start" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+    <a href="mailto:ninapickup@interrupt-sustainability.com" class="btn btn-ghost-on-yellow">Book a Power Hour</a>
+    <a href="mailto:ninapickup@interrupt-sustainability.com" class="btn btn-ghost-on-yellow">Book a findings call</a>
+  </div>
+  <div class="final-contact">
+    <p class="final-contact-tag">Not sure where to start? Get in touch directly.</p>
+    <div class="final-contact-row">
+      <a href="mailto:ninapickup@interrupt-sustainability.com" class="final-contact-link">
+        <strong>Nina Pickup</strong> · ninapickup@interrupt-sustainability.com
+      </a>
+      <a href="mailto:dan.harris@likeso.studio" class="final-contact-link">
+        <strong>Dan Harris</strong> · dan.harris@likeso.studio
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer">
+  <div class="footer-logo">INTERRUPT × LIKE SO</div>
+  <div class="footer-meta">Methodology by INTERRUPT · interrupt-sustainability.com · likeso.studio</div>
+</footer>
 
 </body>
 </html>
