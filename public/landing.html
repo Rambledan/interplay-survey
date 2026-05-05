@@ -391,12 +391,9 @@
     .report-score-bench { font-family: var(--mono); font-size: 12px; color: rgba(245,240,224,0.5); }
     .report-divider { height: 1px; background: rgba(245,240,224,0.1); margin: 24px 0; }
     .report-bars { display: flex; flex-direction: column; gap: 10px; }
-    .report-bar-row { display: grid; grid-template-columns: 110px 1fr 44px 100px; align-items: center; gap: 14px; }
-    .report-bar-label { font-size: 13px; color: rgba(245,240,224,0.85); }
+    .report-bar-row { display: block; }
     .report-bar-track { height: 8px; background: rgba(245,240,224,0.08); }
     .report-bar-fill { height: 100%; background: var(--yellow); }
-    .report-bar-pct { font-family: var(--mono); font-size: 12px; color: rgba(245,240,224,0.6); text-align: right; }
-    .report-bar-band { font-family: var(--display); font-size: 12px; letter-spacing: 0.06em; color: var(--yellow); font-weight: 700; }
     .report-fin-tag {
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
       color: rgba(245,240,224,0.45); margin-bottom: 14px; text-transform: uppercase;
@@ -782,11 +779,11 @@
       <div class="report-divider"></div>
 
       <div class="report-bars">
-        <div class="report-bar-row"><span class="report-bar-label">Appetite</span><div class="report-bar-track"><div class="report-bar-fill" style="width:68%"></div></div><span class="report-bar-pct">68%</span><span class="report-bar-band">MATURING</span></div>
-        <div class="report-bar-row"><span class="report-bar-label">Scale & AI</span><div class="report-bar-track"><div class="report-bar-fill" style="width:76%"></div></div><span class="report-bar-pct">76%</span><span class="report-bar-band">LEADING</span></div>
-        <div class="report-bar-row"><span class="report-bar-label">Sustainability</span><div class="report-bar-track"><div class="report-bar-fill" style="width:69%"></div></div><span class="report-bar-pct">69%</span><span class="report-bar-band">MATURING</span></div>
-        <div class="report-bar-row"><span class="report-bar-label">Brand</span><div class="report-bar-track"><div class="report-bar-fill" style="width:50%"></div></div><span class="report-bar-pct">50%</span><span class="report-bar-band">MATURING</span></div>
-        <div class="report-bar-row"><span class="report-bar-label">Business</span><div class="report-bar-track"><div class="report-bar-fill" style="width:67%"></div></div><span class="report-bar-pct">67%</span><span class="report-bar-band">MATURING</span></div>
+        <div class="report-bar-row"><div class="report-bar-track"><div class="report-bar-fill" style="width:68%"></div></div></div>
+        <div class="report-bar-row"><div class="report-bar-track"><div class="report-bar-fill" style="width:76%"></div></div></div>
+        <div class="report-bar-row"><div class="report-bar-track"><div class="report-bar-fill" style="width:69%"></div></div></div>
+        <div class="report-bar-row"><div class="report-bar-track"><div class="report-bar-fill" style="width:50%"></div></div></div>
+        <div class="report-bar-row"><div class="report-bar-track"><div class="report-bar-fill" style="width:67%"></div></div></div>
       </div>
 
       <div class="report-divider"></div>
