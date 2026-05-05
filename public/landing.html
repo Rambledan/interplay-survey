@@ -529,6 +529,7 @@
     ════════════════════════════════════════════ */
     @media (max-width: 960px) {
       .nav-cta { display: none; }
+      .hero-video { display: none; }
       .hero-grid { grid-template-columns: 1fr; gap: 40px; min-height: auto; }
       .hero-right { display: none; }
       .method-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -585,9 +586,21 @@
 
 <!-- ═══════ HERO ═══════ -->
 <section id="top" class="hero">
-  <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture x-webkit-airplay="deny">
-    <source src="app/public/landing/blobsvideo.mov" type="video/mp4">
+  <video class="hero-video" id="heroVideo" muted loop playsinline preload="none" disablepictureinpicture x-webkit-airplay="deny">
+    <source data-src="app/public/landing/blobsvideo.mov" type="video/mp4">
   </video>
+  <script>
+    (function () {
+      if (window.innerWidth >= 960) {
+        var v = document.getElementById('heroVideo');
+        v.querySelectorAll('source[data-src]').forEach(function (s) {
+          s.src = s.dataset.src;
+        });
+        v.load();
+        v.play().catch(function () {});
+      }
+    })();
+  </script>
   <div class="hero-content-wrap">
   <div class="hero-grid">
 
