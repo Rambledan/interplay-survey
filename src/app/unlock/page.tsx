@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function UnlockPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -21,7 +19,8 @@ export default function UnlockPage() {
     })
 
     if (res.ok) {
-      router.push('/')
+      // Full navigation so the route handler receives the cookie properly
+      window.location.href = '/'
     } else {
       setError('Incorrect password')
       setLoading(false)
