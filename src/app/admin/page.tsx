@@ -2143,6 +2143,13 @@ export default function AdminPage() {
             <span className="ml-4 text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>Admin</span>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/start"
+              className="text-xs font-mono transition-colors"
+              style={{ color: 'rgba(13,20,16,0.4)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = '#0d1410'}
+              onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(13,20,16,0.4)'}>
+              Start survey →
+            </a>
             <button onClick={() => fetchData(password)}
               className="text-xs font-mono transition-colors"
               style={{ color: 'rgba(13,20,16,0.4)' }}
