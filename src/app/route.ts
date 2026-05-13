@@ -60,10 +60,12 @@ export async function GET() {
     })
   }
 
+  // Expire the cookie immediately — forces password entry on every visit
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
+      'Set-Cookie': `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
     },
   })
 }

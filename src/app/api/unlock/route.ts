@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     sameSite: 'lax',
     path: '/',
     // 30-day session
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: 60, // 60 seconds — just long enough to complete the redirect
   })
   return res
 }
