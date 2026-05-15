@@ -295,18 +295,24 @@
       position: absolute; inset: 0;
       background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%);
     }
-    .darshana-overlay { position: absolute; top: 36px; left: 36px; right: 36px; }
-    .darshana-overlay-eyebrow {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: rgba(255,255,255,0.6);
-      text-shadow: 0 1px 8px rgba(0,0,0,0.4);
-      display: block; margin-bottom: 14px;
+    .darshana-overlay { position: absolute; bottom: 36px; left: 36px; right: 36px; }
+    .darshana-overlay-intro {
+      font-size: 16px; font-weight: 400; color: rgba(255,255,255,0.85);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+      display: block; margin-bottom: 8px;
     }
     .darshana-overlay-text {
-      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
-      color: #fff; line-height: 0.84;
+      font-family: var(--display); font-size: clamp(48px, 6vw, 96px);
+      color: var(--yellow); line-height: 0.84;
       text-shadow: 0 2px 16px rgba(0,0,0,0.4);
       font-weight: 700; text-transform: uppercase; display: block;
+      margin-bottom: 14px;
+    }
+    .darshana-overlay-sub {
+      font-size: 17px; line-height: 1.45; font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+      display: block; max-width: 380px;
     }
     .darshana-quote-side {
       padding: 80px 64px; display: flex; flex-direction: column; justify-content: center;
@@ -717,8 +723,9 @@
       <img src="app/public/landing/darshana-bw.png" alt="Darshana Myronidis" class="darshana-bg-img">
       <div class="darshana-scrim" aria-hidden="true"></div>
       <div class="darshana-overlay">
-        <span class="darshana-overlay-eyebrow">Foreword</span>
+        <span class="darshana-overlay-intro">We sat down with</span>
         <span class="darshana-overlay-text">Darshana<br>Myronidis</span>
+        <span class="darshana-overlay-sub">Global Sustainability Leader, to discuss our Interplay assessment</span>
       </div>
     </div>
     <div class="darshana-quote-side">
