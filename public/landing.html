@@ -177,9 +177,16 @@
 
     .hero-right {
       position: relative; display: flex; flex-direction: column;
-      align-items: flex-start; align-self: flex-start; margin-top: 51px;
+      align-items: flex-start; align-self: stretch; margin-top: 51px;
+      overflow: hidden;
     }
-    .hero-logo-img { width: 100%; max-width: 560px; height: auto; display: block; }
+    .hero-logo-img { width: 70%; max-width: 380px; height: auto; display: block; position: relative; z-index: 1; }
+    .hero-rocket {
+      position: absolute; bottom: -40px; right: -40px;
+      width: 72%; max-width: 480px; height: auto;
+      display: block; z-index: 2;
+      pointer-events: none;
+    }
     .darsh-top {
       display: inline-flex; align-items: center; gap: 14px;
       padding: 8px 16px 8px 8px; margin-top: 117px; align-self: flex-start;
@@ -631,6 +638,7 @@
     <!-- Right col -->
     <div class="hero-right">
       <img src="app/public/landing/interplay-lab-logo.png" alt="Interplay" class="hero-logo-img">
+      <img src="app/public/landing/rocket.png" alt="" class="hero-rocket" aria-hidden="true">
     </div>
   </div>
 
