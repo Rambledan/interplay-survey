@@ -296,9 +296,15 @@
       background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%);
     }
     .darshana-overlay { position: absolute; top: 36px; left: 36px; right: 36px; }
+    .darshana-overlay-eyebrow {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      display: block; margin-bottom: 14px;
+    }
     .darshana-overlay-text {
-      font-family: var(--display); font-size: clamp(28px, 3.5vw, 52px);
-      color: #fff; line-height: 1;
+      font-family: var(--display); font-size: clamp(56px, 7vw, 116px);
+      color: #fff; line-height: 0.84;
       text-shadow: 0 2px 16px rgba(0,0,0,0.4);
       font-weight: 700; text-transform: uppercase; display: block;
     }
@@ -711,7 +717,8 @@
       <img src="app/public/landing/darshana-bw.png" alt="Darshana Myronidis" class="darshana-bg-img">
       <div class="darshana-scrim" aria-hidden="true"></div>
       <div class="darshana-overlay">
-        <span class="darshana-overlay-text">Darshana Myronidis,<br><span style="color:var(--yellow)">Global Sustainability</span><br><span style="color:var(--yellow)">Leader</span></span>
+        <span class="darshana-overlay-eyebrow">Foreword</span>
+        <span class="darshana-overlay-text">Darshana<br>Myronidis</span>
       </div>
     </div>
     <div class="darshana-quote-side">
