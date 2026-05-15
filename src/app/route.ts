@@ -12,13 +12,9 @@
 
 import fs from 'fs'
 import path from 'path'
-import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-
-const COOKIE_NAME = 'interplay_access'
-const COOKIE_VALUE = 'granted'
 
 function fixPaths(html: string): string {
   return html
@@ -27,15 +23,6 @@ function fixPaths(html: string): string {
 }
 
 export async function GET() {
-  // Password gate — redirect to /unlock if cookie not present
-  const jar = await cookies()
-  if (jar.get(COOKIE_NAME)?.value !== COOKIE_VALUE) {
-    return new Response(null, {
-      status: 302,
-      headers: { Location: '/unlock' },
-    })
-  }
-
 
   // Local dev: root landing.html lives one level up from the app/ folder.
   // Vercel: root landing.html is also available since the full repo is deployed.
@@ -60,12 +47,10 @@ export async function GET() {
     })
   }
 
-  // Expire the cookie immediately — forces password entry on every visit
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
-      'Set-Cookie': `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
     },
   })
 }
