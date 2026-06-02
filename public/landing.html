@@ -597,22 +597,22 @@
       max-height: 92vh; overflow-y: auto;
       display: flex; flex-direction: column;
     }
-    .modal-close {
-      position: absolute; top: 14px; right: 14px;
-      background: rgba(245,240,224,0.12); border: 1px solid rgba(245,240,224,0.3);
-      border-radius: 6px; color: var(--paper);
-      font-size: 18px; line-height: 1; cursor: pointer;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .15s, border-color .15s; z-index: 1;
-    }
-    .modal-close:hover {
-      background: rgba(245,240,224,0.22); border-color: rgba(245,240,224,0.55);
-    }
     .modal-top-band {
       background: var(--yellow); color: var(--ink);
-      padding: 10px 32px; flex-shrink: 0;
+      padding: 8px 12px 8px 32px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .modal-close {
+      background: rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 5px; color: var(--ink);
+      font-size: 16px; line-height: 1; cursor: pointer;
+      width: 30px; height: 30px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s;
+    }
+    .modal-close:hover {
+      background: rgba(0,0,0,0.22); border-color: rgba(0,0,0,0.4);
     }
     .modal-inner { padding: 36px 32px 32px; }
     .modal-headline {
@@ -1074,8 +1074,10 @@
 <!-- ═══════ CONTACT CAPTURE MODAL ═══════ -->
 <div id="bookingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalHeadline">
   <div class="modal-card">
-    <button class="modal-close" id="modalClose" aria-label="Close">&#x2715;</button>
-    <div class="modal-top-band">Free · 30 minutes · Bespoke report</div>
+    <div class="modal-top-band">
+      <span>Free Bespoke Report</span>
+      <button class="modal-close" id="modalClose" aria-label="Close">&#x2715;</button>
+    </div>
 
     <!-- Form state -->
     <div class="modal-inner" id="modalFormWrap">
