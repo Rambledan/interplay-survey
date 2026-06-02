@@ -1948,6 +1948,268 @@ function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]
   )
 }
 
+// ── Leads Panel ───────────────────────────────────────────────────────────
+
+interface LeadRow {
+  id: number
+  name: string | null
+  email: string
+  company: string | null
+  role: string | null
+  source: string
+  email_sent: boolean
+  email_sent_at: string | null
+  email_error: string | null
+  created_at: string
+}
+
+function LeadsPanel({ password }: { password: string }) {
+  const [leads, setLeads] = useState<LeadRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [resending, setResending] = useState<number | null>(null)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+
+  async function fetchLeads() {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/leads', {
+        headers: { Authorization: `Bearer ${password}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setLeads(data.leads ?? [])
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchLeads() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleResend(lead: LeadRow) {
+    setResending(lead.id)
+    try {
+      await fetch('/api/admin/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ id: lead.id, email: lead.email, name: lead.name ?? undefined }),
+      })
+      await fetchLeads()
+    } finally {
+      setResending(null)
+    }
+  }
+
+  function handleExportCsv() {
+    const header = 'Name,Email,Company,Role,Source,Email Sent,Registered At'
+    const rows = leads.map(l =>
+      [
+        `"${l.name ?? ''}"`,
+        `"${l.email}"`,
+        `"${l.company ?? ''}"`,
+        `"${l.role ?? ''}"`,
+        `"${l.source}"`,
+        l.email_sent ? 'Yes' : 'No',
+        `"${formatDate(l.created_at)}"`,
+      ].join(',')
+    )
+    const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `interplay-leads-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const cardStyle: React.CSSProperties = { backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }
+
+  if (loading) {
+    return (
+      <p className="text-sm font-mono animate-pulse" style={{ color: 'rgba(13,20,16,0.4)' }}>Loading leads…</p>
+    )
+  }
+
+  return (
+    <div>
+      {/* KPI row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Total registered</span>
+          <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>{leads.length}</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Email delivered</span>
+          <span className="text-3xl font-bold" style={{ color: '#22a855' }}>
+            {leads.filter(l => l.email_sent).length}
+          </span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Email failed</span>
+          <span className="text-3xl font-bold" style={{ color: leads.filter(l => !l.email_sent).length > 0 ? '#dc2626' : '#0d1410' }}>
+            {leads.filter(l => !l.email_sent).length}
+          </span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Delivery rate</span>
+          <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>
+            {leads.length > 0
+              ? `${Math.round((leads.filter(l => l.email_sent).length / leads.length) * 100)}%`
+              : '—'}
+          </span>
+        </div>
+      </div>
+
+      {/* Action bar */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.4)' }}>
+          {leads.length} lead{leads.length !== 1 ? 's' : ''} registered via landing page
+        </span>
+        <div className="flex gap-3">
+          <button onClick={fetchLeads}
+            className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+            style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.3)'; e.currentTarget.style.color = '#0d1410' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+            ↺ Refresh
+          </button>
+          {leads.length > 0 && (
+            <button onClick={handleExportCsv}
+              className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
+              style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(62,207,110,0.4)'; e.currentTarget.style.color = '#22a855' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+              Export CSV ↓
+            </button>
+          )}
+        </div>
+      </div>
+
+      {leads.length === 0 ? (
+        <div className="px-6 py-14 text-center" style={cardStyle}>
+          <p className="text-sm" style={{ color: 'rgba(13,20,16,0.5)' }}>No leads yet.</p>
+          <p className="text-xs mt-1 font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>
+            Registrations via the landing page will appear here.
+          </p>
+        </div>
+      ) : (
+        <div style={cardStyle}>
+          {/* Table header */}
+          <div className="px-5 py-3 grid gap-3 text-[10px] font-mono uppercase tracking-[0.15em]"
+            style={{
+              gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 100px',
+              borderBottom: '2px solid rgba(13,20,16,0.07)',
+              color: 'rgba(13,20,16,0.4)',
+            }}>
+            <span>Name</span>
+            <span>Email</span>
+            <span>Company</span>
+            <span>Role</span>
+            <span>Email</span>
+            <span>Registered</span>
+          </div>
+
+          {/* Rows */}
+          {leads.map(lead => {
+            const isExpanded = expandedId === lead.id
+            return (
+              <div key={lead.id} style={{ borderBottom: '1px solid rgba(13,20,16,0.05)' }}>
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : lead.id)}
+                  className="w-full text-left px-5 py-3 grid gap-3 transition-colors"
+                  style={{
+                    gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 100px',
+                    backgroundColor: isExpanded ? 'rgba(13,20,16,0.02)' : 'transparent',
+                    alignItems: 'center',
+                  }}
+                  onMouseEnter={e => !isExpanded && (e.currentTarget.style.backgroundColor = 'rgba(13,20,16,0.015)')}
+                  onMouseLeave={e => !isExpanded && (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  <span className="text-sm font-medium truncate" style={{ color: '#0d1410' }}>
+                    {lead.name ?? <span style={{ color: 'rgba(13,20,16,0.3)', fontStyle: 'italic' }}>—</span>}
+                  </span>
+                  <a
+                    href={`mailto:${lead.email}`}
+                    onClick={e => e.stopPropagation()}
+                    className="text-xs font-mono truncate transition-colors"
+                    style={{ color: 'rgba(13,20,16,0.65)' }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.65)'}
+                  >
+                    {lead.email}
+                  </a>
+                  <span className="text-xs truncate" style={{ color: 'rgba(13,20,16,0.55)' }}>
+                    {lead.company ?? <span style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>}
+                  </span>
+                  <span className="text-xs truncate" style={{ color: 'rgba(13,20,16,0.45)' }}>
+                    {lead.role ?? <span style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>}
+                  </span>
+                  <span>
+                    {lead.email_sent ? (
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
+                        style={{ background: 'rgba(62,207,110,0.1)', border: '1px solid rgba(62,207,110,0.3)', color: '#22a855' }}>
+                        Sent ✓
+                      </span>
+                    ) : (
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
+                        style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.25)', color: '#dc2626' }}>
+                        Failed
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+                    {formatDate(lead.created_at)}
+                  </span>
+                </button>
+
+                {/* Expanded detail row */}
+                {isExpanded && (
+                  <div className="px-6 py-4 flex flex-col gap-3"
+                    style={{ backgroundColor: '#fafafa', borderTop: '1px solid rgba(13,20,16,0.04)' }}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[
+                        { label: 'Source', value: lead.source },
+                        { label: 'Email sent at', value: lead.email_sent_at ? formatDate(lead.email_sent_at) : '—' },
+                        { label: 'Lead ID', value: `#${lead.id}` },
+                        { label: 'Registered', value: formatDate(lead.created_at) },
+                      ].map(({ label, value }) => (
+                        <div key={label}>
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-0.5"
+                            style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                          <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.7)' }}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {lead.email_error && (
+                      <div className="px-3 py-2 text-xs font-mono"
+                        style={{ backgroundColor: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.15)', color: '#dc2626' }}>
+                        Email error: {lead.email_error}
+                      </div>
+                    )}
+                    {!lead.email_sent && (
+                      <div>
+                        <button
+                          onClick={() => handleResend(lead)}
+                          disabled={resending === lead.id}
+                          className="text-xs font-mono px-4 py-2 transition-colors disabled:opacity-40"
+                          style={{ border: '1px solid rgba(62,207,110,0.35)', color: '#22a855' }}
+                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(62,207,110,0.07)'}
+                          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                          {resending === lead.id ? 'Sending…' : '↺ Resend confirmation email'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Login screen ───────────────────────────────────────────────────────────
 
 function LoginScreen({ onSuccess }: { onSuccess: (pw: string) => void }) {
@@ -2022,7 +2284,7 @@ export default function AdminPage() {
   const [expandedSectionId, setExpandedSectionId] = useState<string | null>(null)
   const [deletingRespondent, setDeletingRespondent] = useState<string | null>(null)
   const [allSections, setAllSections] = useState<SurveySection[]>([])
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'responses' | 'cms'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'responses' | 'cms' | 'leads'>('dashboard')
 
   const fetchData = useCallback(async (pw: string) => {
     setLoading(true)
@@ -2173,9 +2435,10 @@ export default function AdminPage() {
           <button style={tabStyle('dashboard')} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
           <button style={tabStyle('responses')} onClick={() => setActiveTab('responses')}>Responses</button>
           <button style={tabStyle('cms')} onClick={() => setActiveTab('cms')}>CMS</button>
+          <button style={tabStyle('leads')} onClick={() => setActiveTab('leads')}>Leads</button>
         </div>
 
-        <main className="flex-1 px-6 py-8 w-full" style={{ maxWidth: activeTab === 'dashboard' ? 1200 : 900, margin: '0 auto' }}>
+        <main className="flex-1 px-6 py-8 w-full" style={{ maxWidth: (activeTab === 'dashboard' || activeTab === 'leads') ? 1200 : 900, margin: '0 auto' }}>
 
           {loading && (
             <p className="text-sm font-mono animate-pulse mb-6" style={{ color: 'rgba(13,20,16,0.4)' }}>Loading…</p>
@@ -2258,6 +2521,11 @@ export default function AdminPage() {
           {/* ── CMS tab ── */}
           {activeTab === 'cms' && (
             <GlobalTemplatePanel password={password} />
+          )}
+
+          {/* ── Leads tab ── */}
+          {activeTab === 'leads' && (
+            <LeadsPanel password={password} />
           )}
 
         </main>

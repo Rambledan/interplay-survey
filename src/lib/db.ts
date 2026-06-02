@@ -459,6 +459,94 @@ export async function saveRespondentOverride(
   })
 }
 
+// ── Leads ─────────────────────────────────────────────────────────────────────
+
+export interface LeadRow {
+  id: number
+  name: string | null
+  email: string
+  company: string | null
+  role: string | null
+  source: string
+  email_sent: boolean
+  email_sent_at: string | null
+  email_error: string | null
+  created_at: string
+}
+
+async function ensureLeadsTable(client: Client): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS leads (
+      id            SERIAL       PRIMARY KEY,
+      name          TEXT,
+      email         TEXT         NOT NULL,
+      company       TEXT,
+      role          TEXT,
+      source        TEXT         NOT NULL DEFAULT 'landing',
+      email_sent    BOOLEAN      NOT NULL DEFAULT FALSE,
+      email_sent_at TIMESTAMPTZ,
+      email_error   TEXT,
+      created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    )
+  `)
+  // Safe migrations for rows created before these columns existed
+  await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_sent    BOOLEAN     NOT NULL DEFAULT FALSE`)
+  await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ`)
+  await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_error   TEXT`)
+}
+
+/** Insert a new lead and return its row ID. */
+export async function insertLead(
+  email: string,
+  name?: string,
+  company?: string,
+  role?: string,
+  source = 'landing'
+): Promise<number> {
+  return withClient(async (client) => {
+    await ensureLeadsTable(client)
+    const result = await client.query<{ id: number }>(
+      `INSERT INTO leads (name, email, company, role, source)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [name || null, email, company || null, role || null, source]
+    )
+    return result.rows[0].id
+  })
+}
+
+/** Mark whether the confirmation email was delivered. */
+export async function updateLeadEmailStatus(
+  id: number,
+  sent: boolean,
+  error?: string
+): Promise<void> {
+  await withClient(async (client) => {
+    await client.query(
+      `UPDATE leads
+       SET email_sent    = $1,
+           email_sent_at = $2,
+           email_error   = $3
+       WHERE id = $4`,
+      [sent, sent ? new Date().toISOString() : null, error ?? null, id]
+    )
+  })
+}
+
+/** Fetch all leads (newest first) for the admin panel. */
+export async function getAllLeads(): Promise<LeadRow[]> {
+  return withClient(async (client) => {
+    await ensureLeadsTable(client)
+    const result = await client.query<LeadRow>(`
+      SELECT id, name, email, company, role, source,
+             email_sent, email_sent_at, email_error, created_at
+      FROM leads
+      ORDER BY created_at DESC
+    `)
+    return result.rows
+  })
+}
+
 /** Convenience: load both global template and respondent override in parallel.
  *  The globalTemplate is merged with hard-coded defaults so callers always get
  *  a fully-populated template even if nothing (or only partial data) is saved. */

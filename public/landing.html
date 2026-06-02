@@ -574,6 +574,96 @@
       .report-fin-value { font-size: 20px; }
       .report-fin-cell { padding: 12px 10px; }
     }
+
+
+    /* ════════════════════════════════════════════
+       CONTACT CAPTURE MODAL
+    ════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .22s ease, visibility .22s ease;
+    }
+    .modal-overlay.is-open {
+      opacity: 1; visibility: visible; pointer-events: auto;
+    }
+    .modal-card {
+      background: var(--ink); color: var(--paper);
+      max-width: 540px; width: 100%; position: relative;
+      border: 1.5px solid rgba(245,240,224,0.12);
+      max-height: 92vh; overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 16px;
+      background: none; border: none; color: var(--paper);
+      font-size: 20px; line-height: 1; cursor: pointer;
+      padding: 6px 10px; opacity: 0.5; transition: opacity .15s; z-index: 1;
+    }
+    .modal-close:hover { opacity: 1; }
+    .modal-top-band {
+      background: var(--yellow); color: var(--ink);
+      padding: 10px 32px; flex-shrink: 0;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .modal-inner { padding: 36px 32px 32px; }
+    .modal-headline {
+      font-family: var(--display); font-size: clamp(36px, 6vw, 52px);
+      color: var(--paper); line-height: 0.84;
+      font-weight: 700; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .modal-hook {
+      font-size: 15px; line-height: 1.65; color: rgba(245,240,224,0.72);
+      padding: 16px 20px; background: rgba(255,255,255,0.05);
+      border-left: 3px solid var(--yellow); margin-bottom: 28px;
+    }
+    .modal-form { display: flex; flex-direction: column; gap: 14px; }
+    .modal-field { display: flex; flex-direction: column; gap: 5px; }
+    .modal-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(245,240,224,0.45);
+    }
+    .modal-required { color: var(--yellow); }
+    .modal-input {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(245,240,224,0.16);
+      color: var(--paper); padding: 11px 14px;
+      font-family: var(--body); font-size: 15px;
+      outline: none; width: 100%;
+      transition: border-color .15s; -webkit-appearance: none;
+    }
+    .modal-input:focus { border-color: var(--yellow); }
+    .modal-input::placeholder { color: rgba(245,240,224,0.28); }
+    .modal-trust {
+      font-size: 13px; line-height: 1.55; color: rgba(245,240,224,0.45);
+      padding-top: 16px; border-top: 1px solid rgba(245,240,224,0.08);
+    }
+    .modal-trust strong { color: rgba(245,240,224,0.7); }
+    .modal-error { color: #F26B7A; font-size: 13px; display: none; }
+    .modal-submit { width: 100%; justify-content: center; margin-top: 8px; }
+    .modal-success {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 64px 32px;
+    }
+    .modal-success-check {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--yellow); color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700; margin: 0 auto 24px; font-family: var(--body);
+    }
+    .modal-success-h {
+      font-family: var(--display); font-size: 40px; color: var(--yellow);
+      font-weight: 700; text-transform: uppercase; line-height: 1; margin-bottom: 14px;
+    }
+    .modal-success-p { font-size: 15px; color: rgba(245,240,224,0.65); line-height: 1.65; max-width: 380px; }
+
+    @media (max-width: 600px) {
+      .modal-inner { padding: 28px 20px 24px; }
+      .modal-top-band { padding: 10px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -593,7 +683,7 @@
     <li><a href="#report">Report</a></li>
     <li><a href="#team">Team</a></li>
   </ul>
-  <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink nav-cta">Take the assessment <span class="arrow">→</span></a>
+  <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink nav-cta js-book">Book your assessment <span class="arrow">→</span></a>
 </nav>
 
 
@@ -624,7 +714,7 @@
       <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
       <p class="hero-sub">Find out how effectively your organisation turns sustainability into commercial value – and where the biggest opportunities lie. A 30-minute diagnostic. A bespoke report. A clear plan.</p>
       <div class="hero-cta-row">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
         <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-ghost-on-yellow">Book a power hour</a>
       </div>
       <ul class="hero-meta">
@@ -674,7 +764,7 @@
   <div class="display premise-stat">$2.7TN</div>
   <p class="premise-stat-label">Sustainability's predicted contribution to global Top 100 brand value by 2040</p>
   <div style="margin-top:40px">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow">Take your assessment <span class="arrow">→</span></a>
+    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
 
@@ -696,7 +786,7 @@
         <li><span class="method-list-num">05</span><span>A personalised Interplay Report – ready to share with your board</span></li>
       </ol>
       <div style="margin-top:32px">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow">Take your assessment <span class="arrow">→</span></a>
+        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
     </div>
     <div class="method-mark-col">
@@ -781,7 +871,7 @@
         <li>How Interrupt × Like So can help you unlock growth</li>
       </ul>
       <div style="margin-top:32px">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
     </div>
 
@@ -928,7 +1018,7 @@
   </article>
 
   <div class="pillars-cta-row">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
 
@@ -961,7 +1051,7 @@
   </h2>
   <p class="final-body">Take your Interplay assessment and receive your personalised report – or book a Power Hour to start unlocking value straight away.</p>
   <div class="final-cta-row">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink">Take your assessment <span class="arrow">→</span></a>
+    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
     <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-ghost-on-yellow">Book a Power Hour</a>
     <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-ghost-on-yellow">Book a findings call</a>
   </div>
@@ -977,6 +1067,135 @@
     </div>
   </div>
 </section>
+
+
+<!-- ═══════ CONTACT CAPTURE MODAL ═══════ -->
+<div id="bookingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalHeadline">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="Close">&#x2715;</button>
+    <div class="modal-top-band">Free · 30 minutes · Bespoke report</div>
+
+    <!-- Form state -->
+    <div class="modal-inner" id="modalFormWrap">
+      <h2 class="modal-headline" id="modalHeadline">BOOK YOUR<br>INTERPLAY<br>ASSESSMENT</h2>
+      <div class="modal-hook">
+        Your Interplay Report gives you a sustainability growth score benchmarked against peers, a pillar-by-pillar commercial analysis, and a quantified financial opportunity — in a format ready to present to your board. There's no obligation, no sales pitch. Just a clear picture of the value you're currently leaving on the table.
+      </div>
+      <form class="modal-form" id="leadForm" novalidate>
+        <div class="modal-field">
+          <label class="modal-label" for="leadName">Your name</label>
+          <input class="modal-input" type="text" id="leadName" name="name" placeholder="Jane Smith" autocomplete="name">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="leadEmail">Work email <span class="modal-required">*</span></label>
+          <input class="modal-input" type="email" id="leadEmail" name="email" placeholder="jane@company.com" required autocomplete="email">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="leadCompany">Company</label>
+          <input class="modal-input" type="text" id="leadCompany" name="company" placeholder="Acme Corp" autocomplete="organization">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="leadRole">Your role</label>
+          <input class="modal-input" type="text" id="leadRole" name="role" placeholder="Head of Sustainability" autocomplete="organization-title">
+        </div>
+        <p class="modal-error" id="leadError">Please enter a valid work email address to continue.</p>
+        <div class="modal-trust">
+          <strong>Why we're asking:</strong> We use your details to prepare a bespoke Interplay Report personally tailored to your organisation and sector. We will never share your information or use it for anything else.
+        </div>
+        <button type="submit" class="btn btn-fill-yellow modal-submit">
+          Book my assessment <span class="arrow">→</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Success state -->
+    <div class="modal-success" id="modalSuccess">
+      <div class="modal-success-check">&#x2713;</div>
+      <p class="modal-success-h">YOU'RE REGISTERED</p>
+      <p class="modal-success-p" id="modalSuccessMsg">A confirmation email is on its way to you. We'll be in touch shortly to arrange your 30-minute Interplay interview.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var modal    = document.getElementById('bookingModal');
+  var closeBtn = document.getElementById('modalClose');
+  var formWrap = document.getElementById('modalFormWrap');
+  var successEl = document.getElementById('modalSuccess');
+  var form     = document.getElementById('leadForm');
+  var errorEl  = document.getElementById('leadError');
+
+  function openModal(e) {
+    if (e) e.preventDefault();
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { document.getElementById('leadName').focus(); }, 60);
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  // Attach open handler to all Book-your-assessment CTAs
+  document.querySelectorAll('.js-book').forEach(function (btn) {
+    btn.addEventListener('click', openModal);
+  });
+
+  // Close handlers
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  // Form submit
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('leadEmail').value.trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errorEl.style.display = 'block';
+      document.getElementById('leadEmail').focus();
+      return;
+    }
+    errorEl.style.display = 'none';
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registering…';
+
+    var payload = {
+      name:    document.getElementById('leadName').value.trim(),
+      email:   email,
+      company: document.getElementById('leadCompany').value.trim(),
+      role:    document.getElementById('leadRole').value.trim(),
+      source:  'landing',
+    };
+
+    // Submit — wait for response so we can personalise the success message
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .catch(function () { return {}; })
+    .finally(function () {
+      // Update success message with the user's email address
+      var msgEl = document.getElementById('modalSuccessMsg');
+      if (msgEl) {
+        msgEl.innerHTML = 'A confirmation email is on its way to <strong style="color:#fff">'
+          + email + '</strong>. We\'ll be in touch shortly to arrange your 30-minute Interplay interview.';
+      }
+
+      // Show success state
+      formWrap.style.display = 'none';
+      successEl.style.display = 'flex';
+    });
+  });
+})();
+</script>
 
 
 <!-- ═══════ FOOTER ═══════ -->
