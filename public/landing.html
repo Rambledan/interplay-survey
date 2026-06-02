@@ -1140,6 +1140,11 @@
     btn.addEventListener('click', openModal);
   });
 
+  // Auto-open if URL contains ?register or ?register=1
+  if (/[?&]register/.test(window.location.search)) {
+    setTimeout(openModal, 400);
+  }
+
   // Close handlers
   closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
