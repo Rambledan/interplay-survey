@@ -42,7 +42,7 @@ function buildConfirmationHtml(name: string | null, email: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>You're registered — Interplay Assessment</title>
+  <title>You're registered: Interplay Assessment</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f0e0;font-family:'Helvetica Neue',Arial,sans-serif;color:#303030">
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f5f0e0">
@@ -82,13 +82,13 @@ function buildConfirmationHtml(name: string | null, email: string): string {
                       Your report will include
                     </p>
                     <p style="margin:0 0 7px;font-size:14px;line-height:1.55;color:rgba(245,240,224,0.8)">
-                      &#x2713;&nbsp; Your Interplay Score — benchmarked against peers
+                      &#x2713;&nbsp; Your Interplay Score, benchmarked against peers
                     </p>
                     <p style="margin:0 0 7px;font-size:14px;line-height:1.55;color:rgba(245,240,224,0.8)">
                       &#x2713;&nbsp; Pillar-by-pillar analysis across sustainability, brand &amp; business
                     </p>
                     <p style="margin:0 0 7px;font-size:14px;line-height:1.55;color:rgba(245,240,224,0.8)">
-                      &#x2713;&nbsp; A quantified financial opportunity — ready for your board
+                      &#x2713;&nbsp; A quantified financial opportunity, ready for your board
                     </p>
                     <p style="margin:0;font-size:14px;line-height:1.55;color:rgba(245,240,224,0.8)">
                       &#x2713;&nbsp; Bespoke recommendations and next actions
@@ -171,7 +171,7 @@ export async function sendLeadConfirmation(
       from:    `${FROM_NAME} <${FROM_EMAIL}>`,
       to:      [email],
       ...(NOTIFY_EMAILS.length > 0 ? { bcc: NOTIFY_EMAILS } : {}),
-      subject: "You're registered — your Interplay Assessment",
+      subject: "You're registered for your Interplay Assessment",
       html:    buildConfirmationHtml(name ?? null, email),
     })
 
