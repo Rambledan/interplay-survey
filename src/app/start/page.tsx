@@ -21,6 +21,7 @@ const inputStyle = {
 // ── Session data shape ────────────────────────────────────────────────────────
 
 interface SessionData {
+  email: string | null
   name: string | null
   role: string | null
   company: string | null
@@ -43,6 +44,7 @@ function StartForm() {
   const [company, setCompany] = useState('')
   const [sector, setSector] = useState('')
   const [companyType, setCompanyType] = useState('')
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sections, setSections] = useState<SurveySection[]>([])
   const [firstSection, setFirstSection] = useState<string | null>(null)
@@ -82,6 +84,7 @@ function StartForm() {
         if (session.company)     setCompany(session.company)
         if (session.sector)      setSector(session.sector)
         if (session.companyType) setCompanyType(session.companyType)
+        if (session.email)       setEmail(session.email)
 
         // Store for the resume effect (step 3 below)
         setSessionData(session)
@@ -121,23 +124,51 @@ function StartForm() {
 
     setLoading(true)
 
+    // If an email is provided but we have no session token yet, create one now.
+    // This handles the "Take survey now" flow where the user lands directly on /start.
+    let activeToken = surveyToken
+    const trimmedEmail = email.trim()
+
+    if (!activeToken && trimmedEmail && trimmedEmail.includes('@')) {
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:        name.trim(),
+            email:       trimmedEmail,
+            company:     company.trim(),
+            role:        role.trim(),
+            source:      'survey-start',
+            startSurvey: true,
+          }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.surveyToken) activeToken = data.surveyToken
+        }
+      } catch {
+        // Non-fatal — proceed anonymously if API fails
+      }
+    }
+
     const respondent: RespondentInfo = {
       name:        name.trim(),
       role:        role.trim(),
       company:     company.trim(),
       sector:      sector.trim(),
       companyType,
-      token:       surveyToken,
+      token:       activeToken,
     }
 
     // Persist to sessionStorage + localStorage
     sessionStorage.setItem('interplay-respondent', JSON.stringify(respondent))
-    persistToken(surveyToken)
+    persistToken(activeToken)
 
-    // Save profile to the survey session (non-blocking, non-fatal)
-    if (surveyToken) {
+    // Save full profile to the survey session (non-blocking, non-fatal)
+    if (activeToken) {
       try {
-        await fetch(`/api/session/${surveyToken}`, {
+        await fetch(`/api/session/${activeToken}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -153,7 +184,7 @@ function StartForm() {
       }
     }
 
-    const dest = `/survey/${firstSection}${surveyToken ? `?token=${surveyToken}` : ''}`
+    const dest = `/survey/${firstSection}${activeToken ? `?token=${activeToken}` : ''}`
     router.push(dest)
   }
 
@@ -239,6 +270,31 @@ function StartForm() {
                 />
               </div>
             ))}
+
+            {/* Email — optional but strongly encouraged; creates a save link */}
+            {!surveyToken && (
+              <div>
+                <label htmlFor="email" className="block text-xs uppercase tracking-widest mb-2"
+                  style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
+                  Work email <span style={{ color: 'rgba(255,255,255,0.3)', textTransform: 'none', letterSpacing: 0 }}>(optional — we&apos;ll send a save link)</span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jane@company.com"
+                  autoComplete="email"
+                  className={inputCls}
+                  style={{ ...inputStyle, caretColor: '#faf000', colorScheme: 'dark' }}
+                  onFocus={focusBorder}
+                  onBlur={blurBorder}
+                />
+                <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  Close the tab and come back later — your progress will be saved.
+                </p>
+              </div>
+            )}
 
             <div>
               <label htmlFor="companyType" className="block text-xs uppercase tracking-widest mb-2"

@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 
   return NextResponse.json({
     session: {
-      email:         session.email,
+      email:         session.email,   // returned so /start can pre-fill the email field
       name:          session.name,
       role:          session.role,
       company:       session.company,

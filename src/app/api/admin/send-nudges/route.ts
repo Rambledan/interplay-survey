@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       session.survey_token,
       doneSections,
       TOTAL_SECTIONS,
+      session.next_section_slug ?? undefined,
     )
 
     // Always update nudge_sent_at to avoid re-hammering on Resend failure

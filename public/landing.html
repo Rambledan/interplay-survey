@@ -719,7 +719,7 @@
       <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
       <p class="hero-sub">Find out how effectively your organisation turns sustainability into commercial value – and where the biggest opportunities lie. A 30-minute diagnostic. A bespoke report. A clear plan.</p>
       <div class="hero-cta-row">
-        <a href="#" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
+        <a href="/start" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
         <a href="#" class="btn btn-ghost-on-yellow js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
       <ul class="hero-meta">
@@ -769,7 +769,7 @@
   <div class="display premise-stat">$2.7TN</div>
   <p class="premise-stat-label">Sustainability's predicted contribution to global Top 100 brand value by 2040</p>
   <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <a href="#" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="/start" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
     <a href="#" class="btn btn-ghost-on-yellow js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
@@ -857,7 +857,7 @@
     <div class="score-band"><div class="score-band-label">LEADING</div><div class="score-band-range">75–100%</div></div>
   </div>
 
-  <a href="#" class="btn btn-fill-yellow js-survey" style="margin-top:8px">Get your Interplay score <span class="arrow">→</span></a>
+  <a href="/start" class="btn btn-fill-yellow js-survey" style="margin-top:8px">Get your Interplay score <span class="arrow">→</span></a>
 </section>
 
 
@@ -1024,7 +1024,7 @@
   </article>
 
   <div class="pillars-cta-row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <a href="#" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="/start" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
     <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
@@ -1058,7 +1058,7 @@
   </h2>
   <p class="final-body">Take your Interplay assessment and receive your personalised report.</p>
   <div class="final-cta-row">
-    <a href="#" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="/start" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
     <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
   <div class="final-contact">
@@ -1147,12 +1147,6 @@
       submit:   'Book my assessment <span class="arrow">→</span>',
       saving:   'Registering…',
     },
-    survey: {
-      band:     'Start Your Assessment',
-      headline: 'START YOUR<br>INTERPLAY<br>ASSESSMENT',
-      submit:   'Start the diagnostic <span class="arrow">→</span>',
-      saving:   'Starting…',
-    },
   };
 
   function openModal(e, mode) {
@@ -1185,11 +1179,6 @@
   // "Book your assessment" CTAs
   document.querySelectorAll('.js-book').forEach(function (btn) {
     btn.addEventListener('click', function (e) { openModal(e, 'book'); });
-  });
-
-  // "Take survey now" CTAs
-  document.querySelectorAll('.js-survey').forEach(function (btn) {
-    btn.addEventListener('click', function (e) { openModal(e, 'survey'); });
   });
 
   // Auto-open (?register defaults to book mode)

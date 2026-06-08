@@ -591,6 +591,7 @@ export interface SurveySessionRow {
   sections_done: string[]
   email_sent: boolean
   email_error: string | null
+  next_section_slug: string | null
   created_at: string
   profile_submitted_at: string | null
   completed_at: string | null
@@ -638,8 +639,9 @@ async function ensureSurveySessionsTable(client: Client): Promise<void> {
     WHERE completed_at IS NULL
   `)
   // Safe migrations
-  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_sent  BOOLEAN     NOT NULL DEFAULT FALSE`)
-  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_error TEXT`)
+  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_sent        BOOLEAN     NOT NULL DEFAULT FALSE`)
+  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_error       TEXT`)
+  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS next_section_slug TEXT`)
 }
 
 /** Create a new survey session linked to a lead. Returns the session including its survey_token. */
@@ -766,6 +768,28 @@ export async function markSectionDone(
     }
 
     return { session, justCompleted: false }
+  })
+}
+
+/**
+ * Record which section is next for a session — stored so the resume email
+ * can link directly to that section rather than back to /start.
+ * Also marks nudge_sent_at = NULL so the session becomes nudge-eligible again
+ * (the user has re-engaged by leaving mid-survey, so the cooldown resets).
+ */
+export async function updateNextSection(
+  surveyToken: string,
+  nextSectionSlug: string
+): Promise<void> {
+  await withClient(async (client) => {
+    await client.query(
+      `UPDATE survey_sessions
+       SET next_section_slug = $2,
+           nudge_sent_at     = NULL
+       WHERE survey_token = $1
+         AND completed_at  IS NULL`,
+      [surveyToken, nextSectionSlug]
+    )
   })
 }
 

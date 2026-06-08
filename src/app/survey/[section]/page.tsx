@@ -76,6 +76,40 @@ function SectionContent({ params }: SectionPageProps) {
       })
   }, [router, urlToken])
 
+  // ── Send a beacon when the user leaves mid-survey ─────────────────────────
+  // visibilitychange fires reliably on tab close, navigate away, and device lock.
+  // navigator.sendBeacon survives the page being unloaded.
+  useEffect(() => {
+    const surveyToken = getSurveyToken(urlToken)
+    if (!surveyToken) return  // anonymous session — no email to send
+
+    function handleLeave() {
+      if (document.visibilityState !== 'hidden') return
+      // Don't ping if survey is complete or we're on the last section submit
+      if (status === 'saving') return
+
+      const next = sections.length > 0
+        ? sections[sections.findIndex(s => s.slug === sectionSlug) + 1]?.slug ?? null
+        : null
+
+      const payload = JSON.stringify({
+        surveyToken,
+        sectionSlug,
+        nextSectionSlug: next,
+      })
+
+      try {
+        navigator.sendBeacon('/api/survey/ping', new Blob([payload], { type: 'application/json' }))
+      } catch {
+        // sendBeacon not supported — silent fail, nudge via admin panel instead
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleLeave)
+    return () => document.removeEventListener('visibilitychange', handleLeave)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlToken, sectionSlug, sections, status])
+
   const currentSection = sections.find(s => s.slug === sectionSlug)
   const currentIndex   = sections.findIndex(s => s.slug === sectionSlug)
   const nextSection    = currentIndex >= 0 ? sections[currentIndex + 1] : null

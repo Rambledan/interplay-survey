@@ -318,10 +318,14 @@ function buildNudgeHtml(
   name: string | null,
   surveyToken: string,
   doneSections: number,
-  totalSections: number
+  totalSections: number,
+  nextSectionSlug?: string
 ): string {
   const firstName = name?.split(' ')[0] ?? 'there'
-  const link = `${APP_URL}/start?token=${surveyToken}`
+  // Link directly to the next section if we know it, otherwise fall back to /start
+  const link = nextSectionSlug
+    ? `${APP_URL}/survey/${nextSectionSlug}?token=${surveyToken}`
+    : `${APP_URL}/start?token=${surveyToken}`
   const remaining = totalSections - doneSections
 
   return `<!DOCTYPE html>
@@ -571,6 +575,7 @@ export async function sendNudgeEmail(
   surveyToken: string,
   doneSections: number,
   totalSections: number,
+  nextSectionSlug?: string,
 ): Promise<EmailResult> {
   const resend = getResend()
   if (!resend) return { sent: false, error: 'RESEND_API_KEY not configured' }
@@ -580,7 +585,7 @@ export async function sendNudgeEmail(
       from:    `${FROM_NAME} <${FROM_EMAIL}>`,
       to:      [email],
       subject: 'You left off halfway - complete your Interplay Assessment',
-      html:    buildNudgeHtml(name ?? null, surveyToken, doneSections, totalSections),
+      html:    buildNudgeHtml(name ?? null, surveyToken, doneSections, totalSections, nextSectionSlug),
     })
 
     if (error) return { sent: false, error: error.message }
