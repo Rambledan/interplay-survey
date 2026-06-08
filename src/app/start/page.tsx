@@ -18,14 +18,18 @@ const inputStyle = {
   borderRadius: '4px',
 }
 
-// Section order used to determine the next incomplete section
-const SECTION_ORDER = [
-  'appetite',
-  'scale-and-delivery',
-  'capability-sustainability',
-  'capability-brand',
-  'capability-business',
-]
+// ── Session data shape ────────────────────────────────────────────────────────
+
+interface SessionData {
+  name: string | null
+  role: string | null
+  company: string | null
+  sector: string | null
+  companyType: string | null
+  sectionsDone: string[]
+  isComplete: boolean
+  resultsToken: string | null
+}
 
 // ── Inner form component (uses useSearchParams — must be inside Suspense) ─────
 
@@ -40,23 +44,26 @@ function StartForm() {
   const [sector, setSector] = useState('')
   const [companyType, setCompanyType] = useState('')
   const [loading, setLoading] = useState(false)
+  const [sections, setSections] = useState<SurveySection[]>([])
   const [firstSection, setFirstSection] = useState<string | null>(null)
   const [fetchError, setFetchError] = useState(false)
   const [tokenInvalid, setTokenInvalid] = useState(false)
+  const [sessionData, setSessionData] = useState<SessionData | null>(null)
 
-  // ── Fetch survey sections ─────────────────────────────────────────────────
+  // ── 1. Fetch survey sections ──────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/questions')
       .then(r => r.json())
       .then((data: { sections: SurveySection[] }) => {
         if (data.sections?.length > 0) {
+          setSections(data.sections)
           setFirstSection(data.sections[0].slug)
         }
       })
       .catch(() => setFetchError(true))
   }, [])
 
-  // ── Hydrate from magic-link session ──────────────────────────────────────
+  // ── 2. Load session from magic-link token ─────────────────────────────────
   useEffect(() => {
     if (!surveyToken) return
 
@@ -67,37 +74,45 @@ function StartForm() {
       })
       .then(data => {
         if (!data) return
-        const { session } = data
+        const { session } = data as { session: SessionData }
 
-        // Already complete → go straight to results
-        if (session.isComplete && session.resultsToken) {
-          router.replace(`/results/${session.resultsToken}`)
-          return
-        }
-
-        // Pre-populate whatever we have
+        // Pre-populate form fields with whatever we have
         if (session.name)        setName(session.name)
         if (session.role)        setRole(session.role)
         if (session.company)     setCompany(session.company)
         if (session.sector)      setSector(session.sector)
         if (session.companyType) setCompanyType(session.companyType)
 
-        // If profile is filled in and the respondent has already started, jump ahead
-        if (session.name && session.sectionsDone?.length > 0) {
-          const done: string[] = session.sectionsDone
-          // Use SECTION_ORDER first, then fall back to firstSection
-          const allSlugs = SECTION_ORDER
-          const nextSlug = allSlugs.find(s => !done.includes(s))
-          if (nextSlug) {
-            persistToken(surveyToken)
-            router.replace(`/survey/${nextSlug}?token=${surveyToken}`)
-            return
-          }
-        }
+        // Store for the resume effect (step 3 below)
+        setSessionData(session)
       })
       .catch(() => setTokenInvalid(true))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surveyToken])
+
+  // ── 3. Resume redirect — runs once BOTH sections and session are ready ────
+  // This effect waits for the sections list so we use real slugs, not a
+  // hardcoded fallback that might not match the API.
+  useEffect(() => {
+    if (!sessionData || !sections.length || !surveyToken) return
+
+    // Already finished — go to results
+    if (sessionData.isComplete && sessionData.resultsToken) {
+      router.replace(`/results/${sessionData.resultsToken}`)
+      return
+    }
+
+    // Profile saved + at least one section done → jump to next incomplete section
+    if (sessionData.name && sessionData.sectionsDone?.length > 0) {
+      const done = new Set(sessionData.sectionsDone)
+      const nextSection = sections.find(s => !done.has(s.slug))
+      if (nextSection) {
+        persistToken(surveyToken)
+        router.replace(`/survey/${nextSection.slug}?token=${surveyToken}`)
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionData, sections])
 
   // ── Form submit ───────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
