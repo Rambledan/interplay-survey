@@ -51,6 +51,9 @@ function StartForm() {
   const [fetchError, setFetchError] = useState(false)
   const [tokenInvalid, setTokenInvalid] = useState(false)
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
+  // Show a loading overlay while we fetch the session + sections and decide where to redirect.
+  // Only relevant when arriving via a magic-link token.
+  const [resuming, setResuming] = useState(!!surveyToken)
 
   // ── 1. Fetch survey sections ──────────────────────────────────────────────
   useEffect(() => {
@@ -71,7 +74,7 @@ function StartForm() {
 
     fetch(`/api/session/${surveyToken}`)
       .then(r => {
-        if (!r.ok) { setTokenInvalid(true); return null }
+        if (!r.ok) { setTokenInvalid(true); setResuming(false); return null }
         return r.json()
       })
       .then(data => {
@@ -89,7 +92,7 @@ function StartForm() {
         // Store for the resume effect (step 3 below)
         setSessionData(session)
       })
-      .catch(() => setTokenInvalid(true))
+      .catch(() => { setTokenInvalid(true); setResuming(false) })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surveyToken])
 
@@ -126,8 +129,13 @@ function StartForm() {
         sessionStorage.setItem('interplay-respondent', JSON.stringify(respondent))
         persistToken(surveyToken)
         router.replace(`/survey/${targetSection.slug}?token=${surveyToken}`)
+        // Leave resuming=true — overlay stays visible until navigation completes
+        return
       }
     }
+
+    // No redirect fired — show the form (pre-populated from session data)
+    setResuming(false)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionData, sections])
 
@@ -207,6 +215,67 @@ function StartForm() {
   }
   function blurBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+  }
+
+  // ── Loading overlay (shown while resolving magic-link token) ─────────────
+  if (resuming) {
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center"
+        style={{ backgroundColor: '#2f2a2a' }}
+      >
+        <div
+          style={{
+            backgroundColor: '#1e1e1e',
+            border: '1px solid rgba(250,240,0,0.15)',
+            borderRadius: '6px',
+            padding: '48px 56px',
+            textAlign: 'center',
+            maxWidth: '380px',
+            width: '100%',
+          }}
+        >
+          {/* Pulsing yellow dots */}
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '28px' }}>
+            {[0, 1, 2].map(i => (
+              <span
+                key={i}
+                style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: '#faf000',
+                  opacity: 0.9,
+                  animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+          <p
+            style={{
+              fontFamily: 'Almarai, monospace',
+              fontSize: '11px',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: 'rgba(250,240,0,0.55)',
+              margin: '0 0 8px',
+            }}
+          >
+            Resuming your survey
+          </p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+            Taking you back to where you left off…
+          </p>
+        </div>
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 0.25; transform: scale(0.85); }
+            50%       { opacity: 1;    transform: scale(1.1);  }
+          }
+        `}</style>
+      </div>
+    )
   }
 
   return (
