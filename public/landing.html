@@ -688,7 +688,7 @@
     <li><a href="#report">Report</a></li>
     <li><a href="#team">Team</a></li>
   </ul>
-  <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink nav-cta js-book">Book your assessment <span class="arrow">→</span></a>
+  <a href="#" class="btn btn-fill-ink nav-cta js-book">Book your assessment <span class="arrow">→</span></a>
 </nav>
 
 
@@ -719,7 +719,8 @@
       <h1 class="hero-headline">SUSTAINABILITY<br>GROWTH<br>POTENTIAL?</h1>
       <p class="hero-sub">Find out how effectively your organisation turns sustainability into commercial value – and where the biggest opportunities lie. A 30-minute diagnostic. A bespoke report. A clear plan.</p>
       <div class="hero-cta-row">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
+        <a href="#" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
+        <a href="#" class="btn btn-ghost-on-yellow js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
       <ul class="hero-meta">
         <li><strong>30&nbsp;min</strong> interview</li>
@@ -767,8 +768,9 @@
   <p class="premise-sub">Interplay to unlock your full sustainability growth potential.</p>
   <div class="display premise-stat">$2.7TN</div>
   <p class="premise-stat-label">Sustainability's predicted contribution to global Top 100 brand value by 2040</p>
-  <div style="margin-top:40px">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
+  <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+    <a href="#" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="#" class="btn btn-ghost-on-yellow js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
 
@@ -790,7 +792,7 @@
         <li><span class="method-list-num">05</span><span>A personalised Interplay Report – ready to share with your board</span></li>
       </ol>
       <div style="margin-top:32px">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
+        <a href="#" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
     </div>
     <div class="method-mark-col">
@@ -855,7 +857,7 @@
     <div class="score-band"><div class="score-band-label">LEADING</div><div class="score-band-range">75–100%</div></div>
   </div>
 
-  <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-yellow" style="margin-top:8px">Get your Interplay score <span class="arrow">→</span></a>
+  <a href="#" class="btn btn-fill-yellow js-survey" style="margin-top:8px">Get your Interplay score <span class="arrow">→</span></a>
 </section>
 
 
@@ -875,7 +877,7 @@
         <li>How Interrupt × Like So can help you unlock growth</li>
       </ul>
       <div style="margin-top:32px">
-        <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
+        <a href="#" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
       </div>
     </div>
 
@@ -1021,8 +1023,9 @@
     </div>
   </article>
 
-  <div class="pillars-cta-row">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
+  <div class="pillars-cta-row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+    <a href="#" class="btn btn-fill-ink js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
 </section>
 
@@ -1055,7 +1058,8 @@
   </h2>
   <p class="final-body">Take your Interplay assessment and receive your personalised report.</p>
   <div class="final-cta-row">
-    <a href="https://calendar.app.google/aBnk5aQYmSQMXFwN8" class="btn btn-fill-ink js-book">Book your assessment <span class="arrow">→</span></a>
+    <a href="#" class="btn btn-fill-yellow js-survey">Take the survey now <span class="arrow">→</span></a>
+    <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
   </div>
   <div class="final-contact">
     <p class="final-contact-tag">Not sure where to start? Get in touch directly.</p>
@@ -1075,7 +1079,7 @@
 <div id="bookingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalHeadline">
   <div class="modal-card">
     <div class="modal-top-band">
-      <span>Free Bespoke Report</span>
+      <span id="modalBandText">Free Bespoke Report</span>
       <button class="modal-close" id="modalClose" aria-label="Close">&#x2715;</button>
     </div>
 
@@ -1106,13 +1110,13 @@
         <div class="modal-trust">
           <strong>Why we're asking:</strong> We use your details to prepare a bespoke Interplay Report personally tailored to your organisation and sector. We will never share your information or use it for anything else.
         </div>
-        <button type="submit" class="btn btn-fill-yellow modal-submit">
+        <button type="submit" class="btn btn-fill-yellow modal-submit" id="modalSubmitBtn">
           Book my assessment <span class="arrow">→</span>
         </button>
       </form>
     </div>
 
-    <!-- Success state -->
+    <!-- Success state (book mode only) -->
     <div class="modal-success" id="modalSuccess">
       <div class="modal-success-check">&#x2713;</div>
       <p class="modal-success-h">YOU'RE REGISTERED</p>
@@ -1123,15 +1127,51 @@
 
 <script>
 (function () {
-  var modal    = document.getElementById('bookingModal');
-  var closeBtn = document.getElementById('modalClose');
-  var formWrap = document.getElementById('modalFormWrap');
-  var successEl = document.getElementById('modalSuccess');
-  var form     = document.getElementById('leadForm');
-  var errorEl  = document.getElementById('leadError');
+  var modal      = document.getElementById('bookingModal');
+  var closeBtn   = document.getElementById('modalClose');
+  var formWrap   = document.getElementById('modalFormWrap');
+  var successEl  = document.getElementById('modalSuccess');
+  var form       = document.getElementById('leadForm');
+  var errorEl    = document.getElementById('leadError');
+  var bandText   = document.getElementById('modalBandText');
+  var headline   = document.getElementById('modalHeadline');
+  var submitBtn  = document.getElementById('modalSubmitBtn');
 
-  function openModal(e) {
+  // Track which mode the modal was opened in
+  var currentMode = 'book'; // 'book' | 'survey'
+
+  var MODES = {
+    book: {
+      band:     'Free Bespoke Report',
+      headline: 'BOOK YOUR<br>INTERPLAY<br>ASSESSMENT',
+      submit:   'Book my assessment <span class="arrow">→</span>',
+      saving:   'Registering…',
+    },
+    survey: {
+      band:     'Start Your Assessment',
+      headline: 'START YOUR<br>INTERPLAY<br>ASSESSMENT',
+      submit:   'Start the diagnostic <span class="arrow">→</span>',
+      saving:   'Starting…',
+    },
+  };
+
+  function openModal(e, mode) {
     if (e) e.preventDefault();
+    currentMode = mode || 'book';
+    var cfg = MODES[currentMode];
+
+    // Swap copy for the chosen mode
+    bandText.textContent    = cfg.band;
+    headline.innerHTML      = cfg.headline;
+    submitBtn.innerHTML     = cfg.submit;
+    submitBtn.disabled      = false;
+
+    // Reset form to clean state
+    form.reset();
+    errorEl.style.display   = 'none';
+    formWrap.style.display  = '';
+    successEl.style.display = 'none';
+
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
     setTimeout(function () { document.getElementById('leadName').focus(); }, 60);
@@ -1142,14 +1182,19 @@
     document.body.style.overflow = '';
   }
 
-  // Attach open handler to all Book-your-assessment CTAs
+  // "Book your assessment" CTAs
   document.querySelectorAll('.js-book').forEach(function (btn) {
-    btn.addEventListener('click', openModal);
+    btn.addEventListener('click', function (e) { openModal(e, 'book'); });
   });
 
-  // Auto-open if URL contains ?register or ?register=1
+  // "Take survey now" CTAs
+  document.querySelectorAll('.js-survey').forEach(function (btn) {
+    btn.addEventListener('click', function (e) { openModal(e, 'survey'); });
+  });
+
+  // Auto-open (?register defaults to book mode)
   if (/[?&]register/.test(window.location.search)) {
-    setTimeout(openModal, 400);
+    setTimeout(function () { openModal(null, 'book'); }, 400);
   }
 
   // Close handlers
@@ -1171,19 +1216,20 @@
     }
     errorEl.style.display = 'none';
 
-    var submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Registering…';
+    submitBtn.disabled   = true;
+    submitBtn.textContent = MODES[currentMode].saving;
+
+    var isSurvey = currentMode === 'survey';
 
     var payload = {
-      name:    document.getElementById('leadName').value.trim(),
-      email:   email,
-      company: document.getElementById('leadCompany').value.trim(),
-      role:    document.getElementById('leadRole').value.trim(),
-      source:  'landing',
+      name:        document.getElementById('leadName').value.trim(),
+      email:       email,
+      company:     document.getElementById('leadCompany').value.trim(),
+      role:        document.getElementById('leadRole').value.trim(),
+      source:      'landing',
+      startSurvey: isSurvey,
     };
 
-    // Submit — redirect immediately to the survey via the magic-link token
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1192,17 +1238,17 @@
     .then(function (res) { return res.ok ? res.json() : {}; })
     .catch(function () { return {}; })
     .then(function (data) {
-      if (data && data.surveyToken) {
-        // Magic-link flow: redirect to /start with the session token
+      if (isSurvey && data && data.surveyToken) {
+        // Survey mode: redirect straight to /start with the session token
         window.location.href = '/start?token=' + encodeURIComponent(data.surveyToken);
       } else {
-        // Fallback (no DB): show the confirmation message
+        // Book mode (or fallback): show the confirmation screen
         var msgEl = document.getElementById('modalSuccessMsg');
         if (msgEl) {
           msgEl.innerHTML = 'A confirmation email is on its way to <strong style="color:#fff">'
             + email + '</strong>. We\'ll be in touch shortly to arrange your 30-minute Interplay interview.';
         }
-        formWrap.style.display = 'none';
+        formWrap.style.display  = 'none';
         successEl.style.display = 'flex';
       }
     });

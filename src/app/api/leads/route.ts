@@ -9,7 +9,14 @@ import {
 import { sendLeadConfirmation, sendSurveyStartEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
-  let body: { name?: string; email?: string; company?: string; role?: string; source?: string }
+  let body: {
+    name?: string
+    email?: string
+    company?: string
+    role?: string
+    source?: string
+    startSurvey?: boolean  // true → create session + magic-link email; false → confirmation screen
+  }
 
   try {
     body = await req.json()
@@ -17,7 +24,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { name, email, company, role, source } = body
+  const { name, email, company, role, source, startSurvey } = body
 
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
@@ -41,37 +48,39 @@ export async function POST(req: NextRequest) {
       // Continue — still try to send the email
     }
 
-    // ── 2. Create survey session + fire magic-link email ──────────────────────
-    try {
-      const session = await createSurveySession(trimmedEmail, leadId)
-      surveyToken = session.survey_token
-      const sessionId = session.id
-
-      // Fire email without blocking the response
-      sendSurveyStartEmail(trimmedEmail, trimmedName, surveyToken)
-        .then(result => updateSessionEmailStatus(sessionId, result.sent, result.error))
-        .catch(err => console.error('[leads] Session email tracking failed:', err))
-    } catch (err) {
-      console.error('[leads] Survey session creation failed:', err)
-      // Fall through to legacy confirmation email below
-    }
-  }
-
-  // ── 3. Fallback: send plain confirmation if no session was created ──────────
-  if (!surveyToken) {
-    const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
-
-    if (leadId !== null && isPostgresConfigured()) {
+    // ── 2. Create survey session + fire magic-link email (only for startSurvey) ─
+    if (startSurvey) {
       try {
-        await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
+        const session = await createSurveySession(trimmedEmail, leadId)
+        surveyToken = session.survey_token
+        const sessionId = session.id
+
+        // Fire email without blocking the response
+        sendSurveyStartEmail(trimmedEmail, trimmedName, surveyToken)
+          .then(result => updateSessionEmailStatus(sessionId, result.sent, result.error))
+          .catch(err => console.error('[leads] Session email tracking failed:', err))
       } catch (err) {
-        console.error('[leads] Email status update failed:', err)
+        console.error('[leads] Survey session creation failed:', err)
+        // Fall through to legacy confirmation email below
       }
     }
-
-    return NextResponse.json({ ok: true, emailSent: emailResult.sent })
   }
 
-  // ── 4. Return immediately with surveyToken so client can redirect ───────────
-  return NextResponse.json({ ok: true, surveyToken })
+  // ── 3. For startSurvey flow: return token so client redirects immediately ───
+  if (surveyToken) {
+    return NextResponse.json({ ok: true, surveyToken })
+  }
+
+  // ── 4. Book-your-assessment flow: send confirmation email + show screen ─────
+  const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
+
+  if (leadId !== null && isPostgresConfigured()) {
+    try {
+      await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
+    } catch (err) {
+      console.error('[leads] Email status update failed:', err)
+    }
+  }
+
+  return NextResponse.json({ ok: true, emailSent: emailResult.sent })
 }
