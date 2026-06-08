@@ -22,7 +22,7 @@ export default function CompletePage() {
         </h1>
 
         <p className="text-base leading-relaxed mb-4 max-w-lg" style={{ color: 'rgba(13,20,16,0.6)' }}>
-          Your responses have been recorded. The Interrupt × Like So team will analyse your results and be in touch with your personalised Interplay report.
+          Your responses have been recorded. Your personalised Interplay report is on its way — check your inbox.
         </p>
 
         <p className="text-base leading-relaxed mb-12 max-w-lg" style={{ color: 'rgba(13,20,16,0.6)' }}>

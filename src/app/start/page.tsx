@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { RespondentInfo, SurveySection } from '@/types/survey'
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 
 const inputCls = [
   'w-full px-4 py-3 text-sm',
@@ -16,8 +18,22 @@ const inputStyle = {
   borderRadius: '4px',
 }
 
-export default function IntroPage() {
+// Section order used to determine the next incomplete section
+const SECTION_ORDER = [
+  'appetite',
+  'scale-and-delivery',
+  'capability-sustainability',
+  'capability-brand',
+  'capability-business',
+]
+
+// ── Inner form component (uses useSearchParams — must be inside Suspense) ─────
+
+function StartForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const surveyToken = searchParams.get('token')
+
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
   const [company, setCompany] = useState('')
@@ -26,7 +42,9 @@ export default function IntroPage() {
   const [loading, setLoading] = useState(false)
   const [firstSection, setFirstSection] = useState<string | null>(null)
   const [fetchError, setFetchError] = useState(false)
+  const [tokenInvalid, setTokenInvalid] = useState(false)
 
+  // ── Fetch survey sections ─────────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/questions')
       .then(r => r.json())
@@ -38,23 +56,90 @@ export default function IntroPage() {
       .catch(() => setFetchError(true))
   }, [])
 
-  function handleSubmit(e: React.FormEvent) {
+  // ── Hydrate from magic-link session ──────────────────────────────────────
+  useEffect(() => {
+    if (!surveyToken) return
+
+    fetch(`/api/session/${surveyToken}`)
+      .then(r => {
+        if (!r.ok) { setTokenInvalid(true); return null }
+        return r.json()
+      })
+      .then(data => {
+        if (!data) return
+        const { session } = data
+
+        // Already complete → go straight to results
+        if (session.isComplete && session.resultsToken) {
+          router.replace(`/results/${session.resultsToken}`)
+          return
+        }
+
+        // Pre-populate whatever we have
+        if (session.name)        setName(session.name)
+        if (session.role)        setRole(session.role)
+        if (session.company)     setCompany(session.company)
+        if (session.sector)      setSector(session.sector)
+        if (session.companyType) setCompanyType(session.companyType)
+
+        // If profile is filled in and the respondent has already started, jump ahead
+        if (session.name && session.sectionsDone?.length > 0) {
+          const done: string[] = session.sectionsDone
+          // Use SECTION_ORDER first, then fall back to firstSection
+          const allSlugs = SECTION_ORDER
+          const nextSlug = allSlugs.find(s => !done.includes(s))
+          if (nextSlug) {
+            persistToken(surveyToken)
+            router.replace(`/survey/${nextSlug}?token=${surveyToken}`)
+            return
+          }
+        }
+      })
+      .catch(() => setTokenInvalid(true))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surveyToken])
+
+  // ── Form submit ───────────────────────────────────────────────────────────
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim() || !role.trim() || !firstSection) return
 
     setLoading(true)
 
     const respondent: RespondentInfo = {
-      name: name.trim(),
-      role: role.trim(),
-      company: company.trim(),
-      sector: sector.trim(),
+      name:        name.trim(),
+      role:        role.trim(),
+      company:     company.trim(),
+      sector:      sector.trim(),
       companyType,
-      token: null,
+      token:       surveyToken,
     }
 
+    // Persist to sessionStorage + localStorage
     sessionStorage.setItem('interplay-respondent', JSON.stringify(respondent))
-    router.push(`/survey/${firstSection}`)
+    persistToken(surveyToken)
+
+    // Save profile to the survey session (non-blocking, non-fatal)
+    if (surveyToken) {
+      try {
+        await fetch(`/api/session/${surveyToken}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:        respondent.name,
+            role:        respondent.role,
+            company:     respondent.company,
+            sector:      respondent.sector,
+            companyType: respondent.companyType,
+          }),
+        })
+      } catch {
+        // Non-fatal — survey still proceeds
+      }
+    }
+
+    const dest = `/survey/${firstSection}${surveyToken ? `?token=${surveyToken}` : ''}`
+    router.push(dest)
   }
 
   function focusBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
@@ -85,7 +170,7 @@ export default function IntroPage() {
           Where do you sit in the interplay?
         </p>
 
-        {/* Main headline — Robson */}
+        {/* Main headline */}
         <h1 className="uppercase leading-none mb-10"
           style={{
             fontFamily: 'Robson, sans-serif',
@@ -97,6 +182,14 @@ export default function IntroPage() {
           Test your sustainability<br />
           growth potential
         </h1>
+
+        {/* Invalid token notice */}
+        {tokenInvalid && (
+          <div className="px-5 py-4 text-sm mb-6"
+            style={{ border: '1px solid rgba(250,200,0,0.3)', backgroundColor: 'rgba(250,200,0,0.06)', color: 'rgba(250,200,0,0.85)' }}>
+            This link has expired or is not valid. You can still complete the survey below — your answers will be saved as you go.
+          </div>
+        )}
 
         {/* Form */}
         {fetchError ? (
@@ -176,7 +269,7 @@ export default function IntroPage() {
         {/* Divider */}
         <div className="mb-14" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
 
-        {/* Value prop — Robson subheading */}
+        {/* Value prop */}
         <p className="mb-8"
           style={{
             fontFamily: 'Robson, sans-serif',
@@ -191,16 +284,13 @@ export default function IntroPage() {
 
         {/* Body paragraphs */}
         <div className="space-y-4 max-w-xl mb-14">
-          <p className="text-sm leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
             There is huge value in sustainability, but it's mostly sitting in a compliance silo — disconnected from business and brand commercials.
           </p>
-          <p className="text-sm leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
             This disconnect can limit pricing power, reduce relevance, weaken differentiation, and restrict investment.
           </p>
-          <p className="text-sm leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
             This diagnostic reveals the gaps — and opportunities — between your sustainability, business and brand, and where their interplay can unlock triple value.
           </p>
         </div>
@@ -208,26 +298,22 @@ export default function IntroPage() {
         {/* Info sections */}
         <div className="space-y-10">
 
-          {/* Pillars */}
           <div>
             <p className="text-xs uppercase tracking-[0.2em] mb-3"
               style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
               Built around 5 pillars
             </p>
-            <p className="text-sm leading-relaxed max-w-lg"
-              style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
+            <p className="text-sm leading-relaxed max-w-lg" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
               This interview is structured across five key pillars, helping you clearly identify where you're strong — and where there's room to grow.
             </p>
           </div>
 
-          {/* Deliverables */}
           <div>
             <p className="text-xs uppercase tracking-[0.2em] mb-3"
               style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
               What you'll receive
             </p>
-            <p className="text-sm mb-5"
-              style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
+            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
               At the end, you'll get a personalised report including:
             </p>
             <div className="space-y-3 max-w-sm">
@@ -236,8 +322,7 @@ export default function IntroPage() {
                 'Value opportunity predictions',
                 'Key recommendations to accelerate growth',
               ].map(item => (
-                <div key={item}
-                  className="px-4 py-3 text-sm"
+                <div key={item} className="px-4 py-3 text-sm"
                   style={{
                     borderLeft: '2px solid rgba(250,240,0,0.5)',
                     backgroundColor: 'rgba(250,240,0,0.04)',
@@ -259,5 +344,29 @@ export default function IntroPage() {
         </p>
       </footer>
     </div>
+  )
+}
+
+// ── Token persistence helpers ─────────────────────────────────────────────────
+
+function persistToken(token: string | null) {
+  if (typeof window === 'undefined') return
+  if (token) {
+    sessionStorage.setItem('interplay-survey-token', token)
+    localStorage.setItem('interplay-survey-token', token)
+  }
+}
+
+// ── Page shell with Suspense (required for useSearchParams in App Router) ─────
+
+export default function StartPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#2f2a2a' }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Loading…</p>
+      </div>
+    }>
+      <StartForm />
+    </Suspense>
   )
 }

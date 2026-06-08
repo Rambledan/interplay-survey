@@ -1183,24 +1183,28 @@
       source:  'landing',
     };
 
-    // Submit — wait for response so we can personalise the success message
+    // Submit — redirect immediately to the survey via the magic-link token
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
+    .then(function (res) { return res.ok ? res.json() : {}; })
     .catch(function () { return {}; })
-    .finally(function () {
-      // Update success message with the user's email address
-      var msgEl = document.getElementById('modalSuccessMsg');
-      if (msgEl) {
-        msgEl.innerHTML = 'A confirmation email is on its way to <strong style="color:#fff">'
-          + email + '</strong>. We\'ll be in touch shortly to arrange your 30-minute Interplay interview.';
+    .then(function (data) {
+      if (data && data.surveyToken) {
+        // Magic-link flow: redirect to /start with the session token
+        window.location.href = '/start?token=' + encodeURIComponent(data.surveyToken);
+      } else {
+        // Fallback (no DB): show the confirmation message
+        var msgEl = document.getElementById('modalSuccessMsg');
+        if (msgEl) {
+          msgEl.innerHTML = 'A confirmation email is on its way to <strong style="color:#fff">'
+            + email + '</strong>. We\'ll be in touch shortly to arrange your 30-minute Interplay interview.';
+        }
+        formWrap.style.display = 'none';
+        successEl.style.display = 'flex';
       }
-
-      // Show success state
-      formWrap.style.display = 'none';
-      successEl.style.display = 'flex';
     });
   });
 })();

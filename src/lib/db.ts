@@ -561,3 +561,247 @@ export async function getReportContentOverrides(respondentName: string): Promise
   const globalTemplate = mergeWithDefaults(getDefaultTemplate(), savedTemplate)
   return { globalTemplate, respondentOverride }
 }
+
+// ── Survey Sessions ───────────────────────────────────────────────────────────
+// Self-serve magic-link flow: email → survey_token → async resume → results_token
+
+export interface SurveySessionRow {
+  id: number
+  email: string
+  name: string | null
+  role: string | null
+  company: string | null
+  sector: string | null
+  company_type: string | null
+  lead_id: number | null
+  survey_token: string
+  results_token: string | null
+  sections_done: string[]
+  email_sent: boolean
+  email_error: string | null
+  created_at: string
+  profile_submitted_at: string | null
+  completed_at: string | null
+  nudge_sent_at: string | null
+}
+
+async function ensureSurveySessionsTable(client: Client): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS survey_sessions (
+      id                    SERIAL        PRIMARY KEY,
+      email                 TEXT          NOT NULL,
+      name                  TEXT,
+      role                  TEXT,
+      company               TEXT,
+      sector                TEXT,
+      company_type          TEXT,
+      lead_id               INTEGER       REFERENCES leads(id) ON DELETE SET NULL,
+      survey_token          TEXT          NOT NULL UNIQUE,
+      results_token         TEXT          UNIQUE,
+      sections_done         TEXT[]        NOT NULL DEFAULT '{}',
+      email_sent            BOOLEAN       NOT NULL DEFAULT FALSE,
+      email_error           TEXT,
+      created_at            TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+      profile_submitted_at  TIMESTAMPTZ,
+      completed_at          TIMESTAMPTZ,
+      nudge_sent_at         TIMESTAMPTZ
+    )
+  `)
+  await client.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_survey_sessions_survey_token
+    ON survey_sessions (survey_token)
+  `)
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS idx_survey_sessions_email
+    ON survey_sessions (LOWER(email))
+  `)
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS idx_survey_sessions_results_token
+    ON survey_sessions (results_token)
+    WHERE results_token IS NOT NULL
+  `)
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS idx_survey_sessions_incomplete
+    ON survey_sessions (created_at)
+    WHERE completed_at IS NULL
+  `)
+  // Safe migrations
+  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_sent  BOOLEAN     NOT NULL DEFAULT FALSE`)
+  await client.query(`ALTER TABLE survey_sessions ADD COLUMN IF NOT EXISTS email_error TEXT`)
+}
+
+/** Create a new survey session linked to a lead. Returns the session including its survey_token. */
+export async function createSurveySession(
+  email: string,
+  leadId?: number | null
+): Promise<SurveySessionRow> {
+  const surveyToken = randomBytes(20).toString('hex')
+
+  return withClient(async (client) => {
+    await ensureLeadsTable(client)
+    await ensureSurveySessionsTable(client)
+    const result = await client.query<SurveySessionRow>(
+      `INSERT INTO survey_sessions (email, lead_id, survey_token)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [email, leadId ?? null, surveyToken]
+    )
+    return result.rows[0]
+  })
+}
+
+/** Look up a session by its survey_token (the magic-link secret). */
+export async function getSurveySessionByToken(token: string): Promise<SurveySessionRow | null> {
+  return withClient(async (client) => {
+    await ensureSurveySessionsTable(client)
+    const result = await client.query<SurveySessionRow>(
+      `SELECT * FROM survey_sessions WHERE survey_token = $1`,
+      [token]
+    )
+    return result.rows[0] ?? null
+  })
+}
+
+/** Persist the respondent profile collected on the /start form. */
+export async function updateSurveySessionProfile(
+  surveyToken: string,
+  profile: { name: string; role: string; company: string; sector: string; companyType: string }
+): Promise<SurveySessionRow | null> {
+  return withClient(async (client) => {
+    const result = await client.query<SurveySessionRow>(
+      `UPDATE survey_sessions
+       SET name = $1, role = $2, company = $3, sector = $4, company_type = $5,
+           profile_submitted_at = NOW()
+       WHERE survey_token = $6
+       RETURNING *`,
+      [profile.name, profile.role, profile.company, profile.sector, profile.companyType, surveyToken]
+    )
+    return result.rows[0] ?? null
+  })
+}
+
+/** Record whether the start email was delivered (called asynchronously after send). */
+export async function updateSessionEmailStatus(
+  sessionId: number,
+  sent: boolean,
+  error?: string
+): Promise<void> {
+  await withClient(async (client) => {
+    await client.query(
+      `UPDATE survey_sessions SET email_sent = $1, email_error = $2 WHERE id = $3`,
+      [sent, error ?? null, sessionId]
+    )
+  })
+}
+
+/**
+ * Mark a section as done and optionally finalise the survey.
+ * If isLast is true and the session is not yet complete:
+ *   - sets completed_at and generates a results_token
+ *   - inserts a matching row in respondent_tokens so /api/results/[token] works
+ * Returns null if the session token is not found.
+ */
+export async function markSectionDone(
+  surveyToken: string,
+  sectionSlug: string,
+  isLast: boolean
+): Promise<{ session: SurveySessionRow; justCompleted: boolean } | null> {
+  return withClient(async (client) => {
+    await ensureSurveySessionsTable(client)
+
+    // Append + deduplicate the section slug
+    const updateResult = await client.query<SurveySessionRow>(
+      `UPDATE survey_sessions
+       SET sections_done = ARRAY(
+         SELECT DISTINCT u FROM unnest(array_append(sections_done, $2)) AS u
+       )
+       WHERE survey_token = $1
+       RETURNING *`,
+      [surveyToken, sectionSlug]
+    )
+
+    if (updateResult.rows.length === 0) return null
+    let session = updateResult.rows[0]
+
+    // Finalise if this is the last section and not already completed
+    if (isLast && !session.completed_at) {
+      const resultsToken = randomBytes(20).toString('hex')
+
+      const completeResult = await client.query<SurveySessionRow>(
+        `UPDATE survey_sessions
+         SET completed_at = NOW(), results_token = $2
+         WHERE survey_token = $1
+         RETURNING *`,
+        [surveyToken, resultsToken]
+      )
+      session = completeResult.rows[0]
+
+      // Register in respondent_tokens so the existing results route works unchanged
+      if (session.name) {
+        try {
+          await client.query(
+            `INSERT INTO respondent_tokens (token, respondent_name)
+             VALUES ($1, $2)
+             ON CONFLICT (token) DO NOTHING`,
+            [resultsToken, session.name]
+          )
+        } catch (err) {
+          console.error('[db] respondent_tokens insert failed (non-fatal):', err)
+        }
+      }
+
+      return { session, justCompleted: true }
+    }
+
+    return { session, justCompleted: false }
+  })
+}
+
+/**
+ * Find sessions that are incomplete and eligible for a nudge email.
+ * cutoffHours: minimum hours since creation before nudging (default 48)
+ * nudgeCooldownDays: minimum days between nudges (default 7)
+ */
+export async function getIncompleteSessions(
+  cutoffHours = 48,
+  nudgeCooldownDays = 7
+): Promise<SurveySessionRow[]> {
+  return withClient(async (client) => {
+    await ensureSurveySessionsTable(client)
+    const result = await client.query<SurveySessionRow>(
+      `SELECT * FROM survey_sessions
+       WHERE completed_at IS NULL
+         AND email IS NOT NULL
+         AND name IS NOT NULL
+         AND created_at < NOW() - ($1 || ' hours')::INTERVAL
+         AND (
+           nudge_sent_at IS NULL
+           OR nudge_sent_at < NOW() - ($2 || ' days')::INTERVAL
+         )
+       ORDER BY created_at ASC`,
+      [String(cutoffHours), String(nudgeCooldownDays)]
+    )
+    return result.rows
+  })
+}
+
+/** Record that a nudge email was sent for this session. */
+export async function updateNudgeSentAt(sessionId: number): Promise<void> {
+  await withClient(async (client) => {
+    await client.query(
+      `UPDATE survey_sessions SET nudge_sent_at = NOW() WHERE id = $1`,
+      [sessionId]
+    )
+  })
+}
+
+/** Fetch all survey sessions (newest first) for the admin panel. */
+export async function getAllSurveySessions(): Promise<SurveySessionRow[]> {
+  return withClient(async (client) => {
+    await ensureSurveySessionsTable(client)
+    const result = await client.query<SurveySessionRow>(
+      `SELECT * FROM survey_sessions ORDER BY created_at DESC`
+    )
+    return result.rows
+  })
+}

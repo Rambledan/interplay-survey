@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isPostgresConfigured, insertResponse } from '@/lib/db'
+import { isPostgresConfigured, insertResponse, markSectionDone } from '@/lib/db'
 import { isGoogleSheetsConfigured, appendLocalResponse } from '@/lib/local-store'
+import { sendResultsEmail } from '@/lib/email'
 import type { SurveyResponse } from '@/types/survey'
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,8 @@ export async function POST(request: NextRequest) {
   }
 
   const { respondent, sectionSlug, answers, followUps, submittedAt } = body
+  const surveyToken  = body.surveyToken  ?? null
+  const isLastSection = body.isLastSection ?? false
 
   if (!respondent?.name || !respondent?.role) {
     return NextResponse.json(
@@ -49,12 +52,41 @@ export async function POST(request: NextRequest) {
         respondent.company ?? '',
         respondent.sector ?? '',
         respondent.companyType ?? '',
-        respondent.token ?? '',
+        surveyToken ?? respondent.token ?? '',
         sectionSlug,
         answers ?? {},
         followUps ?? {}
       )
-      return NextResponse.json({ ok: true, storage: 'postgres' })
+
+      // ── Session tracking (magic-link flow) ───────────────────────────────
+      let completed    = false
+      let resultsToken: string | null = null
+      let emailOk      = true  // optimistic default
+
+      if (surveyToken) {
+        try {
+          const result = await markSectionDone(surveyToken, sectionSlug, isLastSection)
+          if (result) {
+            emailOk = result.session.email_sent && !result.session.email_error
+
+            if (result.justCompleted) {
+              completed    = true
+              resultsToken = result.session.results_token
+
+              // Fire results email without blocking the response
+              const { email, name } = result.session
+              if (email && resultsToken) {
+                sendResultsEmail(email, name ?? undefined, resultsToken)
+                  .catch(err => console.error('[responses] Results email failed:', err))
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[responses] Session tracking failed (non-fatal):', err)
+        }
+      }
+
+      return NextResponse.json({ ok: true, storage: 'postgres', completed, resultsToken, emailOk })
     }
 
     // ── 2. Google Sheets ───────────────────────────────────────────────────

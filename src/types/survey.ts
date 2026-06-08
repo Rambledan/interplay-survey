@@ -36,4 +36,6 @@ export interface SurveyResponse {
   answers: Record<string, string>
   followUps: Record<string, string>
   submittedAt: string
+  surveyToken?: string      // Magic-link session token (set when respondent has an email session)
+  isLastSection?: boolean   // Signals the backend to finalise the session and send results email
 }

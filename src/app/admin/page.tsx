@@ -1963,11 +1963,59 @@ interface LeadRow {
   created_at: string
 }
 
+interface SessionSummary {
+  id: number
+  email: string
+  survey_token: string
+  results_token: string | null
+  sections_done: string[]
+  completed_at: string | null
+  nudge_sent_at: string | null
+  created_at: string
+}
+
+function SurveyProgressChip({ session, totalSections = 5 }: { session: SessionSummary | undefined; totalSections?: number }) {
+  if (!session) return <span style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>
+  const done = session.sections_done?.length ?? 0
+  if (session.completed_at) {
+    return (
+      <a
+        href={session.results_token ? `/results/${session.results_token}` : undefined}
+        target="_blank"
+        rel="noreferrer"
+        onClick={e => e.stopPropagation()}
+        className="text-xs font-mono px-2 py-0.5 rounded-sm transition-opacity"
+        style={{ background: 'rgba(62,207,110,0.1)', border: '1px solid rgba(62,207,110,0.3)', color: '#22a855', textDecoration: 'none' }}
+        title={session.results_token ? 'View report' : undefined}
+      >
+        Complete ✓
+      </a>
+    )
+  }
+  if (done === 0) {
+    return (
+      <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
+        style={{ background: 'rgba(250,240,0,0.1)', border: '1px solid rgba(250,240,0,0.35)', color: '#a08a00' }}>
+        Started
+      </span>
+    )
+  }
+  return (
+    <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
+      style={{ background: 'rgba(250,160,0,0.1)', border: '1px solid rgba(250,160,0,0.3)', color: '#b06000' }}>
+      {done}/{totalSections}
+    </span>
+  )
+}
+
 function LeadsPanel({ password }: { password: string }) {
   const [leads, setLeads] = useState<LeadRow[]>([])
+  const [sessions, setSessions] = useState<SessionSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [resending, setResending] = useState<number | null>(null)
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [nudging, setNudging] = useState(false)
+  const [nudgeResult, setNudgeResult] = useState<string | null>(null)
 
   async function fetchLeads() {
     setLoading(true)
@@ -1978,6 +2026,7 @@ function LeadsPanel({ password }: { password: string }) {
       if (res.ok) {
         const data = await res.json()
         setLeads(data.leads ?? [])
+        setSessions(data.sessions ?? [])
       }
     } finally {
       setLoading(false)
@@ -2000,19 +2049,47 @@ function LeadsPanel({ password }: { password: string }) {
     }
   }
 
+  async function handleSendNudges() {
+    setNudging(true)
+    setNudgeResult(null)
+    try {
+      const res = await fetch('/api/admin/send-nudges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ cutoffHours: 48 }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setNudgeResult(`Sent ${data.sent}, failed ${data.failed} (${data.total} eligible)`)
+        await fetchLeads()
+      } else {
+        setNudgeResult(`Error: ${data.error ?? 'unknown'}`)
+      }
+    } catch {
+      setNudgeResult('Request failed')
+    } finally {
+      setNudging(false)
+    }
+  }
+
   function handleExportCsv() {
-    const header = 'Name,Email,Company,Role,Source,Email Sent,Registered At'
-    const rows = leads.map(l =>
-      [
+    const header = 'Name,Email,Company,Role,Source,Email Sent,Survey Progress,Registered At'
+    const rows = leads.map(l => {
+      const session = sessions.find(s => s.email.toLowerCase() === l.email.toLowerCase())
+      const progress = session
+        ? (session.completed_at ? 'Complete' : `${session.sections_done?.length ?? 0}/5`)
+        : '—'
+      return [
         `"${l.name ?? ''}"`,
         `"${l.email}"`,
         `"${l.company ?? ''}"`,
         `"${l.role ?? ''}"`,
         `"${l.source}"`,
         l.email_sent ? 'Yes' : 'No',
+        progress,
         `"${formatDate(l.created_at)}"`,
       ].join(',')
-    )
+    })
     const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement('a')
@@ -2023,6 +2100,9 @@ function LeadsPanel({ password }: { password: string }) {
   }
 
   const cardStyle: React.CSSProperties = { backgroundColor: '#fff', border: '1px solid rgba(13,20,16,0.08)' }
+
+  const completedCount = sessions.filter(s => s.completed_at).length
+  const inProgressCount = sessions.filter(s => !s.completed_at && (s.sections_done?.length ?? 0) > 0).length
 
   if (loading) {
     return (
@@ -2039,23 +2119,17 @@ function LeadsPanel({ password }: { password: string }) {
           <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>{leads.length}</span>
         </div>
         <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Survey complete</span>
+          <span className="text-3xl font-bold" style={{ color: '#22a855' }}>{completedCount}</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
+          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>In progress</span>
+          <span className="text-3xl font-bold" style={{ color: '#b06000' }}>{inProgressCount}</span>
+        </div>
+        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
           <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Email delivered</span>
-          <span className="text-3xl font-bold" style={{ color: '#22a855' }}>
-            {leads.filter(l => l.email_sent).length}
-          </span>
-        </div>
-        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
-          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Email failed</span>
-          <span className="text-3xl font-bold" style={{ color: leads.filter(l => !l.email_sent).length > 0 ? '#dc2626' : '#0d1410' }}>
-            {leads.filter(l => !l.email_sent).length}
-          </span>
-        </div>
-        <div className="p-5 flex flex-col gap-1" style={cardStyle}>
-          <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.45)' }}>Delivery rate</span>
           <span className="text-3xl font-bold" style={{ color: '#0d1410' }}>
-            {leads.length > 0
-              ? `${Math.round((leads.filter(l => l.email_sent).length / leads.length) * 100)}%`
-              : '—'}
+            {leads.filter(l => l.email_sent).length}
           </span>
         </div>
       </div>
@@ -2063,9 +2137,21 @@ function LeadsPanel({ password }: { password: string }) {
       {/* Action bar */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.4)' }}>
-          {leads.length} lead{leads.length !== 1 ? 's' : ''} registered via landing page
+          {leads.length} lead{leads.length !== 1 ? 's' : ''} registered
         </span>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 items-center">
+          {nudgeResult && (
+            <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.5)' }}>{nudgeResult}</span>
+          )}
+          <button
+            onClick={handleSendNudges}
+            disabled={nudging}
+            className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors disabled:opacity-40"
+            style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(180,100,0,0.35)'; e.currentTarget.style.color = '#b06000' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.5)' }}>
+            {nudging ? 'Sending…' : '✉ Send nudges'}
+          </button>
           <button onClick={fetchLeads}
             className="text-xs font-mono uppercase tracking-wider px-3 py-1.5 border transition-colors"
             style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.5)' }}
@@ -2097,7 +2183,7 @@ function LeadsPanel({ password }: { password: string }) {
           {/* Table header */}
           <div className="px-5 py-3 grid gap-3 text-[10px] font-mono uppercase tracking-[0.15em]"
             style={{
-              gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 100px',
+              gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 90px 90px',
               borderBottom: '2px solid rgba(13,20,16,0.07)',
               color: 'rgba(13,20,16,0.4)',
             }}>
@@ -2106,19 +2192,21 @@ function LeadsPanel({ password }: { password: string }) {
             <span>Company</span>
             <span>Role</span>
             <span>Email</span>
+            <span>Survey</span>
             <span>Registered</span>
           </div>
 
           {/* Rows */}
           {leads.map(lead => {
             const isExpanded = expandedId === lead.id
+            const session = sessions.find(s => s.email.toLowerCase() === lead.email.toLowerCase())
             return (
               <div key={lead.id} style={{ borderBottom: '1px solid rgba(13,20,16,0.05)' }}>
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : lead.id)}
                   className="w-full text-left px-5 py-3 grid gap-3 transition-colors"
                   style={{
-                    gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 100px',
+                    gridTemplateColumns: '1fr 1.5fr 1fr 1fr 80px 90px 90px',
                     backgroundColor: isExpanded ? 'rgba(13,20,16,0.02)' : 'transparent',
                     alignItems: 'center',
                   }}
@@ -2157,6 +2245,9 @@ function LeadsPanel({ password }: { password: string }) {
                       </span>
                     )}
                   </span>
+                  <span onClick={e => e.stopPropagation()}>
+                    <SurveyProgressChip session={session} />
+                  </span>
                   <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
                     {formatDate(lead.created_at)}
                   </span>
@@ -2180,6 +2271,28 @@ function LeadsPanel({ password }: { password: string }) {
                         </div>
                       ))}
                     </div>
+                    {session && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-0.5" style={{ color: 'rgba(13,20,16,0.35)' }}>Sections done</p>
+                          <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.7)' }}>
+                            {session.sections_done?.join(', ') || 'none'}
+                          </p>
+                        </div>
+                        {session.nudge_sent_at && (
+                          <div>
+                            <p className="text-[10px] font-mono uppercase tracking-wider mb-0.5" style={{ color: 'rgba(13,20,16,0.35)' }}>Nudge sent</p>
+                            <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.7)' }}>{formatDate(session.nudge_sent_at)}</p>
+                          </div>
+                        )}
+                        {session.completed_at && (
+                          <div>
+                            <p className="text-[10px] font-mono uppercase tracking-wider mb-0.5" style={{ color: 'rgba(13,20,16,0.35)' }}>Completed</p>
+                            <p className="text-xs font-mono" style={{ color: '#22a855' }}>{formatDate(session.completed_at)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {lead.email_error && (
                       <div className="px-3 py-2 text-xs font-mono"
                         style={{ backgroundColor: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.15)', color: '#dc2626' }}>

@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isPostgresConfigured, insertLead, updateLeadEmailStatus } from '@/lib/db'
-import { sendLeadConfirmation } from '@/lib/email'
+import {
+  isPostgresConfigured,
+  insertLead,
+  updateLeadEmailStatus,
+  createSurveySession,
+  updateSessionEmailStatus,
+} from '@/lib/db'
+import { sendLeadConfirmation, sendSurveyStartEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   let body: { name?: string; email?: string; company?: string; role?: string; source?: string }
@@ -24,6 +30,7 @@ export async function POST(req: NextRequest) {
   const trimmedSource  = source?.trim() || 'landing'
 
   let leadId: number | null = null
+  let surveyToken: string | null = null
 
   // ── 1. Store lead ───────────────────────────────────────────────────────────
   if (isPostgresConfigured()) {
@@ -33,19 +40,38 @@ export async function POST(req: NextRequest) {
       console.error('[leads] DB insert failed:', err)
       // Continue — still try to send the email
     }
-  }
 
-  // ── 2. Send confirmation email ──────────────────────────────────────────────
-  const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
-
-  // ── 3. Record email delivery status in DB ───────────────────────────────────
-  if (leadId !== null && isPostgresConfigured()) {
+    // ── 2. Create survey session + fire magic-link email ──────────────────────
     try {
-      await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
+      const session = await createSurveySession(trimmedEmail, leadId)
+      surveyToken = session.survey_token
+      const sessionId = session.id
+
+      // Fire email without blocking the response
+      sendSurveyStartEmail(trimmedEmail, trimmedName, surveyToken)
+        .then(result => updateSessionEmailStatus(sessionId, result.sent, result.error))
+        .catch(err => console.error('[leads] Session email tracking failed:', err))
     } catch (err) {
-      console.error('[leads] Email status update failed:', err)
+      console.error('[leads] Survey session creation failed:', err)
+      // Fall through to legacy confirmation email below
     }
   }
 
-  return NextResponse.json({ ok: true, emailSent: emailResult.sent })
+  // ── 3. Fallback: send plain confirmation if no session was created ──────────
+  if (!surveyToken) {
+    const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
+
+    if (leadId !== null && isPostgresConfigured()) {
+      try {
+        await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
+      } catch (err) {
+        console.error('[leads] Email status update failed:', err)
+      }
+    }
+
+    return NextResponse.json({ ok: true, emailSent: emailResult.sent })
+  }
+
+  // ── 4. Return immediately with surveyToken so client can redirect ───────────
+  return NextResponse.json({ ok: true, surveyToken })
 }

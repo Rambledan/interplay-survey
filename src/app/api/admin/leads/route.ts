@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isPostgresConfigured, getAllLeads, updateLeadEmailStatus } from '@/lib/db'
+import { isPostgresConfigured, getAllLeads, getAllSurveySessions, updateLeadEmailStatus } from '@/lib/db'
 import { sendLeadConfirmation } from '@/lib/email'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'interplay2026'
@@ -19,8 +19,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const leads = await getAllLeads()
-    return NextResponse.json({ leads })
+    const [leads, sessions] = await Promise.all([
+      getAllLeads(),
+      getAllSurveySessions().catch(() => []),  // non-fatal if table doesn't exist yet
+    ])
+    return NextResponse.json({ leads, sessions })
   } catch (err) {
     console.error('[admin/leads GET]', err)
     return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 })
