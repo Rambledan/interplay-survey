@@ -533,6 +533,18 @@ export async function updateLeadEmailStatus(
   })
 }
 
+/** Permanently delete a lead by ID. Returns true if a row was deleted. */
+export async function deleteLead(id: number): Promise<boolean> {
+  return withClient(async (client) => {
+    await ensureLeadsTable(client)
+    const result = await client.query(
+      `DELETE FROM leads WHERE id = $1`,
+      [id]
+    )
+    return (result.rowCount ?? 0) > 0
+  })
+}
+
 /** Fetch all leads (newest first) for the admin panel. */
 export async function getAllLeads(): Promise<LeadRow[]> {
   return withClient(async (client) => {

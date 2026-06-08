@@ -2016,6 +2016,8 @@ function LeadsPanel({ password }: { password: string }) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [nudging, setNudging] = useState(false)
   const [nudgeResult, setNudgeResult] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
   async function fetchLeads() {
     setLoading(true)
@@ -2069,6 +2071,22 @@ function LeadsPanel({ password }: { password: string }) {
       setNudgeResult('Request failed')
     } finally {
       setNudging(false)
+    }
+  }
+
+  async function handleDeleteLead(lead: LeadRow) {
+    setDeletingId(lead.id)
+    setConfirmDeleteId(null)
+    try {
+      await fetch('/api/admin/leads', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ id: lead.id }),
+      })
+      await fetchLeads()
+      setExpandedId(null)
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -2299,8 +2317,10 @@ function LeadsPanel({ password }: { password: string }) {
                         Email error: {lead.email_error}
                       </div>
                     )}
-                    {!lead.email_sent && (
-                      <div>
+
+                    {/* Action buttons row */}
+                    <div className="flex items-center gap-3 pt-1" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
+                      {!lead.email_sent && (
                         <button
                           onClick={() => handleResend(lead)}
                           disabled={resending === lead.id}
@@ -2310,8 +2330,41 @@ function LeadsPanel({ password }: { password: string }) {
                           onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                           {resending === lead.id ? 'Sending…' : '↺ Resend confirmation email'}
                         </button>
-                      </div>
-                    )}
+                      )}
+
+                      {/* Delete — two-step confirm */}
+                      {confirmDeleteId === lead.id ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.5)' }}>
+                            Delete {lead.email}?
+                          </span>
+                          <button
+                            onClick={() => handleDeleteLead(lead)}
+                            disabled={deletingId === lead.id}
+                            className="text-xs font-mono px-3 py-1.5 transition-colors disabled:opacity-40"
+                            style={{ background: '#dc2626', color: '#fff', border: '1px solid #dc2626', borderRadius: '3px' }}>
+                            {deletingId === lead.id ? 'Deleting…' : 'Yes, delete'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="text-xs font-mono px-3 py-1.5 transition-colors"
+                            style={{ border: '1px solid rgba(13,20,16,0.15)', color: 'rgba(13,20,16,0.5)' }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(13,20,16,0.3)'}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(13,20,16,0.15)'}>
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDeleteId(lead.id)}
+                          className="text-xs font-mono px-4 py-2 transition-colors ml-auto"
+                          style={{ border: '1px solid rgba(220,38,38,0.25)', color: 'rgba(220,38,38,0.7)' }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(220,38,38,0.5)'; e.currentTarget.style.color = '#dc2626' }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(220,38,38,0.25)'; e.currentTarget.style.color = 'rgba(220,38,38,0.7)' }}>
+                          Delete lead
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

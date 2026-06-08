@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isPostgresConfigured, getAllLeads, getAllSurveySessions, updateLeadEmailStatus } from '@/lib/db'
+import { isPostgresConfigured, getAllLeads, getAllSurveySessions, updateLeadEmailStatus, deleteLead } from '@/lib/db'
 import { sendLeadConfirmation } from '@/lib/email'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'interplay2026'
@@ -55,4 +55,34 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, sent: result.sent, error: result.error })
+}
+
+// ── DELETE — permanently remove a lead ───────────────────────────────────────
+export async function DELETE(req: NextRequest) {
+  if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (!isPostgresConfigured()) {
+    return NextResponse.json({ error: 'Storage not configured' }, { status: 503 })
+  }
+
+  let body: { id: number }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { id } = body
+  if (!id || typeof id !== 'number') {
+    return NextResponse.json({ error: 'id (number) required' }, { status: 400 })
+  }
+
+  try {
+    const deleted = await deleteLead(id)
+    if (!deleted) return NextResponse.json({ error: 'Lead not found' }, { status: 404 })
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error('[admin/leads DELETE]', err)
+    return NextResponse.json({ error: 'Failed to delete lead' }, { status: 500 })
+  }
 }
