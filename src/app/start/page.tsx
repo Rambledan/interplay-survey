@@ -105,13 +105,27 @@ function StartForm() {
       return
     }
 
-    // Profile saved + at least one section done → jump to next incomplete section
-    if (sessionData.name && sessionData.sectionsDone?.length > 0) {
-      const done = new Set(sessionData.sectionsDone)
-      const nextSection = sections.find(s => !done.has(s.slug))
-      if (nextSection) {
+    // Profile is saved → the respondent has been here before; go to their next section.
+    // We check sessionData.name (not sectionsDone.length) so this also fires when
+    // the user closed the tab mid-section 1 (before completing any section).
+    if (sessionData.name) {
+      const done = new Set(sessionData.sectionsDone ?? [])
+      const targetSection = sections.find(s => !done.has(s.slug))
+      if (targetSection) {
+        // CRITICAL: populate sessionStorage before navigating to the survey page.
+        // The survey page checks sessionStorage for the respondent on every load —
+        // without this write it finds nothing, bounces back here, and loops.
+        const respondent = {
+          name:        sessionData.name,
+          role:        sessionData.role        ?? '',
+          company:     sessionData.company     ?? '',
+          sector:      sessionData.sector      ?? '',
+          companyType: sessionData.companyType ?? '',
+          token:       surveyToken,
+        }
+        sessionStorage.setItem('interplay-respondent', JSON.stringify(respondent))
         persistToken(surveyToken)
-        router.replace(`/survey/${nextSection.slug}?token=${surveyToken}`)
+        router.replace(`/survey/${targetSection.slug}?token=${surveyToken}`)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
