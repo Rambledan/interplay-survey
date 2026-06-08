@@ -359,7 +359,7 @@ function StartForm() {
               <div>
                 <label htmlFor="email" className="block text-xs uppercase tracking-widest mb-2"
                   style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
-                  Work email <span style={{ color: 'rgba(255,255,255,0.3)', textTransform: 'none', letterSpacing: 0 }}>(optional — we&apos;ll send a save link)</span>
+                  Work email <span style={{ color: 'rgba(250,240,0,0.35)', textTransform: 'none', letterSpacing: 0 }}>*</span>
                 </label>
                 <input
                   id="email"
@@ -368,13 +368,14 @@ function StartForm() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jane@company.com"
                   autoComplete="email"
+                  required
                   className={inputCls}
                   style={{ ...inputStyle, caretColor: '#faf000', colorScheme: 'dark' }}
                   onFocus={focusBorder}
                   onBlur={blurBorder}
                 />
                 <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                  Close the tab and come back later — your progress will be saved.
+                  We&apos;ll send your report here and a save link so you can pick up where you left off.
                 </p>
               </div>
             )}
@@ -404,7 +405,7 @@ function StartForm() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading}
+                disabled={!name.trim() || !role.trim() || !company.trim() || !sector.trim() || !companyType || !firstSection || loading || (!surveyToken && !email.trim().includes('@'))}
                 className="w-full font-bold uppercase tracking-widest py-4 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px' }}
                 onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#e8df00' }}

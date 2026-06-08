@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import type { RespondentInfo } from '@/types/survey'
 
 interface Referee {
@@ -11,14 +12,20 @@ interface Referee {
 
 const EMPTY_REFEREE: Referee = { name: '', email: '' }
 
+const inputCls = 'w-full px-4 py-3 text-sm focus:outline-none transition-colors'
+
 const inputStyle = {
-  backgroundColor: '#fff',
-  border: '1px solid rgba(13,20,16,0.12)',
-  color: '#0d1410',
+  backgroundColor: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  color: 'rgba(255,255,255,0.88)',
+  borderRadius: '4px',
 }
 
-export default function ReferralPage() {
+function ReferralForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const surveyToken = searchParams.get('token')
+
   const [respondent, setRespondent] = useState<RespondentInfo | null>(null)
   const [referees, setReferees] = useState<Referee[]>(
     Array.from({ length: 5 }, () => ({ ...EMPTY_REFEREE }))
@@ -28,7 +35,8 @@ export default function ReferralPage() {
   useEffect(() => {
     const stored = sessionStorage.getItem('interplay-respondent')
     if (!stored) {
-      router.replace('/')
+      const lsToken = localStorage.getItem('interplay-survey-token')
+      router.replace(lsToken ? `/start?token=${lsToken}` : '/')
       return
     }
     setRespondent(JSON.parse(stored))
@@ -39,6 +47,8 @@ export default function ReferralPage() {
   }
 
   const filledCount = referees.filter(r => r.name.trim() && r.email.trim()).length
+
+  const nextDest = `/next-steps${surveyToken ? `?token=${surveyToken}` : ''}`
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -55,91 +65,106 @@ export default function ReferralPage() {
         }),
       })
     } catch {
-      // Best-effort — don't block progression on referral errors
+      // Best-effort — don't block progression
     }
 
-    router.push('/complete')
-  }
-
-  function handleSkip() {
-    router.push('/complete')
+    router.push(nextDest)
   }
 
   function focusBorder(e: React.FocusEvent<HTMLInputElement>) {
-    e.currentTarget.style.borderColor = 'rgba(62,207,110,0.5)'
+    e.currentTarget.style.borderColor = 'rgba(250,240,0,0.5)'
   }
   function blurBorder(e: React.FocusEvent<HTMLInputElement>) {
-    e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'
+    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f6f8f6' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#2f2a2a', color: 'rgba(255,255,255,0.92)' }}>
+
+      {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
-        style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Interrupt</span>
-          <span style={{ color: 'rgba(13,20,16,0.2)' }}>×</span>
-          <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Like So</span>
+        style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
+        <div className="flex items-center gap-4">
+          <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
+          <span style={{ color: 'rgba(255,255,255,0.2)' }}>×</span>
+          <img src="/LS.png" alt="Like So" style={{ height: '31px', width: 'auto', filter: 'invert(1)' }} />
         </div>
-        <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>Interplay Method</span>
+        <span className="text-xs uppercase tracking-[0.2em]"
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.45)' }}>
+          Interplay Method
+        </span>
       </header>
 
-      <main className="flex-1 flex flex-col justify-center px-6 py-16 max-w-2xl mx-auto w-full">
+      <main className="flex-1 px-6 py-16 max-w-2xl mx-auto w-full">
 
-        <p className="text-xs font-mono uppercase tracking-[0.3em] mb-6" style={{ color: '#3ecf6e' }}>
+        <p className="text-xs uppercase tracking-[0.25em] mb-6"
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
           Almost done
         </p>
 
-        <h1 className="text-4xl md:text-5xl font-black uppercase leading-none tracking-tight mb-6" style={{ color: '#0d1410' }}>
+        <h1 className="uppercase leading-none mb-8"
+          style={{
+            fontFamily: 'Robson, sans-serif',
+            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+            color: 'rgba(255,255,255,0.95)',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+          }}>
           Know anyone else<br />
-          <span style={{ color: '#3ecf6e' }}>in the interplay?</span>
+          <span style={{ color: '#faf000' }}>in the interplay?</span>
         </h1>
 
-        <p className="text-base leading-relaxed mb-10 max-w-lg" style={{ color: 'rgba(13,20,16,0.6)' }}>
-          Introduce colleagues from your sustainability, brand or business teams — they can take the same diagnostic and we'll map the interplay across your organisation.
+        <p className="text-sm leading-relaxed mb-10 max-w-lg"
+          style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
+          Introduce colleagues from your sustainability, brand or business teams — they can take the same diagnostic and we&apos;ll map the interplay across your organisation.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="max-w-lg">
 
           {/* Column headers */}
-          <div className="grid grid-cols-2 gap-3 mb-1">
-            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'rgba(13,20,16,0.4)' }}>Name</span>
-            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'rgba(13,20,16,0.4)' }}>Email address</span>
+          <div className="grid grid-cols-2 gap-3 mb-2">
+            <span className="text-xs uppercase tracking-widest"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.4)' }}>Name</span>
+            <span className="text-xs uppercase tracking-widest"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.4)' }}>Email address</span>
           </div>
 
-          {referees.map((referee, i) => (
-            <div key={i} className="grid grid-cols-2 gap-3">
-              <input
-                type="text"
-                value={referee.name}
-                onChange={e => updateReferee(i, 'name', e.target.value)}
-                placeholder={`Person ${i + 1}`}
-                className="px-4 py-3 text-sm focus:outline-none transition-colors"
-                style={{ ...inputStyle }}
-                onFocus={focusBorder}
-                onBlur={blurBorder}
-              />
-              <input
-                type="email"
-                value={referee.email}
-                onChange={e => updateReferee(i, 'email', e.target.value)}
-                placeholder="name@company.com"
-                className="px-4 py-3 text-sm focus:outline-none transition-colors"
-                style={{ ...inputStyle }}
-                onFocus={focusBorder}
-                onBlur={blurBorder}
-              />
-            </div>
-          ))}
+          <div className="space-y-2 mb-8">
+            {referees.map((referee, i) => (
+              <div key={i} className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={referee.name}
+                  onChange={e => updateReferee(i, 'name', e.target.value)}
+                  placeholder={`Person ${i + 1}`}
+                  className={inputCls}
+                  style={{ ...inputStyle, caretColor: '#faf000', colorScheme: 'dark' }}
+                  onFocus={focusBorder}
+                  onBlur={blurBorder}
+                />
+                <input
+                  type="email"
+                  value={referee.email}
+                  onChange={e => updateReferee(i, 'email', e.target.value)}
+                  placeholder="name@company.com"
+                  className={inputCls}
+                  style={{ ...inputStyle, caretColor: '#faf000', colorScheme: 'dark' }}
+                  onFocus={focusBorder}
+                  onBlur={blurBorder}
+                />
+              </div>
+            ))}
+          </div>
 
-          <div className="flex items-center justify-between pt-4" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
+          <div className="flex items-center justify-between pt-4"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <button
               type="button"
-              onClick={handleSkip}
-              className="text-sm font-mono transition-colors"
-              style={{ color: 'rgba(13,20,16,0.45)' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
-              onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.45)'}
+              onClick={() => router.push(nextDest)}
+              className="text-sm transition-colors"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.35)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.35)'}
             >
               Skip →
             </button>
@@ -147,7 +172,10 @@ export default function ReferralPage() {
             <button
               type="submit"
               disabled={submitting || filledCount === 0}
-              className="bg-brand-green text-brand-bg font-black uppercase tracking-widest py-4 px-8 text-sm hover:bg-brand-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="font-bold uppercase tracking-widest py-4 px-8 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px' }}
+              onMouseEnter={e => { if (!submitting && filledCount > 0) e.currentTarget.style.backgroundColor = '#e8df00' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#faf000' }}
             >
               {submitting
                 ? 'Sending…'
@@ -159,11 +187,23 @@ export default function ReferralPage() {
         </form>
       </main>
 
-      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(13,20,16,0.08)' }}>
-        <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.35)' }}>
+      <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.25)' }}>
           Interrupt × Like So — The Interplay Method®
         </p>
       </footer>
     </div>
+  )
+}
+
+export default function ReferralPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#2f2a2a' }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Loading…</p>
+      </div>
+    }>
+      <ReferralForm />
+    </Suspense>
   )
 }
