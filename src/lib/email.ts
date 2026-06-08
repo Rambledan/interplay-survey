@@ -25,7 +25,6 @@ const NOTIFY_EMAILS  = (process.env.RESEND_NOTIFY_EMAILS ?? '')
   .split(',').map(e => e.trim()).filter(Boolean)
 const APP_URL        = (
   process.env.NEXT_PUBLIC_APP_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
   'https://interplaymethod.com'
 ).replace(/\/$/, '')
 
