@@ -1183,12 +1183,12 @@ const SERVICES_BY_SECTION: Record<string, {
         body: 'Not obvious where the biggest digital opportunities are in sustainability? We use a specific type of journey mapping to identify digital opportunities to improve sales, unlock revenue, create efficiencies, and accelerate sustainability impact. We look at organisational operations across value chains, existing products and services, as well as new innovation.',
       },
       {
-        num: '03', title: 'Data Hackathon',
-        body: "Suspect there's value in the data you hold but don't know where to begin? We run a creative workshop that rapidly explores how to turn your sustainability data into market-ready propositions and live commercial products.",
+        num: '03', title: 'Innovation Lab',
+        body: 'Want sustainability to drive product innovation and revenue – not just reporting? We design and run innovation functions that put sustainability at the centre of new product development, creating competitive advantage and unlocking new commercial opportunities for the long term.',
       },
       {
-        num: '04', title: 'Innovation Lab',
-        body: 'Want sustainability to drive product innovation and revenue – not just reporting? We design and run innovation functions that put sustainability at the centre of new product development, creating competitive advantage and unlocking new commercial opportunities for the long term.',
+        num: '04', title: 'Data Hackathon',
+        body: "Suspect there's value in the data you hold but don't know where to begin? We run a creative workshop that rapidly explores how to turn your sustainability data into market-ready propositions and live commercial products.",
       },
     ],
   },
@@ -1223,9 +1223,7 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
           const section = data.scores.sections.find(s => s.slug === slug)
           const band = section ? getScoreBand(section.pct) : null
           const services = SERVICES_BY_SECTION[slug]
-          // Respect visibility toggle
-          const hwchVisible = data.contentOverrides?.globalTemplate?.sections?.[slug]?.visibility?.howWeCanHelp !== false
-          if (!hwchVisible || !services) return null
+          if (!services) return null
 
           return (
             <div key={slug}>
