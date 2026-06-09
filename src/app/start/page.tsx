@@ -211,10 +211,12 @@ function StartForm() {
   }
 
   function focusBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    e.currentTarget.style.borderColor = 'rgba(250,240,0,0.5)'
+    e.currentTarget.style.borderColor = 'rgba(250,240,0,0.55)'
+    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(250,240,0,0.08)'
   }
   function blurBorder(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+    e.currentTarget.style.boxShadow = 'none'
   }
 
   // ── Loading overlay (shown while resolving magic-link token) ─────────────
@@ -283,7 +285,7 @@ function StartForm() {
 
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
-        style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
+        style={{ backgroundColor: '#1a1717', borderBottom: '1px solid rgba(250,240,0,0.15)' }}>
         <div className="flex items-center gap-4">
           <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>×</span>
@@ -291,26 +293,36 @@ function StartForm() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 py-16 max-w-2xl mx-auto w-full">
+      {/* Yellow accent line */}
+      <div style={{ height: '2px', backgroundColor: 'rgba(250,240,0,0.25)' }} />
+
+      <main className="flex-1 px-6 py-16 max-w-xl mx-auto w-full">
 
         {/* Eyebrow */}
         <p className="text-xs uppercase tracking-[0.25em] mb-6"
-          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
-          Where do you sit in the interplay?
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.6)' }}>
+          Get ready to Interplay
         </p>
 
         {/* Main headline */}
-        <h1 className="uppercase leading-none mb-10"
+        <h1 className="uppercase leading-none mb-6"
           style={{
             fontFamily: 'Robson, sans-serif',
             fontSize: 'clamp(2.4rem, 5.5vw, 3.75rem)',
-            color: 'rgba(255,255,255,0.95)',
+            color: '#faf000',
             fontWeight: 400,
             letterSpacing: '-0.01em',
+            lineHeight: 0.9,
           }}>
           Test your sustainability<br />
           growth potential
         </h1>
+
+        {/* Subtitle — expectation setting */}
+        <p className="text-sm leading-relaxed mb-10 max-w-md"
+          style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Open Sans, sans-serif' }}>
+          The diagnostic takes around 15 minutes. Your answers save automatically as you go — to pick up where you left off, use the link we&apos;ll send to your email. At the end you&apos;ll see your Interplay scores straight away, and you can come back to them any time.
+        </p>
 
         {/* Invalid token notice */}
         {tokenInvalid && (
@@ -411,85 +423,12 @@ function StartForm() {
                 onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#e8df00' }}
                 onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#faf000' }}
               >
-                {loading ? 'Starting…' : 'Begin the diagnostic →'}
+                {loading ? 'Starting…' : 'Start survey →'}
               </button>
             </div>
 
-            <p className="text-xs text-center pt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Takes approximately 10–15 minutes. Multiple sections.
-            </p>
           </form>
         )}
-
-        {/* Divider */}
-        <div className="mb-14" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
-
-        {/* Value prop */}
-        <p className="mb-8"
-          style={{
-            fontFamily: 'Robson, sans-serif',
-            fontSize: 'clamp(1.05rem, 2.2vw, 1.3rem)',
-            color: '#faf000',
-            fontWeight: 400,
-            lineHeight: 1.35,
-            letterSpacing: '0.01em',
-          }}>
-          Growth accelerates when sustainability + business + brand interplay
-        </p>
-
-        {/* Body paragraphs */}
-        <div className="space-y-4 max-w-xl mb-14">
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-            There is huge value in sustainability, but it's mostly sitting in a compliance silo — disconnected from business and brand commercials.
-          </p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-            This disconnect can limit pricing power, reduce relevance, weaken differentiation, and restrict investment.
-          </p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-            This diagnostic reveals the gaps — and opportunities — between your sustainability, business and brand, and where their interplay can unlock triple value.
-          </p>
-        </div>
-
-        {/* Info sections */}
-        <div className="space-y-10">
-
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] mb-3"
-              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
-              Built around 5 pillars
-            </p>
-            <p className="text-sm leading-relaxed max-w-lg" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
-              This interview is structured across five key pillars, helping you clearly identify where you're strong — and where there's room to grow.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] mb-3"
-              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
-              What you'll receive
-            </p>
-            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
-              At the end, you'll get a personalised report including:
-            </p>
-            <div className="space-y-3 max-w-sm">
-              {[
-                'Interplay score',
-                'Value opportunity predictions',
-                'Key recommendations to accelerate growth',
-              ].map(item => (
-                <div key={item} className="px-4 py-3 text-sm"
-                  style={{
-                    borderLeft: '2px solid rgba(250,240,0,0.5)',
-                    backgroundColor: 'rgba(250,240,0,0.04)',
-                    color: 'rgba(255,255,255,0.75)',
-                    letterSpacing: '0.01em',
-                  }}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
       </main>
 
