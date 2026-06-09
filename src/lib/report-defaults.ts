@@ -13,14 +13,23 @@ import type { HowWeCanHelpBand } from './score'
 
 export type { HowWeCanHelpBand, HowWeCanHelpItem } from './score'
 
+/** Per-section visibility controls — false means that block is hidden in the report */
+export interface SectionVisibility {
+  insights?: boolean       // default: true
+  actions?: boolean        // default: true
+  howWeCanHelp?: boolean   // default: true
+}
+
 /** Global report template — all overrideable content, keyed by section slug */
 export interface ReportTemplateContent {
   sections?: Record<string, {
     insights?: string[]           // 4 items, one per band [0-39, 40-59, 60-79, 80-100]
     actions?: string[]            // 3 items, one per action band [0-39, 40-59, 60+]
     howWeCanHelp?: HowWeCanHelpBand[]  // 3 items, one per action band [0-39, 40-59, 60+]
+    visibility?: SectionVisibility    // controls which blocks appear in the PDF
   }>
   evidence?: string[]             // reference strings shown on the evidence page
+  evidenceVisible?: boolean       // default: true — hides the entire evidence page when false
 }
 
 /** Per-respondent report overrides — replaces the band-selected content for one person */
@@ -70,6 +79,8 @@ export function mergeWithDefaults(
 ): ReportTemplateContent {
   const merged: ReportTemplateContent = {
     evidence: saved.evidence ?? defaults.evidence ?? [],
+    // evidenceVisible: default true; only override when explicitly set to false
+    evidenceVisible: saved.evidenceVisible !== undefined ? saved.evidenceVisible : true,
     sections: { ...(defaults.sections ?? {}) },
   }
 
@@ -79,6 +90,8 @@ export function mergeWithDefaults(
       insights: savedSection?.insights ?? defSection.insights ?? [],
       actions: savedSection?.actions ?? defSection.actions ?? [],
       howWeCanHelp: savedSection?.howWeCanHelp ?? defSection.howWeCanHelp ?? [],
+      // Pass through saved visibility flags; defaults to all-visible (undefined = true)
+      visibility: savedSection?.visibility ?? {},
     }
   }
 

@@ -560,6 +560,12 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
   const respSec = contentOverrides?.respondentOverride?.sections?.[slug]
   const globalSec = contentOverrides?.globalTemplate?.sections?.[slug]
 
+  // Visibility flags (default: all visible when not explicitly set to false)
+  const vis = globalSec?.visibility
+  const insightsVisible  = vis?.insights     !== false
+  const actionsVisible   = vis?.actions      !== false
+  const hwchVisible      = vis?.howWeCanHelp !== false
+
   const insightText = respSec?.insight
     || globalSec?.insights?.[insightIdx]
     || meta?.insights[insightIdx]
@@ -619,7 +625,7 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
       <View style={s.hr} />
 
       {/* Insight */}
-      {insightText && (
+      {insightsVisible && insightText && (
         <View style={{ marginBottom: 12 }} wrap={false}>
           <Text style={[s.label, { marginBottom: 6 }]}>INSIGHT</Text>
           <Text style={s.body}>{sanitize(insightText)}</Text>
@@ -627,7 +633,7 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
       )}
 
       {/* Recommended action */}
-      {actionText && (
+      {actionsVisible && actionText && (
         <View style={{ marginBottom: 12 }} wrap={false}>
           <Text style={[s.label, { marginBottom: 6 }]}>RECOMMENDED ACTION</Text>
           <Text style={s.body}>{sanitize(actionText)}</Text>
@@ -635,7 +641,7 @@ function SectionPage({ section, data }: { section: SectionScore; data: ReportDat
       )}
 
       {/* How we can help */}
-      {howWeCanHelpBand && (howWeCanHelpBand.intro?.trim() || (howWeCanHelpBand.items && howWeCanHelpBand.items.length > 0)) && (
+      {hwchVisible && howWeCanHelpBand && (howWeCanHelpBand.intro?.trim() || (howWeCanHelpBand.items && howWeCanHelpBand.items.length > 0)) && (
         <View style={{ marginBottom: 12 }}>
           <Text style={[s.label, { marginBottom: 6 }]}>HOW WE CAN HELP</Text>
           {howWeCanHelpBand.intro?.trim() ? (
@@ -758,7 +764,7 @@ function EvidencePage({ data }: { data: ReportData }) {
 export function InterplayReport({ data }: { data: ReportData }) {
   return (
     <Document
-      title={`Interplay Report — ${data.respondent.company}`}
+      title={`${data.respondent.company} Interplay Assessment Report`}
       author="Interrupt × Like So"
       subject="Interplay Method Diagnostic Report"
     >
@@ -768,7 +774,9 @@ export function InterplayReport({ data }: { data: ReportData }) {
       {data.scores.sections.map(section => (
         <SectionPage key={section.slug} section={section} data={data} />
       ))}
-      <EvidencePage data={data} />
+      {data.contentOverrides?.globalTemplate?.evidenceVisible !== false && (
+        <EvidencePage data={data} />
+      )}
     </Document>
   )
 }

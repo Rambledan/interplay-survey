@@ -614,15 +614,23 @@ function ReferralsPanel({ referrals }: { referrals: ReferralRow[] }) {
 type HwchItem = { title: string; content: string }
 type HwchBand = { intro?: string; items?: HwchItem[] }
 
+type SectionVisibility = {
+  insights?: boolean
+  actions?: boolean
+  howWeCanHelp?: boolean
+}
+
 type TemplateSectionContent = {
   insights: string[]
   actions: string[]
   howWeCanHelp: HwchBand[]  // 3 entries, one per action band
+  visibility?: SectionVisibility
 }
 
 type TemplateContent = {
   sections: Record<string, TemplateSectionContent>
   evidence: string[]
+  evidenceVisible?: boolean
 }
 
 // ── How We Can Help band editor ────────────────────────────────────────────
@@ -698,6 +706,28 @@ function HwchBandEditor({
         >+ Add item</button>
       </div>
     </div>
+  )
+}
+
+// ── Visibility toggle pill ─────────────────────────────────────────────────
+
+function VisibilityToggle({ visible, onToggle }: { visible: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      title={visible ? 'Shown in report — click to hide' : 'Hidden from report — click to show'}
+      className="text-[10px] font-mono px-2 py-0.5 transition-all shrink-0"
+      style={{
+        border: `1px solid ${visible ? 'rgba(62,207,110,0.35)' : 'rgba(220,38,38,0.35)'}`,
+        color: visible ? '#22a855' : 'rgba(220,38,38,0.8)',
+        backgroundColor: visible ? 'rgba(62,207,110,0.06)' : 'rgba(220,38,38,0.06)',
+        borderRadius: '3px',
+        cursor: 'pointer',
+      }}
+    >
+      {visible ? '● Visible' : '○ Hidden'}
+    </button>
   )
 }
 
@@ -795,6 +825,26 @@ function GlobalTemplatePanel({ password }: { password: string }) {
     })
   }
 
+  function updateVisibility(slug: string, field: keyof SectionVisibility, value: boolean) {
+    setContent(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [slug]: {
+            ...prev.sections[slug],
+            visibility: { ...(prev.sections[slug]?.visibility ?? {}), [field]: value },
+          },
+        },
+      }
+    })
+  }
+
+  function updateEvidenceVisible(value: boolean) {
+    setContent(prev => prev ? { ...prev, evidenceVisible: value } : prev)
+  }
+
   function updateEvidence(idx: number, value: string) {
     setContent(prev => {
       if (!prev) return prev
@@ -879,64 +929,97 @@ function GlobalTemplatePanel({ password }: { password: string }) {
               {/* Evidence tab */}
               {activeSlug === 'evidence' && (
                 <div className="px-5 py-5 flex flex-col gap-4">
-                  <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.4)' }}>
-                    These references appear on the final page of every report.
-                  </p>
-                  {content.evidence.map((ev, i) => (
-                    <div key={i}>
-                      <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
-                        style={{ color: 'rgba(13,20,16,0.35)' }}>Reference {i + 1}</p>
-                      <CmsTextarea rows={3} value={ev} onChange={v => updateEvidence(i, v)} />
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.4)' }}>
+                      These references appear on the final page of every report.
+                    </p>
+                    <VisibilityToggle
+                      visible={content.evidenceVisible !== false}
+                      onToggle={() => updateEvidenceVisible(content.evidenceVisible === false)}
+                    />
+                  </div>
+                  <div style={{ opacity: content.evidenceVisible === false ? 0.4 : 1, transition: 'opacity 0.15s' }}>
+                    {content.evidence.map((ev, i) => (
+                      <div key={i} className="mb-4">
+                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(13,20,16,0.35)' }}>Reference {i + 1}</p>
+                        <CmsTextarea rows={3} value={ev} onChange={v => updateEvidence(i, v)} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Section content tab */}
               {activeSlug !== 'evidence' && activeSection && (
                 <div className="px-5 py-5 flex flex-col gap-6">
+
                   {/* Insights */}
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
-                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Insights</p>
-                    {INSIGHT_BAND_LABELS.map((label, i) => (
-                      <div key={i} className="mb-4">
-                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
-                        <CmsTextarea rows={3} value={activeSection.insights[i] ?? ''}
-                          onChange={v => updateField(activeSlug, 'insights', i, v)} />
-                      </div>
-                    ))}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-mono uppercase tracking-wider"
+                        style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Insights</p>
+                      <VisibilityToggle
+                        visible={activeSection.visibility?.insights !== false}
+                        onToggle={() => updateVisibility(activeSlug, 'insights', activeSection.visibility?.insights === false)}
+                      />
+                    </div>
+                    <div style={{ opacity: activeSection.visibility?.insights === false ? 0.4 : 1, transition: 'opacity 0.15s' }}>
+                      {INSIGHT_BAND_LABELS.map((label, i) => (
+                        <div key={i} className="mb-4">
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                            style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                          <CmsTextarea rows={3} value={activeSection.insights[i] ?? ''}
+                            onChange={v => updateField(activeSlug, 'insights', i, v)} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Actions */}
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
-                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Recommended Actions</p>
-                    {ACTION_BAND_LABELS.map((label, i) => (
-                      <div key={i} className="mb-4">
-                        <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
-                        <CmsTextarea rows={2} value={activeSection.actions[i] ?? ''}
-                          onChange={v => updateField(activeSlug, 'actions', i, v)} />
-                      </div>
-                    ))}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-mono uppercase tracking-wider"
+                        style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>Recommended Actions</p>
+                      <VisibilityToggle
+                        visible={activeSection.visibility?.actions !== false}
+                        onToggle={() => updateVisibility(activeSlug, 'actions', activeSection.visibility?.actions === false)}
+                      />
+                    </div>
+                    <div style={{ opacity: activeSection.visibility?.actions === false ? 0.4 : 1, transition: 'opacity 0.15s' }}>
+                      {ACTION_BAND_LABELS.map((label, i) => (
+                        <div key={i} className="mb-4">
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-1"
+                            style={{ color: 'rgba(13,20,16,0.35)' }}>{label}</p>
+                          <CmsTextarea rows={2} value={activeSection.actions[i] ?? ''}
+                            onChange={v => updateField(activeSlug, 'actions', i, v)} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* How We Can Help */}
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider mb-3"
-                      style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>How We Can Help</p>
-                    {ACTION_BAND_LABELS.map((label, i) => (
-                      <div key={i} className="mb-5" style={{ borderLeft: '2px solid rgba(13,20,16,0.08)', paddingLeft: '12px' }}>
-                        <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
-                          style={{ color: 'rgba(13,20,16,0.4)' }}>{label}</p>
-                        <HwchBandEditor
-                          band={activeSection.howWeCanHelp[i] ?? { items: [] }}
-                          onChange={updated => updateHwch(activeSlug, i, updated)}
-                        />
-                      </div>
-                    ))}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-mono uppercase tracking-wider"
+                        style={{ color: 'rgba(13,20,16,0.5)', fontWeight: 600 }}>How We Can Help</p>
+                      <VisibilityToggle
+                        visible={activeSection.visibility?.howWeCanHelp !== false}
+                        onToggle={() => updateVisibility(activeSlug, 'howWeCanHelp', activeSection.visibility?.howWeCanHelp === false)}
+                      />
+                    </div>
+                    <div style={{ opacity: activeSection.visibility?.howWeCanHelp === false ? 0.4 : 1, transition: 'opacity 0.15s' }}>
+                      {ACTION_BAND_LABELS.map((label, i) => (
+                        <div key={i} className="mb-5" style={{ borderLeft: '2px solid rgba(13,20,16,0.08)', paddingLeft: '12px' }}>
+                          <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
+                            style={{ color: 'rgba(13,20,16,0.4)' }}>{label}</p>
+                          <HwchBandEditor
+                            band={activeSection.howWeCanHelp[i] ?? { items: [] }}
+                            onChange={updated => updateHwch(activeSlug, i, updated)}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
