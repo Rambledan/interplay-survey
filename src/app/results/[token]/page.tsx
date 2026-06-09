@@ -1287,27 +1287,92 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
 
 // ── Step 14: What's next ───────────────────────────────────────────────────────
 
+const CALENDAR_URL = 'https://calendar.app.google/aBnk5aQYmSQMXFwN8'
+
 function StepWhatsNext() {
   return (
     <StepWrap eyebrow="What's next">
-      <h2 className="uppercase leading-none mb-8"
-        style={{ fontFamily: 'Robson, sans-serif', fontSize: 'clamp(32px, 5vw, 60px)', color: '#faf000', lineHeight: 0.9 }}>
-        Ready to improve<br />your Interplay?
-      </h2>
-      <p className="text-base leading-relaxed mb-6 max-w-xl"
-        style={{ color: 'rgba(255,255,255,0.92)', fontFamily: 'Open Sans, sans-serif' }}>
-        Interrupt × Like So work with organisations to close the gap between sustainability, brand and business strategy — unlocking triple value.
+      <p className="text-xs uppercase tracking-[0.25em] mb-5"
+        style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.55)' }}>
+        Take it further
       </p>
-      <div className="mt-10 p-6 rounded-xl"
-        style={{ backgroundColor: 'rgba(250,240,0,0.05)', border: '1px solid rgba(250,240,0,0.15)' }}>
-        <p className="text-xs font-mono uppercase tracking-widest mb-1" style={{ color: 'rgba(250,240,0,0.5)' }}>
-          Get in touch
-        </p>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
-          interruptconsultancy.com · likeso.com
-        </p>
+
+      <h2 className="uppercase leading-none mb-6"
+        style={{ fontFamily: 'Robson, sans-serif', fontSize: 'clamp(32px, 5vw, 60px)', color: 'rgba(255,255,255,0.95)', lineHeight: 0.9 }}>
+        Go deeper with a<br />
+        <span style={{ color: '#faf000' }}>full assessment</span>
+      </h2>
+
+      <p className="text-base leading-relaxed mb-8 max-w-xl"
+        style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Open Sans, sans-serif' }}>
+        Your Interplay score gives you the picture. A 30-minute assessment with the Interrupt × Like So team turns it into a plan — with bespoke recommendations, a quantified financial opportunity, and a board-ready report tailored to your organisation.
+      </p>
+
+      {/* Value props */}
+      <div className="space-y-3 mb-10 max-w-xl">
+        {[
+          { label: 'Bespoke analysis',      body: 'Deep-dive into your specific sector, business model and competitive context.' },
+          { label: 'Quantified opportunity', body: 'Financial modelling of the value unlocked by closing your Interplay gaps.' },
+          { label: 'Board-ready report',     body: 'A presentation-format report with prioritised recommendations and next actions.' },
+          { label: 'No obligation',          body: 'A genuine conversation. No sales pitch, no pressure — just clarity.' },
+        ].map(({ label, body }) => (
+          <div key={label} className="px-4 py-4"
+            style={{ borderLeft: '2px solid rgba(250,240,0,0.35)', backgroundColor: 'rgba(250,240,0,0.04)' }}>
+            <p className="text-[10px] uppercase tracking-widest mb-1"
+              style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.65)' }}>
+              {label}
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+              {body}
+            </p>
+          </div>
+        ))}
       </div>
-      <p className="mt-12 text-xs font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>
+
+      {/* CTA */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start mb-12">
+        <a
+          href={CALENDAR_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="font-bold uppercase tracking-widest py-4 px-8 text-sm transition-all inline-block"
+          style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px', textDecoration: 'none', fontFamily: 'Open Sans, sans-serif' }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#e8df00'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#faf000'}
+        >
+          Book a 30-min assessment →
+        </a>
+      </div>
+
+      {/* Contact */}
+      <div className="pt-8 max-w-sm" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <p className="text-[10px] uppercase tracking-widest mb-3"
+          style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.25)' }}>
+          Questions? Reach us directly
+        </p>
+        <div className="space-y-1">
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Open Sans, sans-serif' }}>
+            Nina Pickup &nbsp;·&nbsp;
+            <a href="mailto:ninapickup@interrupt-sustainability.com"
+              style={{ color: 'rgba(250,240,0,0.6)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#faf000'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,240,0,0.6)'}>
+              ninapickup@interrupt-sustainability.com
+            </a>
+          </p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Open Sans, sans-serif' }}>
+            Dan Harris &nbsp;·&nbsp;
+            <a href="mailto:dan.harris@likeso.studio"
+              style={{ color: 'rgba(250,240,0,0.6)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#faf000'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,240,0,0.6)'}>
+              dan.harris@likeso.studio
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-10 text-xs font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>
         Interrupt × Like So — The Interplay Method®
       </p>
     </StepWrap>
