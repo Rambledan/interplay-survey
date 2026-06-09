@@ -56,6 +56,24 @@ async function withClient<T>(fn: (client: Client) => Promise<T>): Promise<T> {
 
 // ── Schema ───────────────────────────────────────────────────────────────────
 
+// One-time schema guard.
+// ensureTable() opens its own pg connection and runs 15+ migration queries.
+// Calling it on every request doubles the connection overhead and risks hitting
+// Vercel's 10s function timeout on cold starts.  This singleton ensures the
+// migration runs only once per process instance — warm invocations skip it
+// entirely and only pay for one connection (the actual query).
+let _schemaEnsured = false
+let _schemaPromise: Promise<void> | null = null
+
+function ensureSchemaOnce(): Promise<void> {
+  if (_schemaEnsured) return Promise.resolve()
+  if (_schemaPromise)  return _schemaPromise
+  _schemaPromise = ensureTable()
+    .then(()  => { _schemaEnsured = true; _schemaPromise = null })
+    .catch(err => {             _schemaPromise = null; throw err })
+  return _schemaPromise
+}
+
 export async function ensureTable(): Promise<void> {
   await withClient(async (client) => {
     await client.query(`
@@ -163,7 +181,7 @@ export async function insertResponse(
   answers: Record<string, string>,
   followUps: Record<string, string>
 ): Promise<void> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   await withClient(async (client) => {
     await client.query(
@@ -192,7 +210,7 @@ export async function insertReferrals(
   referrerName: string,
   referees: Array<{ name: string; email: string }>
 ): Promise<void> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   if (referees.length === 0) return
 
@@ -246,7 +264,7 @@ export async function updateRowAnswers(
 }
 
 export async function deleteResponsesByRespondent(name: string): Promise<number> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query(
@@ -276,7 +294,7 @@ export interface ReferralRow {
 }
 
 export async function getAllReferrals(): Promise<ReferralRow[]> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query<ReferralRow>(`
@@ -289,7 +307,7 @@ export async function getAllReferrals(): Promise<ReferralRow[]> {
 }
 
 export async function getAllResponses(): Promise<DbRow[]> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query<DbRow>(`
@@ -345,7 +363,7 @@ export interface TokenRow {
 }
 
 export async function createRespondentToken(respondentName: string): Promise<TokenRow> {
-  await ensureTable()
+  await ensureSchemaOnce()
   const token = randomBytes(20).toString('hex')  // 40-char hex
 
   return withClient(async (client) => {
@@ -360,7 +378,7 @@ export async function createRespondentToken(respondentName: string): Promise<Tok
 }
 
 export async function listTokensForRespondent(respondentName: string): Promise<TokenRow[]> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query<TokenRow>(
@@ -375,7 +393,7 @@ export async function listTokensForRespondent(respondentName: string): Promise<T
 }
 
 export async function getRespondentToken(token: string): Promise<TokenRow | null> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query<TokenRow>(
@@ -389,7 +407,7 @@ export async function getRespondentToken(token: string): Promise<TokenRow | null
 }
 
 export async function revokeRespondentToken(token: string): Promise<boolean> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query(
@@ -408,7 +426,7 @@ import type { ReportTemplateContent, ReportOverrideContent } from './report-defa
 export type { ReportTemplateContent, ReportOverrideContent }
 
 export async function getGlobalTemplate(): Promise<ReportTemplateContent> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query(
@@ -419,7 +437,7 @@ export async function getGlobalTemplate(): Promise<ReportTemplateContent> {
 }
 
 export async function saveGlobalTemplate(content: ReportTemplateContent): Promise<void> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   await withClient(async (client) => {
     await client.query(
@@ -432,7 +450,7 @@ export async function saveGlobalTemplate(content: ReportTemplateContent): Promis
 }
 
 export async function getRespondentOverride(name: string): Promise<ReportOverrideContent | null> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   return withClient(async (client) => {
     const result = await client.query(
@@ -447,7 +465,7 @@ export async function saveRespondentOverride(
   name: string,
   content: ReportOverrideContent
 ): Promise<void> {
-  await ensureTable()
+  await ensureSchemaOnce()
 
   await withClient(async (client) => {
     await client.query(

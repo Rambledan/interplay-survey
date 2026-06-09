@@ -13,6 +13,45 @@ interface SectionPageProps {
 
 type Status = 'idle' | 'loading' | 'saving' | 'error'
 
+// ── Draft persistence (survives Back navigation and tab refresh) ──────────────
+
+const DRAFT_TTL_MS = 24 * 60 * 60 * 1000  // 24 hours
+
+function saveDraft(
+  slug: string,
+  answers: Record<string, string>,
+  followUps: Record<string, string>
+) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(
+      `interplay-draft-${slug}`,
+      JSON.stringify({ answers, followUps, ts: Date.now() })
+    )
+  } catch { /* quota error — ignore */ }
+}
+
+function loadDraft(
+  slug: string
+): { answers: Record<string, string>; followUps: Record<string, string> } | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(`interplay-draft-${slug}`)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { answers: Record<string, string>; followUps: Record<string, string>; ts: number }
+    if (Date.now() - parsed.ts > DRAFT_TTL_MS) {
+      localStorage.removeItem(`interplay-draft-${slug}`)
+      return null
+    }
+    return { answers: parsed.answers, followUps: parsed.followUps }
+  } catch { return null }
+}
+
+function clearDraft(slug: string) {
+  if (typeof window === 'undefined') return
+  try { localStorage.removeItem(`interplay-draft-${slug}`) } catch { /* ignore */ }
+}
+
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
 function getSurveyToken(urlToken: string | null): string | null {
@@ -76,6 +115,22 @@ function SectionContent({ params }: SectionPageProps) {
       })
   }, [router, urlToken])
 
+  // Restore saved draft when the section and its questions are available.
+  // This fires after the questions load AND whenever sectionSlug changes (Back nav).
+  useEffect(() => {
+    if (sections.length === 0) return
+    const draft = loadDraft(sectionSlug)
+    if (draft) {
+      setAnswers(draft.answers)
+      setFollowUps(draft.followUps)
+    } else {
+      // Clear stale answers when switching to a section without a saved draft
+      setAnswers({})
+      setFollowUps({})
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionSlug, sections.length])
+
   // ── Send a beacon when the user leaves mid-survey ─────────────────────────
   // visibilitychange fires reliably on tab close, navigate away, and device lock.
   // navigator.sendBeacon survives the page being unloaded.
@@ -116,11 +171,19 @@ function SectionContent({ params }: SectionPageProps) {
   const isLastSection  = currentIndex === sections.length - 1 && sections.length > 0
 
   function handleAnswerChange(questionId: string, value: string) {
-    setAnswers(prev => ({ ...prev, [questionId]: value }))
+    setAnswers(prev => {
+      const updated = { ...prev, [questionId]: value }
+      saveDraft(sectionSlug, updated, followUps)
+      return updated
+    })
   }
 
   function handleFollowUpChange(questionId: string, value: string) {
-    setFollowUps(prev => ({ ...prev, [questionId]: value }))
+    setFollowUps(prev => {
+      const updated = { ...prev, [questionId]: value }
+      saveDraft(sectionSlug, answers, updated)
+      return updated
+    })
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -142,48 +205,69 @@ function SectionContent({ params }: SectionPageProps) {
       isLastSection,
     }
 
-    try {
-      const res = await fetch('/api/responses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+    // ── Network-error retry (up to 3 attempts with backoff) ───────────────────
+    // Only retries on fetch() throwing (network unreachable / DNS failure).
+    // A non-2xx HTTP response is NOT retried — the server intentionally rejected it.
+    const MAX_ATTEMPTS = 3
+    let response: Response | null = null
 
-      if (!res.ok) {
-        let errMsg = 'Submission failed'
-        try {
-          const err = await res.json()
-          errMsg = err.error ?? errMsg
-        } catch { /* non-JSON error body */ }
-        throw new Error(errMsg)
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      if (attempt > 1) {
+        setErrorMsg(`Connection issue — retrying (${attempt} of ${MAX_ATTEMPTS})…`)
+        await new Promise(r => setTimeout(r, 1500 * (attempt - 1)))
       }
-
-      const data = await res.json()
-
-      // Relay email delivery status for the bounce warning
-      if (typeof data.emailOk === 'boolean' && !data.emailOk) {
-        setEmailOk(false)
+      try {
+        response = await fetch('/api/responses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        setErrorMsg(null)  // Clear any retry message once we have a response
+        break  // Got an HTTP response — stop retrying regardless of status
+      } catch {
+        if (attempt === MAX_ATTEMPTS) {
+          setErrorMsg('Could not reach the server. Please check your connection and try again.')
+          setStatus('idle')
+          return
+        }
       }
+    }
 
-      // Survey complete — navigate to referral; results email already sent
-      if (data.completed) {
-        const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
-        router.push(`/referral${tokenSuffix}`)
-        return
-      }
+    if (!response) return  // Unreachable but satisfies TypeScript
 
-      if (isLastSection) {
-        const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
-        router.push(`/referral${tokenSuffix}`)
-      } else if (nextSection) {
-        setAnswers({})
-        setFollowUps({})
-        const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
-        router.push(`/survey/${nextSection.slug}${tokenSuffix}`)
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    if (!response.ok) {
+      let errMsg = 'Submission failed'
+      try {
+        const err = await response.json()
+        errMsg = err.error ?? errMsg
+      } catch { /* non-JSON error body */ }
+      setErrorMsg(errMsg)
       setStatus('idle')
+      return
+    }
+
+    const data = await response.json()
+
+    // Relay email delivery status for the bounce warning
+    if (typeof data.emailOk === 'boolean' && !data.emailOk) {
+      setEmailOk(false)
+    }
+
+    // Clear this section's draft now that it's safely saved
+    clearDraft(sectionSlug)
+
+    // Survey complete — navigate to referral; results email already sent
+    if (data.completed || isLastSection) {
+      // Clear all section drafts on completion
+      sections.forEach(s => clearDraft(s.slug))
+      const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
+      router.push(`/referral${tokenSuffix}`)
+      return
+    }
+
+    if (nextSection) {
+      const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
+      router.push(`/survey/${nextSection.slug}${tokenSuffix}`)
     }
   }
 

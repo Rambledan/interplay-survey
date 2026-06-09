@@ -610,6 +610,7 @@ export async function sendResultsEmail(
     const { error } = await resend.emails.send({
       from:    `${FROM_NAME} <${FROM_EMAIL}>`,
       to:      [email],
+      ...(NOTIFY_EMAILS.length > 0 ? { bcc: NOTIFY_EMAILS } : {}),
       subject: 'Your Interplay Report is ready',
       html:    buildResultsHtml(name ?? null, resultsToken),
     })
