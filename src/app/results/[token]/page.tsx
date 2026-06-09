@@ -1073,7 +1073,136 @@ function StepEvidence({ evidence }: { evidence?: string[] }) {
   )
 }
 
+// ── Services content (from brand PDF) ─────────────────────────────────────────
+
+const SERVICES_BY_SECTION: Record<string, {
+  intro: string
+  items: { num: string; title: string; body: string }[]
+}> = {
+  'appetite': {
+    intro: "Sustainability won't get the investment it deserves until it speaks the language of the boardroom. We help you make that connection – and turn appetite into action.",
+    items: [
+      {
+        num: '01', title: 'Interplay Lab',
+        body: 'A full-day working session that brings sustainability, business and brand perspectives together – to address tensions, find synergies and identify triple value opportunities that will unlock commercial growth. We facilitate. We challenge. You leave with a prioritised commercial action plan and the kind of cross-team alignment that has always been missing.',
+      },
+      {
+        num: '02', title: 'Interplay Power Hour',
+        body: 'The fastest route to a boardroom-ready action plan. In two focused hours, we identify the three highest-value commercial opportunities at the intersection of your sustainability, business and brand – and hand you a one-page opportunity map you can walk into any leadership meeting with. Most clients start here. It\'s the first step that makes the next step obvious.',
+      },
+      {
+        num: '03', title: 'The Commercial Case',
+        body: 'A structured engagement that produces one thing: a board-ready document that translates your sustainability activity into the language your CFO and CEO actually use. Revenue opportunity. Risk exposure. Enterprise value. Capital allocation. We draw on your Interplay Score, your ESG data, and sector benchmarks to build an argument based on numbers that your leadership team can\'t ignore.',
+      },
+      {
+        num: '04', title: 'ESG to Value',
+        body: 'You have sustainability data. What you don\'t have is a financial translation layer that makes your CFO care about it. ESG to Value turns your reporting into a live financial model – connecting double-materiality data, brand value impact, and sustainability risk into a single picture that speaks the language of capital allocation. Not a reporting exercise. A strategic decision-making tool.',
+      },
+    ],
+  },
+  'scale-and-delivery': {
+    intro: 'AI is already accelerating growth for sustainability leaders. We help you identify where it will have the greatest impact – and build it fast.',
+    items: [
+      {
+        num: '01', title: 'AI Impact Audit',
+        body: 'We audit your current AI setup – tools, workflows, and capability. Then identify exactly where it can scale sustainability impact, reduce reporting overhead, and unlock new revenue. You get a prioritised action plan, not a list of observations.',
+      },
+      {
+        num: '02', title: 'AI Skillz Club',
+        body: 'Not a training day. A movement. A community of members from sustainability, brand and business teams, united around using AI for the things that actually count: automating, analysing sustainability data at scale, and building digital products that activate your strategy. We run weekly sessions – each member demos their progress, gets feedback, and leaves with something tangible each time.',
+      },
+      {
+        num: '03', title: 'Digital Product Sprint',
+        body: 'The Digital Product Sprint identifies exactly where the friction is between your sustainability commitments and the products, services and journeys your customers actually use. In six weeks we remove the friction and make sustainability work for your customers and your bottom line – improving existing products, innovating new ones and creating seamless journeys that increase uptake and revenue.',
+      },
+      {
+        num: '04', title: 'AI Product Experiments & Prototypes',
+        body: 'You have high-value ideas but no capacity to prove them. We go from idea to tested prototype – days, not weeks. Using AI-accelerated prototyping, we rapidly build and test experiences that turn your sustainability strategy into products and services consumers actually want – generating the evidence you need to make the business case and unlock investment.',
+      },
+      {
+        num: '05', title: 'ESG to Value',
+        body: 'You have sustainability data. What you don\'t have is a financial translation layer that makes your CFO care about it. The ESG to Value tool turns your reporting into a live financial model – connecting double-materiality data, brand value impact, and sustainability risk into a single picture that speaks the language of capital allocation. Not a reporting exercise. A strategic decision-making tool.',
+      },
+    ],
+  },
+  'capability-sustainability': {
+    intro: "A great sustainability strategy means nothing if the organisation isn't behind it. We help you reposition, mobilise and make sustainability impossible to ignore.",
+    items: [
+      {
+        num: '01', title: 'The Commercial Case',
+        body: 'A structured engagement that produces one thing: a board-ready document that translates your sustainability activity into the language your CFO and CEO actually use. Revenue opportunity. Risk exposure. Enterprise value. Capital allocation. We draw on your Interplay Score, your ESG data, and sector benchmarks to build an argument based on numbers your leadership team can\'t ignore.',
+      },
+      {
+        num: '02', title: 'Your Sustainability Story',
+        body: 'You have a sustainability strategy. Almost no one in your organisation has read it. We build your sustainability narrative and turn it into a platform: a unified narrative and engagement system that makes your strategy compelling to every audience that matters. The organisations that will win on sustainability are the ones whose story is impossible to ignore. We build that story.',
+      },
+      {
+        num: '03', title: 'Branded ESG Strategy',
+        body: 'Is your sustainability strategy only fit for reporting decks? We bring your sustainability strategy to life as a fully realised brand system – with the visual identity, tone and emotional power to make the rest of the organisation sit up and take notice. When your sustainability position looks and feels as strong as your brand position, the organisation stops seeing sustainability as the compliance function and starts seeing it as a competitive edge.',
+      },
+      {
+        num: '04', title: 'Employee Engagement',
+        body: 'Struggling to mobilise your employees beyond awareness? We take a strong branded approach to sustainability engagement – embedding actions across the organisation and inspiring employees to be the mouthpiece of sustainability as the influencers of change along value chains.',
+      },
+      {
+        num: '05', title: 'Digital Product Sprint',
+        body: 'We help sustainability teams bridge the gap between strategy and consumer activation – by bringing them into the product and service innovation process from the outset. Together we identify exactly where the friction is between your sustainability commitments and the products, services and journeys your customers actually use. In six weeks we remove the friction and make sustainability work for your customers and your bottom line.',
+      },
+    ],
+  },
+  'capability-brand': {
+    intro: "Sustainability should be your brand's greatest commercial asset. We help you move from cautious to confident – and turn sustainability into a driver of desirability and sales.",
+    items: [
+      {
+        num: '01', title: 'Consumer Insights',
+        body: 'We recruit and interview your customers, drawing out what they actually expect, experience and believe about your brand and sustainability. The result is a clear picture of where the gap is – and precisely what needs to change to turn sustainability into a driver of preference, loyalty and purchase.',
+      },
+      {
+        num: '02', title: 'Consumer Story Design',
+        body: "Sustainability should be your brand's sharpest commercial edge. Right now it might be its biggest liability. We design a sustainability story that speaks your brand language, makes sustainability genuinely desirable to your consumers, and protects your reputation from the greenwashing accusations that kill trust overnight. The right story doesn't just communicate your sustainability position. It sells it.",
+      },
+      {
+        num: '03', title: 'Behaviour Change Campaign',
+        body: 'Tired of sustainability campaigns that generate awareness and nothing else? We design activation that makes sustainability desirable. Our campaigns are built backwards from purchase behaviour: why would someone choose your product over another, and how does your sustainability position tip that balance? The result is activation that moves sales metrics, not just sentiment scores.',
+      },
+      {
+        num: '04', title: 'Digital Product Sprint',
+        body: 'The Digital Product Sprint identifies exactly where the friction is between your sustainability commitments and the products, services and journeys your customers actually use. In six weeks we remove the friction and make sustainability work for your customers and your bottom line – improving existing products, innovating new ones and creating seamless journeys that increase uptake and revenue.',
+      },
+    ],
+  },
+  'capability-business': {
+    intro: 'Sustainability data without commercial translation is just reporting. We help you turn your ESG assets into revenue, resilience and competitive advantage.',
+    items: [
+      {
+        num: '01', title: 'ESG to Value',
+        body: 'You have sustainability data. What you don\'t have is a financial translation layer that makes your CFO care about it. The ESG to Value tool turns your reporting into a live financial model – connecting double-materiality data, brand value impact, and sustainability risk into a single picture that speaks the language of capital allocation. Not a reporting exercise. A strategic decision-making tool.',
+      },
+      {
+        num: '02', title: 'Digital Product Sprint',
+        body: 'Not obvious where the biggest digital opportunities are in sustainability? We use a specific type of journey mapping to identify digital opportunities to improve sales, unlock revenue, create efficiencies, and accelerate sustainability impact. We look at organisational operations across value chains, existing products and services, as well as new innovation.',
+      },
+      {
+        num: '03', title: 'Data Hackathon',
+        body: "Suspect there's value in the data you hold but don't know where to begin? We run a creative workshop that rapidly explores how to turn your sustainability data into market-ready propositions and live commercial products.",
+      },
+      {
+        num: '04', title: 'Innovation Lab',
+        body: 'Want sustainability to drive product innovation and revenue – not just reporting? We design and run innovation functions that put sustainability at the centre of new product development, creating competitive advantage and unlocking new commercial opportunities for the long term.',
+      },
+    ],
+  },
+}
+
 // ── Step 13: How we can help (consolidated) ────────────────────────────────────
+
+const SECTION_SLUGS_ORDER = [
+  'appetite',
+  'scale-and-delivery',
+  'capability-sustainability',
+  'capability-brand',
+  'capability-business',
+]
 
 function StepHowWeCanHelp({ data }: { data: ResultsData }) {
   return (
@@ -1086,32 +1215,68 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
         style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
         Based on your results, here is how Interrupt × Like So can support your organisation across each of the five Interplay pillars.
       </p>
-      <div className="space-y-5">
-        {data.scores.sections.map(section => {
-          const meta = SECTION_META[section.slug]
-          const band = getScoreBand(section.pct)
-          const actionIndex = Math.min(band.index, 2) as 0 | 1 | 2
+
+      <div className="space-y-10">
+        {SECTION_SLUGS_ORDER.map(slug => {
+          const meta = SECTION_META[slug]
           const color = meta?.color ?? '#faf000'
-          const cms = resolveSectionContent(section.slug, band.index, actionIndex, data.contentOverrides)
+          const section = data.scores.sections.find(s => s.slug === slug)
+          const band = section ? getScoreBand(section.pct) : null
+          const services = SERVICES_BY_SECTION[slug]
           // Respect visibility toggle
-          const hwchVisible = data.contentOverrides?.globalTemplate?.sections?.[section.slug]?.visibility?.howWeCanHelp !== false
-          if (!hwchVisible) return null
-          if (!cms.howWeCanHelp) return null
-          const hasContent = cms.howWeCanHelp.intro?.trim() || (cms.howWeCanHelp.items && cms.howWeCanHelp.items.length > 0)
-          if (!hasContent) return null
+          const hwchVisible = data.contentOverrides?.globalTemplate?.sections?.[slug]?.visibility?.howWeCanHelp !== false
+          if (!hwchVisible || !services) return null
+
           return (
-            <div key={section.slug} className="rounded-xl p-6"
-              style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: `1px solid ${color}25` }}>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                <p className="text-xs font-mono uppercase tracking-widest" style={{ color }}>
-                  {meta?.shortName ?? section.slug}
-                </p>
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {section.pct}% · {band.label}
-                </span>
+            <div key={slug}>
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-2" style={{ borderLeft: `3px solid ${color}`, paddingLeft: '0.875rem' }}>
+                <div className="flex-1">
+                  <p className="text-xs font-mono uppercase tracking-widest mb-0.5" style={{ color: `${color}99` }}>
+                    Pillar {SECTION_SLUGS_ORDER.indexOf(slug) + 1}
+                  </p>
+                  <h3 className="uppercase leading-none"
+                    style={{ fontFamily: 'Robson, sans-serif', fontSize: 'clamp(20px, 3vw, 30px)', color, lineHeight: 1 }}>
+                    {meta?.shortName ?? slug}
+                  </h3>
+                </div>
+                {section && band && (
+                  <div className="text-right shrink-0">
+                    <span className="text-2xl font-black tabular-nums" style={{ color: '#fff' }}>{section.pct}%</span>
+                    <p className="text-[10px] font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{band.label}</p>
+                  </div>
+                )}
               </div>
-              <HowWeCanHelpContent band={cms.howWeCanHelp} color={color} />
+
+              {/* Intro */}
+              <p className="text-sm leading-relaxed mb-5 ml-4"
+                style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Open Sans, sans-serif' }}>
+                {services.intro}
+              </p>
+
+              {/* Service cards grid */}
+              <div className="grid gap-3 ml-4"
+                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+                {services.items.map(item => (
+                  <div key={item.num} className="rounded-xl p-5"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: `1px solid ${color}20` }}>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-[10px] font-mono font-bold"
+                        style={{ color, minWidth: '1.5rem', fontFamily: 'Almarai, sans-serif' }}>
+                        {item.num}
+                      </span>
+                      <p className="text-xs font-bold uppercase tracking-wide leading-tight"
+                        style={{ color: '#fff', fontFamily: 'Open Sans, sans-serif' }}>
+                        {item.title}
+                      </p>
+                    </div>
+                    <p className="text-xs leading-relaxed"
+                      style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Open Sans, sans-serif' }}>
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )
         })}
