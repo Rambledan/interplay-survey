@@ -910,6 +910,12 @@ function StepSection({
     ? resolveSectionContent(slug, band.index, actionIndex, data.contentOverrides)
     : null
 
+  // Visibility flags from global template (default: all visible)
+  const globalSecVis = data.contentOverrides?.globalTemplate?.sections?.[slug]?.visibility
+  const insightsVisible  = globalSecVis?.insights     !== false
+  const actionsVisible   = globalSecVis?.actions      !== false
+  const hwchVisible      = globalSecVis?.howWeCanHelp !== false
+
   if (!section || !band || !cms) {
     return (
       <StepWrap eyebrow={meta?.shortName ?? slug}>
@@ -957,18 +963,20 @@ function StepSection({
       </div>
 
       {/* Insight */}
-      <div className="mb-6">
-        <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color: `${color}99` }}>
-          Assessment
-        </p>
-        <p className="text-base leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Open Sans, sans-serif' }}>
-          {cms.insight}
-        </p>
-      </div>
+      {insightsVisible && cms.insight && (
+        <div className="mb-6">
+          <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color: `${color}99` }}>
+            Assessment
+          </p>
+          <p className="text-base leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Open Sans, sans-serif' }}>
+            {cms.insight}
+          </p>
+        </div>
+      )}
 
       {/* Recommended action */}
-      {cms.action && (
+      {actionsVisible && cms.action && (
         <div className="mb-6 p-5 rounded-xl"
           style={{ backgroundColor: `${color}10`, border: `1px solid ${color}25` }}>
           <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color }}>
@@ -982,7 +990,7 @@ function StepSection({
       )}
 
       {/* How we can help */}
-      {cms.howWeCanHelp && (
+      {hwchVisible && cms.howWeCanHelp && (
         <div className="mb-6 p-5 rounded-xl"
           style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: `1px solid ${color}20` }}>
           <p className="text-[10px] font-mono uppercase tracking-widest mb-4" style={{ color }}>
@@ -1085,6 +1093,9 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
           const actionIndex = Math.min(band.index, 2) as 0 | 1 | 2
           const color = meta?.color ?? '#faf000'
           const cms = resolveSectionContent(section.slug, band.index, actionIndex, data.contentOverrides)
+          // Respect visibility toggle
+          const hwchVisible = data.contentOverrides?.globalTemplate?.sections?.[section.slug]?.visibility?.howWeCanHelp !== false
+          if (!hwchVisible) return null
           if (!cms.howWeCanHelp) return null
           const hasContent = cms.howWeCanHelp.intro?.trim() || (cms.howWeCanHelp.items && cms.howWeCanHelp.items.length > 0)
           if (!hasContent) return null
@@ -1220,7 +1231,9 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       case 8:
       case 9:
       case 10: return <StepSection slug={SECTION_STEP_SLUGS[step - 6]} data={data} animate={animate} />
-      case 11: return <StepEvidence evidence={data.contentOverrides?.globalTemplate?.evidence} />
+      case 11: return data.contentOverrides?.globalTemplate?.evidenceVisible === false
+        ? null
+        : <StepEvidence evidence={data.contentOverrides?.globalTemplate?.evidence} />
       case 12: return <StepHowWeCanHelp data={data} />
       case 13: return <StepWhatsNext />
       default: return null
