@@ -811,7 +811,7 @@ function AnswersPanel({ responses, color, sectionRaw, sectionMax, sectionPct }: 
   sectionMax: number
   sectionPct: number
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   if (responses.length === 0) return null
   const scored = responses.filter(q => q.points !== null)
   const unscored = responses.filter(q => q.points === null)
