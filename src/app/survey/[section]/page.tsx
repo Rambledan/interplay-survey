@@ -253,12 +253,9 @@ function SectionContent({ params }: SectionPageProps) {
       setEmailOk(false)
     }
 
-    // Clear this section's draft now that it's safely saved
-    clearDraft(sectionSlug)
-
     // Survey complete — navigate to referral; results email already sent
     if (data.completed || isLastSection) {
-      // Clear all section drafts on completion
+      // Clear all section drafts now that the survey is fully submitted
       sections.forEach(s => clearDraft(s.slug))
       const tokenSuffix = surveyToken ? `?token=${surveyToken}` : ''
       router.push(`/referral${tokenSuffix}`)
