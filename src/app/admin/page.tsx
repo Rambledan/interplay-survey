@@ -2052,6 +2052,8 @@ interface SessionSummary {
   survey_token: string
   results_token: string | null
   sections_done: string[]
+  email_sent: boolean
+  email_error: string | null
   completed_at: string | null
   nudge_sent_at: string | null
   created_at: string
@@ -2292,7 +2294,7 @@ function LeadsPanel({ password }: { password: string }) {
             <span>Email</span>
             <span>Company</span>
             <span>Role</span>
-            <span>Email</span>
+            <span>Delivery</span>
             <span>Survey</span>
             <span>Registered</span>
           </div>
@@ -2333,19 +2335,38 @@ function LeadsPanel({ password }: { password: string }) {
                   <span className="text-xs truncate" style={{ color: 'rgba(13,20,16,0.45)' }}>
                     {lead.role ?? <span style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>}
                   </span>
-                  <span>
-                    {lead.email_sent ? (
-                      <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
-                        style={{ background: 'rgba(62,207,110,0.1)', border: '1px solid rgba(62,207,110,0.3)', color: '#22a855' }}>
-                        Sent ✓
+                  {(() => {
+                    // When a survey session exists, its email_sent is more accurate:
+                    // the session tracks the survey-start magic-link email, while
+                    // lead.email_sent only tracks the old confirmation email (not sent
+                    // for the startSurvey flow). Fall back to lead data when no session.
+                    const emailSent  = session ? session.email_sent  : lead.email_sent
+                    const emailError = session ? session.email_error : lead.email_error
+                    return (
+                      <span className="flex flex-col gap-0.5">
+                        {emailSent ? (
+                          <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
+                            style={{ background: 'rgba(62,207,110,0.1)', border: '1px solid rgba(62,207,110,0.3)', color: '#22a855' }}>
+                            Sent ✓
+                          </span>
+                        ) : (
+                          <span
+                            title={emailError ?? 'Email not sent'}
+                            className="text-xs font-mono px-2 py-0.5 rounded-sm cursor-help"
+                            style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.25)', color: '#dc2626' }}>
+                            Failed
+                          </span>
+                        )}
+                        {!emailSent && emailError && (
+                          <span className="text-[10px] font-mono leading-tight"
+                            style={{ color: '#dc2626', opacity: 0.7, maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                            title={emailError}>
+                            {emailError}
+                          </span>
+                        )}
                       </span>
-                    ) : (
-                      <span className="text-xs font-mono px-2 py-0.5 rounded-sm"
-                        style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.25)', color: '#dc2626' }}>
-                        Failed
-                      </span>
-                    )}
-                  </span>
+                    )
+                  })()}
                   <span onClick={e => e.stopPropagation()}>
                     <SurveyProgressChip session={session} />
                   </span>
@@ -2394,16 +2415,16 @@ function LeadsPanel({ password }: { password: string }) {
                         )}
                       </div>
                     )}
-                    {lead.email_error && (
+                    {(session?.email_error || lead.email_error) && (
                       <div className="px-3 py-2 text-xs font-mono"
                         style={{ backgroundColor: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.15)', color: '#dc2626' }}>
-                        Email error: {lead.email_error}
+                        Email error: {session?.email_error ?? lead.email_error}
                       </div>
                     )}
 
                     {/* Action buttons row */}
                     <div className="flex items-center gap-3 pt-1" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
-                      {!lead.email_sent && (
+                      {!(session ? session.email_sent : lead.email_sent) && (
                         <button
                           onClick={() => handleResend(lead)}
                           disabled={resending === lead.id}

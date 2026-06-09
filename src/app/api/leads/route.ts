@@ -55,10 +55,19 @@ export async function POST(req: NextRequest) {
         surveyToken = session.survey_token
         const sessionId = session.id
 
-        // Fire email without blocking the response
+        // Fire email without blocking the response; update both session AND lead
+        // so the admin Leads panel reflects the actual delivery outcome.
+        const capturedLeadId = leadId
         sendSurveyStartEmail(trimmedEmail, trimmedName, surveyToken)
-          .then(result => updateSessionEmailStatus(sessionId, result.sent, result.error))
-          .catch(err => console.error('[leads] Session email tracking failed:', err))
+          .then(result => {
+            updateSessionEmailStatus(sessionId, result.sent, result.error)
+              .catch(err => console.error('[leads] Session email status failed:', err))
+            if (capturedLeadId !== null) {
+              updateLeadEmailStatus(capturedLeadId, result.sent, result.error)
+                .catch(err => console.error('[leads] Lead email status failed:', err))
+            }
+          })
+          .catch(err => console.error('[leads] Survey start email failed:', err))
       } catch (err) {
         console.error('[leads] Survey session creation failed:', err)
         // Fall through to legacy confirmation email below
