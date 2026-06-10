@@ -139,13 +139,13 @@ function ProgressBar({
         className="flex items-center px-4"
         style={{ height: '36px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
       >
-        <div className="flex items-center">
+        <a href="/landing.html" style={{ display: 'flex', alignItems: 'center' }}>
           <img
             src="/interplay-logo-yellow.png"
             alt="Interplay"
             style={{ height: '22px', width: 'auto' }}
           />
-        </div>
+        </a>
       </div>
 
       {/* Step controls row */}

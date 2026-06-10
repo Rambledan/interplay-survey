@@ -27,10 +27,10 @@ export function SurveyShell({ sections, currentSection, children }: SurveyShellP
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
         style={{ backgroundColor: '#1a1717', borderBottom: '1px solid rgba(250,240,0,0.15)' }}>
-        <div className="flex items-center">
+        <a href="/landing.html" style={{ display: 'flex', alignItems: 'center' }}>
           <img src="/interplay-logo-yellow.png" alt="Interplay"
             style={{ height: '28px', width: 'auto' }} />
-        </div>
+        </a>
       </header>
 
       {/* Yellow accent line — matches start page and report nav */}
