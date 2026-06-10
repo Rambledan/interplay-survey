@@ -139,17 +139,11 @@ function ProgressBar({
         className="flex items-center px-4"
         style={{ height: '36px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <img
-            src="/Logo+small.png.webp"
-            alt="Interrupt"
-            style={{ height: '20px', width: 'auto', filter: 'invert(1) sepia(1) saturate(10)' }}
-          />
-          <span style={{ color: 'rgba(250,240,0,0.35)', fontSize: '11px' }}>×</span>
-          <img
-            src="/LS.png"
-            alt="Like So"
-            style={{ height: '17px', width: 'auto', filter: 'invert(1) sepia(1) saturate(10)' }}
+            src="/interplay-logo-yellow.png"
+            alt="Interplay"
+            style={{ height: '22px', width: 'auto' }}
           />
         </div>
       </div>

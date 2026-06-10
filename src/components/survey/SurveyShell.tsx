@@ -27,12 +27,9 @@ export function SurveyShell({ sections, currentSection, children }: SurveyShellP
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
         style={{ backgroundColor: '#1a1717', borderBottom: '1px solid rgba(250,240,0,0.15)' }}>
-        <div className="flex items-center gap-4">
-          <img src="/Logo+small.png.webp" alt="Interrupt"
-            style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.2)' }}>×</span>
-          <img src="/LS.png" alt="Like So"
-            style={{ height: '31px', width: 'auto', filter: 'invert(1)' }} />
+        <div className="flex items-center">
+          <img src="/interplay-logo-yellow.png" alt="Interplay"
+            style={{ height: '28px', width: 'auto' }} />
         </div>
         <span className="text-xs uppercase tracking-[0.2em]"
           style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', padding: '3px 8px' }}>
