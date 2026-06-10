@@ -26,7 +26,7 @@ export function SurveyShell({ sections, currentSection, children }: SurveyShellP
 
       {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between"
-        style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
+        style={{ backgroundColor: '#1a1717', borderBottom: '1px solid rgba(250,240,0,0.15)' }}>
         <div className="flex items-center gap-4">
           <img src="/Logo+small.png.webp" alt="Interrupt"
             style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
@@ -39,6 +39,9 @@ export function SurveyShell({ sections, currentSection, children }: SurveyShellP
           Interplay Method
         </span>
       </header>
+
+      {/* Yellow accent line — matches start page and report nav */}
+      <div style={{ height: '2px', backgroundColor: 'rgba(250,240,0,0.25)' }} />
 
       {/* Progress */}
       <div className="px-6 pt-6 max-w-2xl mx-auto w-full">
