@@ -134,7 +134,28 @@ function ProgressBar({
         borderBottom: '1px solid rgba(250,240,0,0.12)',
       }}
     >
-      <div className="flex items-center gap-3 px-4" style={{ height: '52px' }}>
+      {/* Logo row */}
+      <div
+        className="flex items-center px-4"
+        style={{ height: '36px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+      >
+        <div className="flex items-center gap-2">
+          <img
+            src="/Logo+small.png.webp"
+            alt="Interrupt"
+            style={{ height: '20px', width: 'auto', filter: 'invert(1) sepia(1) saturate(10)' }}
+          />
+          <span style={{ color: 'rgba(250,240,0,0.35)', fontSize: '11px' }}>×</span>
+          <img
+            src="/LS.png"
+            alt="Like So"
+            style={{ height: '17px', width: 'auto', filter: 'invert(1) sepia(1) saturate(10)' }}
+          />
+        </div>
+      </div>
+
+      {/* Step controls row */}
+      <div className="flex items-center gap-3 px-4" style={{ height: '44px' }}>
 
         {/* Back button */}
         <button
@@ -245,7 +266,7 @@ function ProgressBar({
 
 function StepWrap({ children, eyebrow }: { children: React.ReactNode; eyebrow?: string }) {
   return (
-    <div style={{ backgroundColor: '#2f2a2a', minHeight: 'calc(100vh - 54px)', color: '#fff' }}
+    <div style={{ backgroundColor: '#2f2a2a', minHeight: 'calc(100vh - 82px)', color: '#fff' }}
       className="px-6 py-16">
       <div className="max-w-3xl mx-auto">
         {eyebrow && (
@@ -1478,8 +1499,8 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
         onNext={() => goTo(step + 1)}
         token={token}
       />
-      {/* Spacer for fixed bar (52px bar + 2px progress line) */}
-      <div style={{ paddingTop: '54px' }}>
+      {/* Spacer for fixed bar (36px logo row + 44px controls + 2px progress line) */}
+      <div style={{ paddingTop: '82px' }}>
         {renderStep()}
       </div>
     </div>
