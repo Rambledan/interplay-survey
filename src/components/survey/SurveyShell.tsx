@@ -31,10 +31,6 @@ export function SurveyShell({ sections, currentSection, children }: SurveyShellP
           <img src="/interplay-logo-yellow.png" alt="Interplay"
             style={{ height: '28px', width: 'auto' }} />
         </div>
-        <span className="text-xs uppercase tracking-[0.2em]"
-          style={{ fontFamily: 'Almarai, sans-serif', color: '#2f2a2a', backgroundColor: '#faf000', padding: '3px 8px' }}>
-          Interplay Method
-        </span>
       </header>
 
       {/* Yellow accent line — matches start page and report nav */}
