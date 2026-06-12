@@ -38,6 +38,7 @@ export interface ReportOverrideContent {
     insight?: string
     action?: string
     howWeCanHelp?: HowWeCanHelpBand   // replaces the whole band-selected howWeCanHelp
+    sectionVisible?: boolean          // false = hide the entire pillar page from this respondent's report
   }>
 }
 

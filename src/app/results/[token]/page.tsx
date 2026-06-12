@@ -1473,7 +1473,12 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       case 7:
       case 8:
       case 9:
-      case 10: return <StepSection slug={SECTION_STEP_SLUGS[step - 6]} data={data} animate={animate} />
+      case 10: {
+        const slug = SECTION_STEP_SLUGS[step - 6]
+        const hidden = data.contentOverrides?.respondentOverride?.sections?.[slug]?.sectionVisible === false
+        if (hidden) return null
+        return <StepSection slug={slug} data={data} animate={animate} />
+      }
       case 11: return data.contentOverrides?.globalTemplate?.evidenceVisible === false
         ? null
         : <StepEvidence evidence={data.contentOverrides?.globalTemplate?.evidence} />

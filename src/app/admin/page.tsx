@@ -1053,7 +1053,7 @@ function GlobalTemplatePanel({ password }: { password: string }) {
 
 // ── Per-respondent Report Override Editor ──────────────────────────────────
 
-type OverrideSection = { insight: string; action: string; howWeCanHelp: HwchBand }
+type OverrideSection = { insight: string; action: string; howWeCanHelp: HwchBand; sectionVisible: boolean }
 type OverrideState = Record<string, OverrideSection>
 
 function ReportOverridePanel({
@@ -1082,11 +1082,12 @@ function ReportOverridePanel({
       if (res.ok) {
         const data = await res.json()
         const init: OverrideState = {}
-        for (const slug of completedSlugs) {
+        for (const slug of SECTION_SLUGS_ORDERED) {
           init[slug] = {
             insight: data.override?.sections?.[slug]?.insight ?? '',
             action: data.override?.sections?.[slug]?.action ?? '',
             howWeCanHelp: data.override?.sections?.[slug]?.howWeCanHelp ?? { items: [] },
+            sectionVisible: data.override?.sections?.[slug]?.sectionVisible !== false,
           }
         }
         setOverrides(init)
@@ -1114,6 +1115,7 @@ function ReportOverridePanel({
         const hwch = vals.howWeCanHelp
         const hasHwch = hwch.intro?.trim() || hwch.items?.some(it => it.title.trim() || it.content.trim())
         if (hasHwch) sec.howWeCanHelp = hwch
+        if (!vals.sectionVisible) sec.sectionVisible = false   // only store when hidden
         if (Object.keys(sec).length > 0) sections[slug] = sec
       }
       await fetch('/api/admin/report-cms', {
@@ -1138,8 +1140,15 @@ function ReportOverridePanel({
   function updateOverrideHwch(slug: string, updated: HwchBand) {
     setOverrides(prev => ({
       ...prev,
-      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: { items: [] } }), howWeCanHelp: updated },
+      [slug]: { ...(prev[slug] ?? { insight: '', action: '', howWeCanHelp: { items: [] }, sectionVisible: true }), howWeCanHelp: updated },
     }))
+  }
+
+  function toggleSectionVisible(slug: string) {
+    setOverrides(prev => {
+      const cur = prev[slug] ?? { insight: '', action: '', howWeCanHelp: { items: [] }, sectionVisible: true }
+      return { ...prev, [slug]: { ...cur, sectionVisible: !cur.sectionVisible } }
+    })
   }
 
   const sectionsToShow = SECTION_SLUGS_ORDERED.filter(s => completedSlugs.includes(s))
@@ -1171,6 +1180,38 @@ function ReportOverridePanel({
             </p>
           ) : (
             <>
+              {/* Pillar visibility toggles */}
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider mb-2"
+                  style={{ color: 'rgba(13,20,16,0.4)' }}>Pillar page visibility in report</p>
+                <div className="flex flex-wrap gap-2">
+                  {SECTION_SLUGS_ORDERED.map(slug => {
+                    const visible = overrides[slug]?.sectionVisible !== false
+                    return (
+                      <button
+                        key={slug}
+                        type="button"
+                        onClick={() => toggleSectionVisible(slug)}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-mono transition-all"
+                        style={{
+                          border: `1px solid ${visible ? 'rgba(34,168,85,0.4)' : 'rgba(220,38,38,0.35)'}`,
+                          backgroundColor: visible ? 'rgba(34,168,85,0.07)' : 'rgba(220,38,38,0.06)',
+                          color: visible ? '#22a855' : '#dc2626',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        <span style={{
+                          display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%',
+                          backgroundColor: visible ? '#22a855' : '#dc2626',
+                        }} />
+                        {SECTION_SHORT_NAMES[slug] ?? slug}
+                        <span style={{ opacity: 0.6 }}>{visible ? 'ON' : 'OFF'}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
               <p className="text-xs" style={{ color: 'rgba(13,20,16,0.45)' }}>
                 Override specific report content for this participant only.
                 Leave any field blank to use the global template content.
