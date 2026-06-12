@@ -285,22 +285,6 @@ export async function deleteResponseById(id: number): Promise<boolean> {
   })
 }
 
-export async function duplicateResponseById(id: number): Promise<number | null> {
-  return withClient(async (client) => {
-    const result = await client.query<{ id: number }>(
-      `INSERT INTO responses
-         (submitted_at, respondent_name, respondent_role, respondent_company,
-          respondent_sector, respondent_type, token, section_slug, answers, follow_ups)
-       SELECT NOW(), respondent_name, respondent_role, respondent_company,
-              respondent_sector, respondent_type, token, section_slug, answers, follow_ups
-         FROM responses WHERE id = $1
-       RETURNING id`,
-      [id]
-    )
-    return result.rows[0]?.id ?? null
-  })
-}
-
 export interface ReferralRow {
   id: number
   submitted_at: string

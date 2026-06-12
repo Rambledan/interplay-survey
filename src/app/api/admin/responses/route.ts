@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import questionsData from '../../../../../data/questions.json'
 import { parseCsv } from '@/lib/parse-csv'
-import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, duplicateResponseById, updateRespondentProfile, updateRowAnswers, getAllReferrals } from '@/lib/db'
+import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers, getAllReferrals } from '@/lib/db'
 import type { ReferralRow } from '@/lib/db'
 import type { SurveySection, Question } from '@/types/survey'
 import type { DbRow } from '@/lib/db'
@@ -256,13 +256,6 @@ export async function PATCH(request: NextRequest) {
       if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
       const ok = await updateRowAnswers(Number(id), answers ?? {}, followUps ?? {})
       return NextResponse.json({ ok })
-    }
-
-    if (body.type === 'duplicate') {
-      const { id } = body as { id: string }
-      if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
-      const newId = await duplicateResponseById(Number(id))
-      return NextResponse.json({ ok: newId !== null, newId })
     }
 
     return NextResponse.json({ error: 'Unknown update type' }, { status: 400 })
