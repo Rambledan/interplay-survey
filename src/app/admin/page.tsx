@@ -205,6 +205,7 @@ function SectionRow({
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
   const [editAnswers, setEditAnswers] = useState<Record<string, string>>({})
   const [editFollowUps, setEditFollowUps] = useState<Record<string, string>>({})
 
@@ -234,6 +235,21 @@ function SectionRow({
       onSaved()
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleDuplicate(e: React.MouseEvent) {
+    e.stopPropagation()
+    setDuplicating(true)
+    try {
+      await fetch('/api/admin/responses', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ type: 'duplicate', id: response.id }),
+      })
+      onSaved()
+    } finally {
+      setDuplicating(false)
     }
   }
 
@@ -274,6 +290,17 @@ function SectionRow({
         </span>
         <span className="text-xs font-mono shrink-0" style={{ color: 'rgba(13,20,16,0.35)' }}>
           {response.answers.length}q {expanded ? '▲' : '▼'}
+        </span>
+        <span
+          role="button"
+          onClick={handleDuplicate}
+          className="text-xs font-mono px-2 py-0.5 shrink-0 transition-colors"
+          style={{ color: duplicating ? 'rgba(13,20,16,0.25)' : 'rgba(13,20,16,0.35)', cursor: duplicating ? 'default' : 'pointer' }}
+          onMouseEnter={e => !duplicating && ((e.currentTarget as HTMLElement).style.color = 'rgba(13,20,16,0.7)')}
+          onMouseLeave={e => !duplicating && ((e.currentTarget as HTMLElement).style.color = 'rgba(13,20,16,0.35)')}
+          title="Duplicate this response"
+        >
+          {duplicating ? '…' : '⊕'}
         </span>
         <span
           role="button"
