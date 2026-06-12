@@ -109,28 +109,22 @@ const SECTION_STEP_SLUGS = [
 
 function ProgressBar({
   current,
-  total,
+  visibleSteps,
   onStep,
   onPrev,
   onNext,
   token,
-  hiddenSteps,
 }: {
   current: number
-  total: number
-  onStep: (i: number) => void
+  visibleSteps: Array<{ label: string; fullIndex: number }>
+  onStep: (fullIndex: number) => void
   onPrev: () => void
   onNext: () => void
   token: string
-  hiddenSteps: Set<number>
 }) {
-  // Find the nearest navigable step in each direction, skipping hidden ones
-  let prevTarget = current - 1
-  while (prevTarget >= 0 && hiddenSteps.has(prevTarget)) prevTarget--
-  let nextTarget = current + 1
-  while (nextTarget < total && hiddenSteps.has(nextTarget)) nextTarget++
-  const canGoPrev = prevTarget >= 0
-  const canGoNext = nextTarget < total
+  const currentVisibleIndex = visibleSteps.findIndex(v => v.fullIndex === current)
+  const canGoPrev = currentVisibleIndex > 0
+  const canGoNext = currentVisibleIndex < visibleSteps.length - 1
 
   return (
     <div
@@ -180,59 +174,50 @@ function ProgressBar({
           ← Back
         </button>
 
-        {/* Step dots — scrollable on small screens */}
+        {/* Step dots — only visible steps, re-numbered from 1 */}
         <div
           className="flex items-center gap-1.5 flex-1 overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {STEPS.map((step, i) => {
-            const isCurrent = i === current
-            const isPast = i < current
-            const isHidden = hiddenSteps.has(i)
+          {visibleSteps.map((vs, vi) => {
+            const isCurrent = vs.fullIndex === current
+            const isPast = vi < currentVisibleIndex
             return (
               <button
-                key={i}
-                onClick={() => !isHidden && onStep(i)}
-                title={isHidden ? `${step.label} (hidden)` : step.label}
-                disabled={isHidden}
+                key={vs.fullIndex}
+                onClick={() => onStep(vs.fullIndex)}
+                title={vs.label}
                 style={{
                   flexShrink: 0,
                   width: isCurrent ? '28px' : '22px',
                   height: isCurrent ? '28px' : '22px',
                   borderRadius: '50%',
-                  border: isHidden
-                    ? '1.5px dashed rgba(255,255,255,0.1)'
-                    : isCurrent
-                      ? '2px solid #faf000'
-                      : isPast
-                        ? '1.5px solid rgba(250,240,0,0.4)'
-                        : '1.5px solid rgba(255,255,255,0.15)',
-                  backgroundColor: isHidden
-                    ? 'transparent'
-                    : isCurrent
-                      ? '#faf000'
-                      : isPast
-                        ? 'rgba(250,240,0,0.12)'
-                        : 'transparent',
-                  color: isHidden
-                    ? 'rgba(255,255,255,0.15)'
-                    : isCurrent
-                      ? '#1a1717'
-                      : isPast
-                        ? 'rgba(250,240,0,0.7)'
-                        : 'rgba(255,255,255,0.3)',
+                  border: isCurrent
+                    ? '2px solid #faf000'
+                    : isPast
+                      ? '1.5px solid rgba(250,240,0,0.4)'
+                      : '1.5px solid rgba(255,255,255,0.15)',
+                  backgroundColor: isCurrent
+                    ? '#faf000'
+                    : isPast
+                      ? 'rgba(250,240,0,0.12)'
+                      : 'transparent',
+                  color: isCurrent
+                    ? '#1a1717'
+                    : isPast
+                      ? 'rgba(250,240,0,0.7)'
+                      : 'rgba(255,255,255,0.3)',
                   fontFamily: 'Almarai, sans-serif',
                   fontSize: isCurrent ? '11px' : '10px',
                   fontWeight: isCurrent ? '700' : '400',
-                  cursor: isHidden ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   transition: 'all 0.15s',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: isHidden ? 0.4 : 1,
                 }}
               >
-                {isHidden ? '–' : i + 1}
+                {vi + 1}
               </button>
             )
           })}
@@ -266,7 +251,7 @@ function ProgressBar({
           style={{
             height: '100%',
             backgroundColor: '#faf000',
-            width: `${((current + 1) / total) * 100}%`,
+            width: `${((currentVisibleIndex + 1) / visibleSteps.length) * 100}%`,
             transition: 'width 0.2s ease',
           }}
         />
@@ -1433,7 +1418,7 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       .catch(() => setStatus('error'))
   }, [token])
 
-  // Compute which pillar steps (6–10) are hidden based on respondent overrides
+  // Build the set of hidden pillar steps (6–10) based on respondent overrides
   const hiddenSteps = new Set<number>()
   if (data) {
     SECTION_STEP_SLUGS.forEach((slug, i) => {
@@ -1442,6 +1427,12 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       }
     })
   }
+
+  // Visible steps for the nav bar — hidden steps are removed entirely and the
+  // remaining steps are re-numbered sequentially by the ProgressBar
+  const visibleSteps = STEPS
+    .map((s, i) => ({ label: s.label, fullIndex: i }))
+    .filter(s => !hiddenSteps.has(s.fullIndex))
 
   function goTo(i: number) {
     if (hiddenSteps.has(i)) return
@@ -1534,12 +1525,11 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
     <div style={pageStyle}>
       <ProgressBar
         current={step}
-        total={STEPS.length}
+        visibleSteps={visibleSteps}
         onStep={goTo}
         onPrev={goToPrev}
         onNext={goToNext}
         token={token}
-        hiddenSteps={hiddenSteps}
       />
       {/* Spacer for fixed bar (36px logo row + 44px controls + 2px progress line) */}
       <div style={{ paddingTop: '82px' }}>
