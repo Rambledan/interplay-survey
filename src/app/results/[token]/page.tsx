@@ -1475,7 +1475,7 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       case 9:
       case 10: {
         const slug = SECTION_STEP_SLUGS[step - 6]
-        const hidden = data.contentOverrides?.respondentOverride?.sections?.[slug]?.sectionVisible === false
+        const hidden = data.contentOverrides?.respondentOverride?.sections?.[slug]?.sectionVisible !== true
         if (hidden) return null
         return <StepSection slug={slug} data={data} animate={animate} />
       }

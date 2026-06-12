@@ -1087,7 +1087,7 @@ function ReportOverridePanel({
             insight: data.override?.sections?.[slug]?.insight ?? '',
             action: data.override?.sections?.[slug]?.action ?? '',
             howWeCanHelp: data.override?.sections?.[slug]?.howWeCanHelp ?? { items: [] },
-            sectionVisible: data.override?.sections?.[slug]?.sectionVisible !== false,
+            sectionVisible: data.override?.sections?.[slug]?.sectionVisible === true,
           }
         }
         setOverrides(init)
@@ -1115,7 +1115,7 @@ function ReportOverridePanel({
         const hwch = vals.howWeCanHelp
         const hasHwch = hwch.intro?.trim() || hwch.items?.some(it => it.title.trim() || it.content.trim())
         if (hasHwch) sec.howWeCanHelp = hwch
-        if (!vals.sectionVisible) sec.sectionVisible = false   // only store when hidden
+        if (vals.sectionVisible) sec.sectionVisible = true   // only store when visible
         if (Object.keys(sec).length > 0) sections[slug] = sec
       }
       await fetch('/api/admin/report-cms', {
