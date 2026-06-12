@@ -121,6 +121,22 @@
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
+        "id": "brand-q8",
+        "text": "How strong is the connection between sustainability storytelling and your brand TOV?",
+        "type": "text-options",
+        "subCategory": "Story",
+        "options": ["Very weak", "Weak", "Moderate", "Strong", "Very strong"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
+        "id": "brand-q2",
+        "text": "Is your sustainability story aligned with your brand purpose, vision & mission?",
+        "type": "text-options",
+        "subCategory": "Story",
+        "options": ["100%", "75%", "50%", "25%", "0%"],
+        "followUpLabel": "Why did you choose this as your answer?"
+      },
+      {
         "id": "sus-q9",
         "text": "What is your experience of selling your sustainability story to the rest of the business?",
         "type": "text-options",
@@ -167,6 +183,23 @@
         "subCategory": "Risk",
         "options": [],
         "followUpLabel": null
+      },
+      {
+        "id": "sus-q13",
+        "text": "What is included in your sustainability strategy?",
+        "type": "multiple-select",
+        "options": [
+          "Circular Economy",
+          "Social & Community",
+          "Net Zero",
+          "Nature Positive",
+          "Innovation & Product Activation",
+          "Decent Work",
+          "Diversity & Inclusion",
+          "Water Stewardship",
+          "None of the above"
+        ],
+        "followUpLabel": "Is there anything else to add?"
       }
     ]
   },
@@ -197,22 +230,6 @@
         "type": "text-options",
         "subCategory": "Strategic Alignment",
         "options": ["Yes", "No", "Maybe", "Not sure"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "brand-q8",
-        "text": "How strong is the connection between sustainability storytelling and your brand TOV?",
-        "type": "text-options",
-        "subCategory": "Story",
-        "options": ["Very weak", "Weak", "Moderate", "Strong", "Very strong"],
-        "followUpLabel": "Why did you choose this as your answer?"
-      },
-      {
-        "id": "brand-q2",
-        "text": "Is your sustainability story aligned with your brand purpose, vision & mission?",
-        "type": "text-options",
-        "subCategory": "Story",
-        "options": ["100%", "75%", "50%", "25%", "0%"],
         "followUpLabel": "Why did you choose this as your answer?"
       },
       {
