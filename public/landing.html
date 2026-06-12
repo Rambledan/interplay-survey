@@ -564,6 +564,16 @@
     }
     .cta-card--free .cta-card-title { color: var(--ink); }
     .cta-card--paid .cta-card-title { color: var(--yellow); }
+    .cta-card-desc {
+      font-size: 14px; line-height: 1.5;
+      margin: 0 0 20px; flex: 1;
+      border-top: 1px solid rgba(0,0,0,0.1); padding-top: 14px;
+    }
+    .cta-card--free .cta-card-desc { color: rgba(0,0,0,0.7); }
+    .cta-card--paid .cta-card-desc {
+      color: rgba(245,240,224,0.7);
+      border-top-color: rgba(245,240,224,0.14);
+    }
     .cta-card-features {
       list-style: none; padding: 0; margin: 0 0 20px;
       flex: 1; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 14px;
@@ -795,25 +805,13 @@
         <div class="cta-card cta-card--free">
           <span class="cta-card-badge">Free</span>
           <p class="cta-card-title">Growth<br>Estimate</p>
-          <ul class="cta-card-features">
-            <li>Secure, private 30-minute online survey</li>
-            <li>Potential for growth &amp; impact, in £££ based on your ARR</li>
-            <li>Benchmark your ability to unlock potential</li>
-            <li>Roadmap of methods to growth</li>
-          </ul>
+          <p class="cta-card-desc">Take a 30 minute online survey to get a quick estimate</p>
           <a href="/start" class="btn btn-fill-ink js-survey">Start free survey <span class="arrow">→</span></a>
         </div>
         <div class="cta-card cta-card--paid">
           <span class="cta-card-badge">Free until Sept 2026</span>
           <p class="cta-card-title">Bespoke<br>Report</p>
-          <ul class="cta-card-features">
-            <li>In-depth 45-minute interview, research &amp; analysis</li>
-            <li>Potential for growth &amp; impact, in £££ based on your ARR</li>
-            <li>Benchmark your ability to unlock potential</li>
-            <li>Key recommendations to unlock each pillar</li>
-            <li>Recommended actions to take</li>
-            <li>Roadmap of methods to growth</li>
-          </ul>
+          <p class="cta-card-desc">A 45 minute interview plus 3 hours of research and analysis, resulting in an in-depth report and business case</p>
           <a href="#" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
         </div>
       </div>
@@ -1136,25 +1134,13 @@
     <div class="cta-card cta-card--free">
       <span class="cta-card-badge">Free</span>
       <p class="cta-card-title">Growth<br>Estimate</p>
-      <ul class="cta-card-features">
-        <li>Secure, private 30-minute online survey</li>
-        <li>Potential for growth &amp; impact, in £££ based on your ARR</li>
-        <li>Benchmark your ability to unlock potential</li>
-        <li>Roadmap of methods to growth</li>
-      </ul>
+      <p class="cta-card-desc">Take a 30 minute online survey to get a quick estimate</p>
       <a href="/start" class="btn btn-fill-yellow js-survey">Start free survey <span class="arrow">→</span></a>
     </div>
     <div class="cta-card cta-card--paid">
       <span class="cta-card-badge">Free until Sept 2026</span>
       <p class="cta-card-title">Bespoke<br>Report</p>
-      <ul class="cta-card-features">
-        <li>In-depth 45-minute interview, research &amp; analysis</li>
-        <li>Potential for growth &amp; impact, in £££ based on your ARR</li>
-        <li>Benchmark your ability to unlock potential</li>
-        <li>Key recommendations to unlock each pillar</li>
-        <li>Recommended actions to take</li>
-        <li>Roadmap of methods to growth</li>
-      </ul>
+      <p class="cta-card-desc">A 45 minute interview plus 3 hours of research and analysis, resulting in an in-depth report and business case</p>
       <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
     </div>
   </div>

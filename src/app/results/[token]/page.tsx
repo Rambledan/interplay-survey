@@ -114,6 +114,7 @@ function ProgressBar({
   onPrev,
   onNext,
   token,
+  hiddenSteps,
 }: {
   current: number
   total: number
@@ -121,7 +122,16 @@ function ProgressBar({
   onPrev: () => void
   onNext: () => void
   token: string
+  hiddenSteps: Set<number>
 }) {
+  // Find the nearest navigable step in each direction, skipping hidden ones
+  let prevTarget = current - 1
+  while (prevTarget >= 0 && hiddenSteps.has(prevTarget)) prevTarget--
+  let nextTarget = current + 1
+  while (nextTarget < total && hiddenSteps.has(nextTarget)) nextTarget++
+  const canGoPrev = prevTarget >= 0
+  const canGoNext = nextTarget < total
+
   return (
     <div
       style={{
@@ -154,15 +164,15 @@ function ProgressBar({
         {/* Back button */}
         <button
           onClick={onPrev}
-          disabled={current === 0}
+          disabled={!canGoPrev}
           style={{
             fontFamily: 'Almarai, sans-serif',
             fontSize: '11px',
             letterSpacing: '0.1em',
-            color: current === 0 ? 'rgba(255,255,255,0.2)' : '#faf000',
+            color: canGoPrev ? '#faf000' : 'rgba(255,255,255,0.2)',
             background: 'none',
             border: 'none',
-            cursor: current === 0 ? 'default' : 'pointer',
+            cursor: canGoPrev ? 'pointer' : 'default',
             padding: '4px 8px',
             flexShrink: 0,
           }}
@@ -178,42 +188,51 @@ function ProgressBar({
           {STEPS.map((step, i) => {
             const isCurrent = i === current
             const isPast = i < current
+            const isHidden = hiddenSteps.has(i)
             return (
               <button
                 key={i}
-                onClick={() => onStep(i)}
-                title={step.label}
+                onClick={() => !isHidden && onStep(i)}
+                title={isHidden ? `${step.label} (hidden)` : step.label}
+                disabled={isHidden}
                 style={{
                   flexShrink: 0,
                   width: isCurrent ? '28px' : '22px',
                   height: isCurrent ? '28px' : '22px',
                   borderRadius: '50%',
-                  border: isCurrent
-                    ? '2px solid #faf000'
-                    : isPast
-                      ? '1.5px solid rgba(250,240,0,0.4)'
-                      : '1.5px solid rgba(255,255,255,0.15)',
-                  backgroundColor: isCurrent
-                    ? '#faf000'
-                    : isPast
-                      ? 'rgba(250,240,0,0.12)'
-                      : 'transparent',
-                  color: isCurrent
-                    ? '#1a1717'
-                    : isPast
-                      ? 'rgba(250,240,0,0.7)'
-                      : 'rgba(255,255,255,0.3)',
+                  border: isHidden
+                    ? '1.5px dashed rgba(255,255,255,0.1)'
+                    : isCurrent
+                      ? '2px solid #faf000'
+                      : isPast
+                        ? '1.5px solid rgba(250,240,0,0.4)'
+                        : '1.5px solid rgba(255,255,255,0.15)',
+                  backgroundColor: isHidden
+                    ? 'transparent'
+                    : isCurrent
+                      ? '#faf000'
+                      : isPast
+                        ? 'rgba(250,240,0,0.12)'
+                        : 'transparent',
+                  color: isHidden
+                    ? 'rgba(255,255,255,0.15)'
+                    : isCurrent
+                      ? '#1a1717'
+                      : isPast
+                        ? 'rgba(250,240,0,0.7)'
+                        : 'rgba(255,255,255,0.3)',
                   fontFamily: 'Almarai, sans-serif',
                   fontSize: isCurrent ? '11px' : '10px',
                   fontWeight: isCurrent ? '700' : '400',
-                  cursor: 'pointer',
+                  cursor: isHidden ? 'not-allowed' : 'pointer',
                   transition: 'all 0.15s',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  opacity: isHidden ? 0.4 : 1,
                 }}
               >
-                {i + 1}
+                {isHidden ? '–' : i + 1}
               </button>
             )
           })}
@@ -222,15 +241,15 @@ function ProgressBar({
         {/* Next button */}
         <button
           onClick={onNext}
-          disabled={current === total - 1}
+          disabled={!canGoNext}
           style={{
             fontFamily: 'Almarai, sans-serif',
             fontSize: '11px',
             letterSpacing: '0.1em',
-            color: current === total - 1 ? 'rgba(255,255,255,0.2)' : '#faf000',
+            color: canGoNext ? '#faf000' : 'rgba(255,255,255,0.2)',
             background: 'none',
             border: 'none',
-            cursor: current === total - 1 ? 'default' : 'pointer',
+            cursor: canGoNext ? 'pointer' : 'default',
             padding: '4px 8px',
             flexShrink: 0,
           }}
@@ -1414,9 +1433,32 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
       .catch(() => setStatus('error'))
   }, [token])
 
+  // Compute which pillar steps (6–10) are hidden based on respondent overrides
+  const hiddenSteps = new Set<number>()
+  if (data) {
+    SECTION_STEP_SLUGS.forEach((slug, i) => {
+      if (data.contentOverrides?.respondentOverride?.sections?.[slug]?.sectionVisible !== true) {
+        hiddenSteps.add(6 + i)
+      }
+    })
+  }
+
   function goTo(i: number) {
+    if (hiddenSteps.has(i)) return
     setStep(Math.max(0, Math.min(STEPS.length - 1, i)))
     window.scrollTo({ top: 0 })
+  }
+
+  function goToPrev() {
+    let p = step - 1
+    while (p >= 0 && hiddenSteps.has(p)) p--
+    if (p >= 0) goTo(p)
+  }
+
+  function goToNext() {
+    let n = step + 1
+    while (n < STEPS.length && hiddenSteps.has(n)) n++
+    if (n < STEPS.length) goTo(n)
   }
 
   const pageStyle = { backgroundColor: '#2f2a2a', color: '#fff', minHeight: '100vh' }
@@ -1494,9 +1536,10 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
         current={step}
         total={STEPS.length}
         onStep={goTo}
-        onPrev={() => goTo(step - 1)}
-        onNext={() => goTo(step + 1)}
+        onPrev={goToPrev}
+        onNext={goToNext}
         token={token}
+        hiddenSteps={hiddenSteps}
       />
       {/* Spacer for fixed bar (36px logo row + 44px controls + 2px progress line) */}
       <div style={{ paddingTop: '82px' }}>
