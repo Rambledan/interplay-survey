@@ -1333,6 +1333,7 @@ function RespondentCard({
   referrals: ReferralRow[]
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
   const [editingProfile, setEditingProfile] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
   const [profile, setProfile] = useState({
@@ -1344,6 +1345,20 @@ function RespondentCard({
   useEffect(() => {
     setProfile({ name: group.name, role: group.role, company: group.company, sector: group.sector, companyType: group.companyType })
   }, [group.name, group.role, group.company, group.sector, group.companyType])
+
+  async function handleDuplicate() {
+    setDuplicating(true)
+    try {
+      await fetch('/api/admin/responses', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ type: 'duplicate', name: group.name }),
+      })
+      onRefresh()
+    } finally {
+      setDuplicating(false)
+    }
+  }
 
   async function handleSaveProfile() {
     setSavingProfile(true)
@@ -1473,6 +1488,17 @@ function RespondentCard({
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.3)'; e.currentTarget.style.color = '#0d1410' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.45)' }}>
                 Edit
+              </button>
+
+              {/* Duplicate respondent button */}
+              <button
+                onClick={handleDuplicate}
+                disabled={duplicating}
+                className="text-xs font-mono px-3 py-1.5 transition-colors disabled:opacity-40"
+                style={{ border: '1px solid rgba(13,20,16,0.12)', color: 'rgba(13,20,16,0.45)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,159,223,0.4)'; e.currentTarget.style.color = '#5F9FDF' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(13,20,16,0.12)'; e.currentTarget.style.color = 'rgba(13,20,16,0.45)' }}>
+                {duplicating ? 'Duplicating…' : 'Duplicate'}
               </button>
 
               {/* Delete control */}

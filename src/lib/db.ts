@@ -285,6 +285,25 @@ export async function deleteResponseById(id: number): Promise<boolean> {
   })
 }
 
+export async function duplicateRespondent(originalName: string): Promise<number> {
+  return withClient(async (client) => {
+    const result = await client.query(
+      `INSERT INTO responses
+         (submitted_at, respondent_name, respondent_role, respondent_company,
+          respondent_sector, respondent_type, token, section_slug, answers, follow_ups)
+       SELECT
+         NOW(), $2,
+         respondent_role, respondent_company,
+         respondent_sector, respondent_type,
+         token, section_slug, answers, follow_ups
+       FROM responses
+       WHERE LOWER(respondent_name) = LOWER($1)`,
+      [originalName, `${originalName} (copy)`]
+    )
+    return result.rowCount ?? 0
+  })
+}
+
 export interface ReferralRow {
   id: number
   submitted_at: string
