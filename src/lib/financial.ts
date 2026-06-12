@@ -106,8 +106,7 @@ export function parseCurrencySymbol(answer: string | null | undefined): string {
 
 export function formatCurrency(n: number, symbol = '£'): string {
   if (n >= 1_000_000) return `${symbol}${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000)     return `${symbol}${Math.round(n / 1_000)}K`
-  return `${symbol}${Math.round(n).toLocaleString()}`
+  return `${symbol}${Math.round(n).toLocaleString('en-GB')}`
 }
 
 function pct(n: number): string {
