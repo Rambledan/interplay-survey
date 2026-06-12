@@ -103,6 +103,8 @@ export async function GET(
       sustainabilityCapability:  pctMap['capability-sustainability'] ?? 0,
       brandCapability:           pctMap['capability-brand'] ?? 0,
       businessCapability:        pctMap['capability-business'] ?? 0,
+      sustainabilityApproach:    myAnswers['sus-q14'],
+      sustainabilityCategories:  myAnswers['sus-q13'],
     })
   }
 

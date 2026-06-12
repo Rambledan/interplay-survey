@@ -91,6 +91,8 @@ export interface SurveyInputs {
   sustainabilityCapability: number
   brandCapability: number
   businessCapability: number
+  sustainabilityApproach?:   string   // raw answer from sus-q14 (comma-separated)
+  sustainabilityCategories?: string   // raw answer from sus-q13 (comma-separated)
 }
 
 // ── Formatting helpers ────────────────────────────────────────────────────
@@ -148,18 +150,89 @@ function calcAI(revenue: number, score: number): ScenarioValues {
 
 /**
  * Section 3: Sustainability Capability
- * Driver: Circular Economy Savings + Risk Cost Avoidance + Sustainable Innovation Uplift
- * Evidence: Ellen MacArthur / McKinsey "Growth Within" (2015) — 32% material cost reduction.
- * Natura (CMO Blueprint 2025) — circular product outperformed sales 100% in first 3 months.
- * L'Oréal (CMO Blueprint 2025) — 20% carbon reduction without reducing campaign effectiveness.
+ * Category-aware multiplier table (Mode A — strategy-led).
+ * Mode B (targets-only) = Mode A × 0.75, floored at 4%.
+ * Multiple categories: multipliers are averaged across selections.
+ * Fallback (no categories / None of the above) uses a conservative Friede-floor model.
  */
-function calcSustainability(revenue: number, score: number): ScenarioValues {
+const CATEGORY_MULTIPLIERS: Record<string, [number, number, number]> = {
+  'Circular Economy':               [0.05, 0.08, 0.12],
+  'Social & Community':             [0.05, 0.09, 0.12],
+  'Net Zero':                       [0.04, 0.07, 0.10],
+  'Nature Positive':                [0.04, 0.08, 0.11],
+  'Innovation & Product Activation':[0.06, 0.09, 0.12],
+  'Decent Work':                    [0.04, 0.07, 0.10],
+  'Diversity & Inclusion':          [0.05, 0.08, 0.11],
+  'Water Stewardship':              [0.04, 0.07, 0.10],
+}
+const FALLBACK_MULTIPLIERS: [number, number, number] = [0.04, 0.06, 0.08]
+const MODE_B_FACTOR = 0.75
+const CONSERVATIVE_FLOOR = 0.04
+
+export const CATEGORY_DRIVER: Record<string, string> = {
+  'Circular Economy':               'Circular Economy Savings + Risk Cost Avoidance',
+  'Social & Community':             'Social Purpose Premium + Community Trust Uplift',
+  'Net Zero':                       'Net Zero Margin Uplift + Transition Risk Avoidance',
+  'Nature Positive':                'Nature-Positive Brand Growth + Operational Efficiency',
+  'Innovation & Product Activation':'Sustainability-Led Product Innovation + Sales Uplift',
+  'Decent Work':                    'Productivity Uplift + Reputational Risk Reduction',
+  'Diversity & Inclusion':          'Diversity Performance Premium + Innovation Revenue Uplift',
+  'Water Stewardship':              'Water Risk Mitigation + Operational Cost Reduction',
+}
+
+export const CATEGORY_EVIDENCE: Record<string, string> = {
+  'Circular Economy':               'Ellen MacArthur/McKinsey Growth Within (2015): 32% material cost reduction from circular transition; WEF (2020): 30–40% circular product cost savings',
+  'Social & Community':             'B Lab UK (2025): B Corps grow 28× faster than peers; Cone Communications: 6–9% purchase premium for community-purpose brands; Edelman Trust Barometer: 2–3× trust premium for socially responsible brands',
+  'Net Zero':                       'McKinsey (2023): 1–3% margin uplift from carbon efficiency programmes; SBTi/CDP (2024): companies with science-based targets face 25–30% lower transition risk cost',
+  'Nature Positive':                'Unilever Sustainable Living Brands (2023): nature-positive brands grew 69% faster than the rest of the portfolio; TNFD (2023): nature-positive land use delivers 15–30% profit uplift per hectare',
+  'Innovation & Product Activation':'Accenture (2023): sustainability-led product innovation drives 2.6× revenue growth; Forrester (2022): sustainability-integrated product launches achieve 6–10% sales uplift in year one',
+  'Decent Work':                    'ILO (2022): decent work programmes deliver 15–25% productivity uplift; World Benchmarking Alliance (2023): 8–12% reduction in reputational risk costs for high-scoring social companies',
+  'Diversity & Inclusion':          'McKinsey Diversity Wins (2023): companies in top quartile for diversity 39% more likely to outperform peers; BCG (2018): diverse management teams generate 19% higher innovation revenue',
+  'Water Stewardship':              'CDP Water (2023): water stewardship programmes improve operational cost metrics 6–10%; AWS Coalition (2023): businesses with water risk mitigation face 15–25% lower operational disruption costs',
+}
+
+function calcSustainability(
+  revenue: number,
+  score: number,
+  approach?: string,
+  categories?: string,
+): ScenarioValues {
   const gap = (100 - score) / 100
-  const CIRCULAR_SAVING = 0.32
+
+  // Mode A = strategy-led; Mode B = targets/commitments only
+  const isStrategyLed = approach?.includes('We have an overarching strategy') ?? false
+
+  // Resolve category multipliers (average across valid selections)
+  const selected = (categories ?? '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s && s !== 'None of the above' && CATEGORY_MULTIPLIERS[s])
+
+  let rawCon: number, rawMod: number, rawOpt: number
+  if (selected.length > 0) {
+    const sums = selected.reduce(
+      ([ac, am, ao], cat) => {
+        const [c, m, o] = CATEGORY_MULTIPLIERS[cat]!
+        return [ac + c, am + m, ao + o] as [number, number, number]
+      },
+      [0, 0, 0] as [number, number, number]
+    )
+    rawCon = sums[0] / selected.length
+    rawMod = sums[1] / selected.length
+    rawOpt = sums[2] / selected.length
+  } else {
+    ;[rawCon, rawMod, rawOpt] = FALLBACK_MULTIPLIERS
+  }
+
+  // Apply Mode B discount if targets-only
+  const con = isStrategyLed ? rawCon : Math.max(CONSERVATIVE_FLOOR, rawCon * MODE_B_FACTOR)
+  const mod = isStrategyLed ? rawMod : Math.max(CONSERVATIVE_FLOOR, rawMod * MODE_B_FACTOR)
+  const opt = isStrategyLed ? rawOpt : Math.max(CONSERVATIVE_FLOOR, rawOpt * MODE_B_FACTOR)
+
   return {
-    conservative: revenue * gap * ((CIRCULAR_SAVING * 0.05) + 0.003),          // savings + risk
-    moderate:     revenue * gap * ((CIRCULAR_SAVING * 0.12) + 0.005 + 0.005),  // + Natura uplift
-    optimistic:   revenue * gap * ((CIRCULAR_SAVING * 0.20) + 0.008 + 0.010),  // + full innovation
+    conservative: revenue * gap * con,
+    moderate:     revenue * gap * mod,
+    optimistic:   revenue * gap * opt,
   }
 }
 
@@ -202,6 +275,20 @@ function calcBusiness(revenue: number, score: number): ScenarioValues {
 export function calculateFinancialOpportunity(inputs: SurveyInputs): FinancialModel {
   const { annualRevenue: r } = inputs
 
+  // Build dynamic driver + evidence for sustainability section
+  const selectedCats = (inputs.sustainabilityCategories ?? '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s && s !== 'None of the above' && CATEGORY_DRIVER[s])
+
+  const sustainabilityDriver = selectedCats.length > 0
+    ? selectedCats.map(c => CATEGORY_DRIVER[c]).join(' + ')
+    : 'Circular Economy Savings + Risk Cost Avoidance + Sustainable Innovation Uplift'
+
+  const sustainabilityEvidence = selectedCats.length > 0
+    ? selectedCats.map(c => CATEGORY_EVIDENCE[c]).join('; ')
+    : 'Ellen MacArthur/McKinsey Growth Within (2015): 32% material cost reduction from circular transition; Natura / CMO Blueprint (2025): circular product innovation outperformed sales expectations by 100% in first 3 months; L\'Oréal / CMO Blueprint (2025): sustainability-integrated digital campaigns reduced carbon footprint 20% without reducing effectiveness'
+
   const sections: Record<string, SectionOpportunity> = {
     appetiteForGrowth: {
       label: 'Appetite for Growth',
@@ -221,11 +308,16 @@ export function calculateFinancialOpportunity(inputs: SurveyInputs): FinancialMo
     },
     sustainabilityCapability: {
       label: 'Sustainability Capability',
-      driver: 'Circular Economy Savings + Risk Cost Avoidance + Sustainable Innovation Uplift',
-      evidence: 'Ellen MacArthur/McKinsey Growth Within (2015): 32% material cost reduction from circular transition; Natura / CMO Blueprint (2025): circular product innovation outperformed sales expectations by 100% in first 3 months; L\'Oréal / CMO Blueprint (2025): sustainability-integrated digital campaigns reduced carbon footprint 20% without reducing effectiveness',
+      driver: sustainabilityDriver,
+      evidence: sustainabilityEvidence,
       score: inputs.sustainabilityCapability,
       gap: 100 - inputs.sustainabilityCapability,
-      opportunity: calcSustainability(r, inputs.sustainabilityCapability),
+      opportunity: calcSustainability(
+        r,
+        inputs.sustainabilityCapability,
+        inputs.sustainabilityApproach,
+        inputs.sustainabilityCategories,
+      ),
     },
     brandCapability: {
       label: 'Brand Capability',
