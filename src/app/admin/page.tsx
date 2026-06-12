@@ -154,6 +154,34 @@ function EditSelect({ value, onChange, options }: {
   )
 }
 
+function EditMultiSelect({ value, onChange, options }: {
+  value: string; onChange: (v: string) => void; options: string[]
+}) {
+  const selected = value ? value.split(',').map(s => s.trim()).filter(Boolean) : []
+  function toggle(option: string) {
+    const next = selected.includes(option)
+      ? selected.filter(s => s !== option)
+      : [...selected, option]
+    onChange(next.join(','))
+  }
+  return (
+    <div className="flex flex-col gap-1.5 p-2"
+      style={{ border: '1px solid rgba(13,20,16,0.1)', backgroundColor: '#fff' }}>
+      {options.map(o => {
+        const checked = selected.includes(o)
+        return (
+          <label key={o} className="flex items-center gap-2 cursor-pointer"
+            style={{ fontSize: '0.8rem', color: '#0d1410' }}>
+            <input type="checkbox" checked={checked} onChange={() => toggle(o)}
+              style={{ accentColor: '#22a855', cursor: 'pointer' }} />
+            {o}
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
 // ── Section row with answer editing ────────────────────────────────────────
 
 function SectionRow({
@@ -304,7 +332,13 @@ function SectionRow({
                   <div key={q.id} className="px-6 py-3"
                     style={{ borderBottom: '1px solid rgba(13,20,16,0.04)' }}>
                     <p className="text-xs mb-2" style={{ color: 'rgba(13,20,16,0.5)' }}>{q.text}</p>
-                    {(q.type === 'text-options' || q.type === 'percentage') && q.options?.length ? (
+                    {q.type === 'multiple-select' && q.options?.length ? (
+                      <EditMultiSelect
+                        value={curAnswer}
+                        onChange={v => setEditAnswers(prev => ({ ...prev, [q.id]: v }))}
+                        options={q.options}
+                      />
+                    ) : (q.type === 'text-options' || q.type === 'percentage') && q.options?.length ? (
                       <EditSelect
                         value={curAnswer}
                         onChange={v => setEditAnswers(prev => ({ ...prev, [q.id]: v }))}
