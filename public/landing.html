@@ -811,7 +811,7 @@
           <span class="cta-card-badge">Free until Sept 2026</span>
           <p class="cta-card-title">Bespoke<br>Report</p>
           <p class="cta-card-desc">A 45 minute interview plus 3 hours of research and analysis, resulting in an in-depth report and business case</p>
-          <a href="#" class="btn btn-fill-yellow js-book">Book your assessment <span class="arrow">→</span></a>
+          <a href="#" class="btn btn-fill-yellow js-book">Apply for an assessment <span class="arrow">→</span></a>
         </div>
       </div>
     </div>
@@ -1140,7 +1140,7 @@
       <span class="cta-card-badge">Free until Sept 2026</span>
       <p class="cta-card-title">Bespoke<br>Report</p>
       <p class="cta-card-desc">A 45 minute interview plus 3 hours of research and analysis, resulting in an in-depth report and business case</p>
-      <a href="#" class="btn btn-ghost-on-ink js-book">Book your assessment <span class="arrow">→</span></a>
+      <a href="#" class="btn btn-ghost-on-ink js-book">Apply for an assessment <span class="arrow">→</span></a>
     </div>
   </div>
   <div class="final-contact">
@@ -1167,7 +1167,7 @@
 
     <!-- Form state -->
     <div class="modal-inner" id="modalFormWrap">
-      <h2 class="modal-headline" id="modalHeadline">BOOK YOUR<br>INTERPLAY<br>ASSESSMENT</h2>
+      <h2 class="modal-headline" id="modalHeadline">APPLY FOR<br>YOUR<br>ASSESSMENT</h2>
       <div class="modal-hook">
         Your Interplay Report gives you a sustainability growth score benchmarked against peers, a pillar-by-pillar commercial analysis, and a quantified financial opportunity — in a format ready to present to your board. There's no obligation, no sales pitch. Just a clear picture of the value you're currently leaving on the table.
       </div>
@@ -1193,7 +1193,7 @@
           <strong>Why we're asking:</strong> We use your details to prepare a bespoke Interplay Report personally tailored to your organisation and sector. We will never share your information or use it for anything else.
         </div>
         <button type="submit" class="btn btn-fill-yellow modal-submit" id="modalSubmitBtn">
-          Book my assessment <span class="arrow">→</span>
+          Apply for an assessment <span class="arrow">→</span>
         </button>
       </form>
     </div>
@@ -1201,8 +1201,8 @@
     <!-- Success state (book mode only) -->
     <div class="modal-success" id="modalSuccess">
       <div class="modal-success-check">&#x2713;</div>
-      <p class="modal-success-h">YOU'RE REGISTERED</p>
-      <p class="modal-success-p" id="modalSuccessMsg">A confirmation email is on its way to you. We'll be in touch shortly to arrange your 30-minute Interplay interview.</p>
+      <p class="modal-success-h">APPLICATION RECEIVED</p>
+      <p class="modal-success-p" id="modalSuccessMsg">Your application has been received. We'll be in touch with you in due course.</p>
     </div>
   </div>
 </div>
@@ -1225,8 +1225,8 @@
   var MODES = {
     book: {
       band:     'Free Bespoke Report',
-      headline: 'BOOK YOUR<br>INTERPLAY<br>ASSESSMENT',
-      submit:   'Book my assessment <span class="arrow">→</span>',
+      headline: 'APPLY FOR<br>YOUR<br>ASSESSMENT',
+      submit:   'Apply for an assessment <span class="arrow">→</span>',
       saving:   'Registering…',
     },
   };
@@ -1316,8 +1316,8 @@
         // Book mode (or fallback): show the confirmation screen
         var msgEl = document.getElementById('modalSuccessMsg');
         if (msgEl) {
-          msgEl.innerHTML = 'A confirmation email is on its way to <strong style="color:#fff">'
-            + email + '</strong>. We\'ll be in touch shortly to arrange your 30-minute Interplay interview.';
+          msgEl.innerHTML = 'Your application has been received. We\'ll be in touch with you at <strong style="color:#fff">'
+            + email + '</strong> in due course.';
         }
         formWrap.style.display  = 'none';
         successEl.style.display = 'flex';

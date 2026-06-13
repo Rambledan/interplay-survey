@@ -26,15 +26,16 @@ export async function POST(req: NextRequest) {
 
   const { name, email, company, role, source, startSurvey } = body
 
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
-  }
-
-  const trimmedEmail   = email.trim()
+  const trimmedEmail   = typeof email === 'string' ? email.trim() : null
   const trimmedName    = name?.trim()
   const trimmedCompany = company?.trim()
   const trimmedRole    = role?.trim()
   const trimmedSource  = source?.trim() || 'landing'
+
+  // Email is required only when startSurvey is true (magic-link needs a destination)
+  if (startSurvey && (!trimmedEmail || !trimmedEmail.includes('@'))) {
+    return NextResponse.json({ error: 'Valid email required to start survey' }, { status: 400 })
+  }
 
   let leadId: number | null = null
   let surveyToken: string | null = null
@@ -51,14 +52,14 @@ export async function POST(req: NextRequest) {
     // ── 2. Create survey session + fire magic-link email (only for startSurvey) ─
     if (startSurvey) {
       try {
-        const session = await createSurveySession(trimmedEmail, leadId)
+        const session = await createSurveySession(trimmedEmail!, leadId)
         surveyToken = session.survey_token
         const sessionId = session.id
 
         // Fire email without blocking the response; update both session AND lead
         // so the admin Leads panel reflects the actual delivery outcome.
         const capturedLeadId = leadId
-        sendSurveyStartEmail(trimmedEmail, trimmedName, surveyToken)
+        sendSurveyStartEmail(trimmedEmail!, trimmedName, surveyToken)
           .then(result => {
             updateSessionEmailStatus(sessionId, result.sent, result.error)
               .catch(err => console.error('[leads] Session email status failed:', err))
@@ -80,16 +81,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, surveyToken })
   }
 
-  // ── 4. Book-your-assessment flow: send confirmation email + show screen ─────
-  const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
-
-  if (leadId !== null && isPostgresConfigured()) {
-    try {
-      await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
-    } catch (err) {
-      console.error('[leads] Email status update failed:', err)
+  // ── 4. Apply-for-assessment flow: send confirmation email if email known ─────
+  if (trimmedEmail) {
+    const emailResult = await sendLeadConfirmation(trimmedEmail, trimmedName)
+    if (leadId !== null && isPostgresConfigured()) {
+      try {
+        await updateLeadEmailStatus(leadId, emailResult.sent, emailResult.error)
+      } catch (err) {
+        console.error('[leads] Email status update failed:', err)
+      }
     }
+    return NextResponse.json({ ok: true, emailSent: emailResult.sent })
   }
 
-  return NextResponse.json({ ok: true, emailSent: emailResult.sent })
+  return NextResponse.json({ ok: true, emailSent: false })
 }

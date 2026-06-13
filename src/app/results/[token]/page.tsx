@@ -1304,9 +1304,24 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
 
 // ── Step 14: What's next ───────────────────────────────────────────────────────
 
-const CALENDAR_URL = 'https://calendar.app.google/aBnk5aQYmSQMXFwN8'
+function StepWhatsNext({ respondentName, respondentCompany }: { respondentName: string; respondentCompany: string }) {
+  const [applying, setApplying] = useState(false)
+  const [applied, setApplied] = useState(false)
 
-function StepWhatsNext() {
+  async function handleApply() {
+    setApplying(true)
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: respondentName, company: respondentCompany, source: 'report-apply', startSurvey: false }),
+      })
+      setApplied(true)
+    } finally {
+      setApplying(false)
+    }
+  }
+
   return (
     <StepWrap eyebrow="What's next">
       <p className="text-xs uppercase tracking-[0.25em] mb-5"
@@ -1348,17 +1363,30 @@ function StepWhatsNext() {
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row gap-4 items-start mb-12">
-        <a
-          href={CALENDAR_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="font-bold uppercase tracking-widest py-4 px-8 text-sm transition-all inline-block"
-          style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px', textDecoration: 'none', fontFamily: 'Open Sans, sans-serif' }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#e8df00'}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#faf000'}
-        >
-          Book a 30-min assessment →
-        </a>
+        {applied ? (
+          <div className="px-6 py-5 max-w-sm"
+            style={{ backgroundColor: 'rgba(250,240,0,0.07)', border: '1px solid rgba(250,240,0,0.3)' }}>
+            <p className="text-xs uppercase tracking-widest mb-2"
+              style={{ fontFamily: 'Almarai, sans-serif', color: '#faf000' }}>
+              Application received
+            </p>
+            <p className="text-sm leading-relaxed"
+              style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Open Sans, sans-serif' }}>
+              Thank you. We'll review your submission and be in touch with you shortly.
+            </p>
+          </div>
+        ) : (
+          <button
+            onClick={handleApply}
+            disabled={applying}
+            className="font-bold uppercase tracking-widest py-4 px-8 text-sm transition-all disabled:opacity-50"
+            style={{ backgroundColor: '#faf000', color: '#2f2a2a', borderRadius: '6px', fontFamily: 'Open Sans, sans-serif', cursor: applying ? 'default' : 'pointer' }}
+            onMouseEnter={e => { if (!applying) (e.currentTarget as HTMLElement).style.backgroundColor = '#e8df00' }}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#faf000'}
+          >
+            {applying ? 'Applying…' : 'Apply for an assessment →'}
+          </button>
+        )}
       </div>
 
       {/* Contact */}
@@ -1516,7 +1544,7 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
         ? null
         : <StepEvidence evidence={data.contentOverrides?.globalTemplate?.evidence} />
       case 12: return <StepHowWeCanHelp data={data} />
-      case 13: return <StepWhatsNext />
+      case 13: return <StepWhatsNext respondentName={data.respondent.name} respondentCompany={data.respondent.company} />
       default: return null
     }
   }

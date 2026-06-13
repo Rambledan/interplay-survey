@@ -530,11 +530,13 @@ async function ensureLeadsTable(client: Client): Promise<void> {
   await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_sent    BOOLEAN     NOT NULL DEFAULT FALSE`)
   await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ`)
   await client.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_error   TEXT`)
+  // Allow leads submitted without an email (e.g. from the report apply-CTA)
+  await client.query(`ALTER TABLE leads ALTER COLUMN email DROP NOT NULL`).catch(() => {/* already nullable */})
 }
 
 /** Insert a new lead and return its row ID. */
 export async function insertLead(
-  email: string,
+  email: string | null | undefined,
   name?: string,
   company?: string,
   role?: string,
@@ -546,7 +548,7 @@ export async function insertLead(
       `INSERT INTO leads (name, email, company, role, source)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [name || null, email, company || null, role || null, source]
+      [name || null, email || null, company || null, role || null, source]
     )
     return result.rows[0].id
   })
