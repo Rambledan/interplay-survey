@@ -2421,8 +2421,17 @@ function LeadsPanel({ password }: { password: string }) {
                   onMouseEnter={e => !isExpanded && (e.currentTarget.style.backgroundColor = 'rgba(13,20,16,0.015)')}
                   onMouseLeave={e => !isExpanded && (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
-                  <span className="text-sm font-medium truncate" style={{ color: '#0d1410' }}>
-                    {lead.name ?? <span style={{ color: 'rgba(13,20,16,0.3)', fontStyle: 'italic' }}>—</span>}
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span className="text-sm font-medium truncate" style={{ color: '#0d1410' }}>
+                      {lead.name ?? <span style={{ color: 'rgba(13,20,16,0.3)', fontStyle: 'italic' }}>—</span>}
+                    </span>
+                    {lead.source === 'report-apply' && (
+                      <span
+                        className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded-sm tracking-wide uppercase"
+                        style={{ background: 'rgba(255,193,7,0.15)', border: '1px solid rgba(255,193,7,0.5)', color: '#b45309' }}>
+                        Applied
+                      </span>
+                    )}
                   </span>
                   {lead.email ? (
                     <a
