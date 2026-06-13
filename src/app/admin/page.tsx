@@ -2137,7 +2137,7 @@ function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]
 interface LeadRow {
   id: number
   name: string | null
-  email: string
+  email: string | null
   company: string | null
   role: string | null
   source: string
@@ -2149,6 +2149,7 @@ interface LeadRow {
 
 interface SessionSummary {
   id: number
+  lead_id: number | null
   email: string
   survey_token: string
   results_token: string | null
@@ -2279,7 +2280,8 @@ function LeadsPanel({ password }: { password: string }) {
   function handleExportCsv() {
     const header = 'Name,Email,Company,Role,Source,Email Sent,Survey Progress,Registered At'
     const rows = leads.map(l => {
-      const session = sessions.find(s => s.email.toLowerCase() === l.email.toLowerCase())
+      const session = sessions.find(s => s.lead_id === l.id)
+        ?? (l.email ? sessions.find(s => s.email?.toLowerCase() === l.email!.toLowerCase()) : undefined)
       const progress = session
         ? (session.completed_at ? 'Complete' : `${session.sections_done?.length ?? 0}/5`)
         : '—'
@@ -2403,7 +2405,9 @@ function LeadsPanel({ password }: { password: string }) {
           {/* Rows */}
           {leads.map(lead => {
             const isExpanded = expandedId === lead.id
-            const session = sessions.find(s => s.email.toLowerCase() === lead.email.toLowerCase())
+            // Match session by lead_id first (precise); fall back to email only as legacy safety net
+            const session = sessions.find(s => s.lead_id === lead.id)
+              ?? (lead.email ? sessions.find(s => s.email?.toLowerCase() === lead.email!.toLowerCase()) : undefined)
             return (
               <div key={lead.id} style={{ borderBottom: '1px solid rgba(13,20,16,0.05)' }}>
                 <button
@@ -2420,16 +2424,20 @@ function LeadsPanel({ password }: { password: string }) {
                   <span className="text-sm font-medium truncate" style={{ color: '#0d1410' }}>
                     {lead.name ?? <span style={{ color: 'rgba(13,20,16,0.3)', fontStyle: 'italic' }}>—</span>}
                   </span>
-                  <a
-                    href={`mailto:${lead.email}`}
-                    onClick={e => e.stopPropagation()}
-                    className="text-xs font-mono truncate transition-colors"
-                    style={{ color: 'rgba(13,20,16,0.65)' }}
-                    onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.65)'}
-                  >
-                    {lead.email}
-                  </a>
+                  {lead.email ? (
+                    <a
+                      href={`mailto:${lead.email}`}
+                      onClick={e => e.stopPropagation()}
+                      className="text-xs font-mono truncate transition-colors"
+                      style={{ color: 'rgba(13,20,16,0.65)' }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#0d1410'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(13,20,16,0.65)'}
+                    >
+                      {lead.email}
+                    </a>
+                  ) : (
+                    <span className="text-xs font-mono" style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>
+                  )}
                   <span className="text-xs truncate" style={{ color: 'rgba(13,20,16,0.55)' }}>
                     {lead.company ?? <span style={{ color: 'rgba(13,20,16,0.25)' }}>—</span>}
                   </span>
@@ -2525,7 +2533,7 @@ function LeadsPanel({ password }: { password: string }) {
 
                     {/* Action buttons row */}
                     <div className="flex items-center gap-3 pt-1" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
-                      {!(session ? session.email_sent : lead.email_sent) && (
+                      {lead.email && !(session ? session.email_sent : lead.email_sent) && (
                         <button
                           onClick={() => handleResend(lead)}
                           disabled={resending === lead.id}
