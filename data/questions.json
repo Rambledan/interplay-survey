@@ -187,7 +187,7 @@
       {
         "id": "sus-q14",
         "text": "What is the predominant approach to sustainability in your organisation?",
-        "type": "multiple-select",
+        "type": "text-options",
         "options": [
           "We have an overarching strategy for sustainability",
           "Sustainability works toward targets and commitments"
