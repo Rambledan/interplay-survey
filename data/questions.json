@@ -200,13 +200,14 @@
         "type": "multiple-select",
         "options": [
           "Circular Economy",
-          "Social & Community",
+          "Social Impact",
           "Net Zero",
-          "Nature Positive",
+          "Nature",
           "Innovation & Product Activation",
-          "Decent Work",
+          "Decent work in the supply chain",
           "Diversity & Inclusion",
           "Water Stewardship",
+          "Health & Wellbeing",
           "None of the above"
         ],
         "followUpLabel": "Is there anything else to add?"

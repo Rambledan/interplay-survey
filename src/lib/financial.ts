@@ -155,39 +155,42 @@ function calcAI(revenue: number, score: number): ScenarioValues {
  * Fallback (no categories / None of the above) uses a conservative Friede-floor model.
  */
 const CATEGORY_MULTIPLIERS: Record<string, [number, number, number]> = {
-  'Circular Economy':               [0.05, 0.08, 0.12],
-  'Social & Community':             [0.05, 0.09, 0.12],
-  'Net Zero':                       [0.04, 0.07, 0.10],
-  'Nature Positive':                [0.04, 0.08, 0.11],
-  'Innovation & Product Activation':[0.06, 0.09, 0.12],
-  'Decent Work':                    [0.04, 0.07, 0.10],
-  'Diversity & Inclusion':          [0.05, 0.08, 0.11],
-  'Water Stewardship':              [0.04, 0.07, 0.10],
+  'Circular Economy':                    [0.05, 0.08, 0.12],
+  'Social Impact':                       [0.05, 0.09, 0.12],
+  'Net Zero':                            [0.04, 0.07, 0.10],
+  'Nature':                              [0.04, 0.08, 0.11],
+  'Innovation & Product Activation':     [0.06, 0.09, 0.12],
+  'Decent work in the supply chain':     [0.04, 0.07, 0.10],
+  'Diversity & Inclusion':               [0.05, 0.08, 0.11],
+  'Water Stewardship':                   [0.04, 0.07, 0.10],
+  'Health & Wellbeing':                  [0.05, 0.08, 0.11],
 }
 const FALLBACK_MULTIPLIERS: [number, number, number] = [0.04, 0.06, 0.08]
 const MODE_B_FACTOR = 0.75
 const CONSERVATIVE_FLOOR = 0.04
 
 export const CATEGORY_DRIVER: Record<string, string> = {
-  'Circular Economy':               'Circular Economy Savings + Risk Cost Avoidance',
-  'Social & Community':             'Social Purpose Premium + Community Trust Uplift',
-  'Net Zero':                       'Net Zero Margin Uplift + Transition Risk Avoidance',
-  'Nature Positive':                'Nature-Positive Brand Growth + Operational Efficiency',
-  'Innovation & Product Activation':'Sustainability-Led Product Innovation + Sales Uplift',
-  'Decent Work':                    'Productivity Uplift + Reputational Risk Reduction',
-  'Diversity & Inclusion':          'Diversity Performance Premium + Innovation Revenue Uplift',
-  'Water Stewardship':              'Water Risk Mitigation + Operational Cost Reduction',
+  'Circular Economy':                    'Circular Economy Savings + Risk Cost Avoidance',
+  'Social Impact':                       'Social Purpose Premium + Community Trust Uplift',
+  'Net Zero':                            'Net Zero Margin Uplift + Transition Risk Avoidance',
+  'Nature':                              'Nature-Positive Brand Growth + Operational Efficiency',
+  'Innovation & Product Activation':     'Sustainability-Led Product Innovation + Sales Uplift',
+  'Decent work in the supply chain':     'Supply Chain Productivity Uplift + Reputational Risk Reduction',
+  'Diversity & Inclusion':               'Diversity Performance Premium + Innovation Revenue Uplift',
+  'Water Stewardship':                   'Water Risk Mitigation + Operational Cost Reduction',
+  'Health & Wellbeing':                  'Employee Wellbeing Premium + Health-Related Productivity Uplift',
 }
 
 export const CATEGORY_EVIDENCE: Record<string, string> = {
-  'Circular Economy':               'Ellen MacArthur/McKinsey Growth Within (2015): 32% material cost reduction from circular transition; WEF (2020): 30–40% circular product cost savings',
-  'Social & Community':             'B Lab UK (2025): B Corps grow 28× faster than peers; Cone Communications: 6–9% purchase premium for community-purpose brands; Edelman Trust Barometer: 2–3× trust premium for socially responsible brands',
-  'Net Zero':                       'McKinsey (2023): 1–3% margin uplift from carbon efficiency programmes; SBTi/CDP (2024): companies with science-based targets face 25–30% lower transition risk cost',
-  'Nature Positive':                'Unilever Sustainable Living Brands (2023): nature-positive brands grew 69% faster than the rest of the portfolio; TNFD (2023): nature-positive land use delivers 15–30% profit uplift per hectare',
-  'Innovation & Product Activation':'Accenture (2023): sustainability-led product innovation drives 2.6× revenue growth; Forrester (2022): sustainability-integrated product launches achieve 6–10% sales uplift in year one',
-  'Decent Work':                    'ILO (2022): decent work programmes deliver 15–25% productivity uplift; World Benchmarking Alliance (2023): 8–12% reduction in reputational risk costs for high-scoring social companies',
-  'Diversity & Inclusion':          'McKinsey Diversity Wins (2023): companies in top quartile for diversity 39% more likely to outperform peers; BCG (2018): diverse management teams generate 19% higher innovation revenue',
-  'Water Stewardship':              'CDP Water (2023): water stewardship programmes improve operational cost metrics 6–10%; AWS Coalition (2023): businesses with water risk mitigation face 15–25% lower operational disruption costs',
+  'Circular Economy':                    'Ellen MacArthur/McKinsey Growth Within (2015): 32% material cost reduction from circular transition; WEF (2020): 30–40% circular product cost savings',
+  'Social Impact':                       'B Lab UK (2025): B Corps grow 28× faster than peers; Cone Communications: 6–9% purchase premium for community-purpose brands; Edelman Trust Barometer: 2–3× trust premium for socially responsible brands',
+  'Net Zero':                            'McKinsey (2023): 1–3% margin uplift from carbon efficiency programmes; SBTi/CDP (2024): companies with science-based targets face 25–30% lower transition risk cost',
+  'Nature':                              'Unilever Sustainable Living Brands (2023): nature-positive brands grew 69% faster than the rest of the portfolio; TNFD (2023): nature-positive land use delivers 15–30% profit uplift per hectare',
+  'Innovation & Product Activation':     'Accenture (2023): sustainability-led product innovation drives 2.6× revenue growth; Forrester (2022): sustainability-integrated product launches achieve 6–10% sales uplift in year one',
+  'Decent work in the supply chain':     'ILO (2022): decent work programmes deliver 15–25% productivity uplift; World Benchmarking Alliance (2023): 8–12% reduction in reputational risk costs for high-scoring social companies',
+  'Diversity & Inclusion':               'McKinsey Diversity Wins (2023): companies in top quartile for diversity 39% more likely to outperform peers; BCG (2018): diverse management teams generate 19% higher innovation revenue',
+  'Water Stewardship':                   'CDP Water (2023): water stewardship programmes improve operational cost metrics 6–10%; AWS Coalition (2023): businesses with water risk mitigation face 15–25% lower operational disruption costs',
+  'Health & Wellbeing':                  'WHO (2023): workplace wellbeing programmes deliver 10–25% productivity uplift; Gallup (2023): high-wellbeing organisations show 23% higher profitability; Deloitte (2022): mental health investment generates £5 return per £1 spent',
 }
 
 function calcSustainability(
