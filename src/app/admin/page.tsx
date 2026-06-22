@@ -35,16 +35,16 @@ const SECTION_SHORT_NAMES: Record<string, string> = {
 }
 
 const INSIGHT_BAND_LABELS = [
-  'Band 0 — EARLY STAGE (0–39%)',
-  'Band 1 — DEVELOPING (40–59%)',
-  'Band 2 — MATURING (60–79%)',
-  'Band 3 — LEADING (80–100%)',
+  'Band 0 — EARLY STAGE (1–25%)',
+  'Band 1 — EMERGING (26–50%)',
+  'Band 2 — DEVELOPING (51–75%)',
+  'Band 3 — MATURING (76–100%)',
 ]
 
 const ACTION_BAND_LABELS = [
-  'Band 0 — EARLY STAGE (0–39%)',
-  'Band 1 — DEVELOPING (40–59%)',
-  'Band 2 — MATURING / LEADING (60–100%)',
+  'Band 0 — EARLY STAGE (1–25%)',
+  'Band 1 — EMERGING (26–50%)',
+  'Band 2 — DEVELOPING / MATURING (51–100%)',
 ]
 
 function getSectionColor(slug: string) {
@@ -1572,7 +1572,7 @@ function buildAnswerMap(sections: ResponseEntry[]): Record<string, string> {
 }
 
 const BAND_COLORS = ['#dc2626', '#d97706', '#3b82f6', '#22a855']
-const BAND_LABELS = ['Early Stage', 'Developing', 'Maturing', 'Leading']
+const BAND_LABELS = ['Early Stage', 'Emerging', 'Developing', 'Maturing']
 
 // Simple horizontal bar (used for pillar averages, sector counts, etc.)
 function HBar({
@@ -2015,11 +2015,11 @@ function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]
           ))}
           {/* Benchmark line overlay description */}
           <div className="mt-4 pt-4 flex gap-6 flex-wrap" style={{ borderTop: '1px solid rgba(13,20,16,0.06)' }}>
-            {[{ pct: 0, label: 'Early Stage', color: BAND_COLORS[0] }, { pct: 40, label: 'Developing', color: BAND_COLORS[1] }, { pct: 60, label: 'Maturing', color: BAND_COLORS[2] }, { pct: 80, label: 'Leading', color: BAND_COLORS[3] }].map(b => (
+            {[{ pct: 0, label: 'Early Stage', color: BAND_COLORS[0] }, { pct: 26, label: 'Emerging', color: BAND_COLORS[1] }, { pct: 51, label: 'Developing', color: BAND_COLORS[2] }, { pct: 76, label: 'Maturing', color: BAND_COLORS[3] }].map(b => (
               <div key={b.pct} className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: b.color }} />
                 <span className="text-[10px] font-mono uppercase" style={{ color: 'rgba(13,20,16,0.45)' }}>{b.label}</span>
-                <span className="text-[10px] font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>{b.pct === 0 ? '< 40%' : b.pct === 40 ? '40–59%' : b.pct === 60 ? '60–79%' : '80%+'}</span>
+                <span className="text-[10px] font-mono" style={{ color: 'rgba(13,20,16,0.3)' }}>{b.pct === 0 ? '1–25%' : b.pct === 26 ? '26–50%' : b.pct === 51 ? '51–75%' : '76–100%'}</span>
               </div>
             ))}
           </div>

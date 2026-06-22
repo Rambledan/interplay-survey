@@ -59,19 +59,19 @@ const INTRO = {
   ],
   bands: [
     {
-      label: 'Early Stage', range: '0–39%',
+      label: 'Early Stage', range: '1–25%',
       desc: 'Sustainability is a low priority and disconnected from the business, leading to poor potential for growth.',
     },
     {
-      label: 'Developing', range: '40–59%',
+      label: 'Emerging', range: '26–50%',
       desc: 'Sustainability is important but has limited connectivity across the organisation, limiting growth.',
     },
     {
-      label: 'Maturing', range: '60–79%',
+      label: 'Developing', range: '51–75%',
       desc: 'Sustainability strategy is mature and you are starting to integrate it with other business functions. However it needs more encouragement to unlock growth and get you into a leadership position.',
     },
     {
-      label: 'Leading', range: '80–100%',
+      label: 'Maturing', range: '76–100%',
       desc: 'Sustainability is well integrated across the business. There is ongoing potential to unlock greater value – to stay ahead of the competition.',
     },
   ],

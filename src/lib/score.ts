@@ -319,8 +319,8 @@ export const SECTION_META: Record<string, {
 }
 
 export function getScoreBand(pct: number): { label: string; index: number } {
-  if (pct >= 80) return { label: 'LEADING', index: 3 }
-  if (pct >= 60) return { label: 'MATURING', index: 2 }
-  if (pct >= 40) return { label: 'DEVELOPING', index: 1 }
+  if (pct >= 76) return { label: 'MATURING', index: 3 }
+  if (pct >= 51) return { label: 'DEVELOPING', index: 2 }
+  if (pct >= 26) return { label: 'EMERGING', index: 1 }
   return { label: 'EARLY STAGE', index: 0 }
 }

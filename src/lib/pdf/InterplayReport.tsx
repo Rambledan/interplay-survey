@@ -340,10 +340,10 @@ const PDF_INTRO = {
     { num: '5', name: 'Business', desc: 'Measures how central sustainability is to the business strategy and capital allocation.' },
   ],
   bands: [
-    { label: 'Early Stage', range: '0–39%', desc: 'Sustainability is a low priority and disconnected from the business.' },
-    { label: 'Developing', range: '40–59%', desc: 'Sustainability is important but has limited connectivity across the organisation.' },
-    { label: 'Maturing', range: '60–79%', desc: 'Sustainability strategy is mature but needs more encouragement to unlock growth.' },
-    { label: 'Leading', range: '80–100%', desc: 'Sustainability is well integrated. Ongoing potential to unlock greater value and stay ahead.' },
+    { label: 'Early Stage', range: '1–25%', desc: 'Sustainability is a low priority and disconnected from the business.' },
+    { label: 'Emerging', range: '26–50%', desc: 'Sustainability is important but has limited connectivity across the organisation.' },
+    { label: 'Developing', range: '51–75%', desc: 'Sustainability strategy is developing and you are starting to integrate it with other business functions.' },
+    { label: 'Maturing', range: '76–100%', desc: 'Sustainability is well integrated. Ongoing potential to unlock greater value and stay ahead.' },
   ],
 }
 
