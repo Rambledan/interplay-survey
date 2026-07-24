@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import questionsData from '../../../../../data/questions.json'
 import { parseCsv } from '@/lib/parse-csv'
-import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers, getAllReferrals, duplicateRespondent } from '@/lib/db'
+import { isPostgresConfigured, getAllResponses, deleteResponsesByRespondent, deleteResponseById, updateRespondentProfile, updateRowAnswers, getAllReferrals, duplicateRespondent, setRespondentBenchmarkInclusion } from '@/lib/db'
 import type { ReferralRow } from '@/lib/db'
 import type { SurveySection, Question } from '@/types/survey'
 import type { DbRow } from '@/lib/db'
@@ -42,6 +42,8 @@ export interface ResponseEntry {
   sectionSlug: string
   sectionName: string
   answers: AnswerEntry[]
+  /** Whether this respondent's scores count towards the peer benchmark. */
+  includeInBenchmark: boolean
 }
 
 export interface AdminStats {
@@ -109,6 +111,7 @@ async function getResponsesFromPostgres(): Promise<ResponseEntry[]> {
       (row.answers as Record<string, string>) ?? {},
       (row.follow_ups as Record<string, string>) ?? {}
     ),
+    includeInBenchmark: row.include_in_benchmark !== false,
   }))
 }
 
@@ -141,6 +144,7 @@ function getResponsesFromCsv(): ResponseEntry[] {
       sectionSlug: sectionSlug ?? '',
       sectionName: sectionNames.get(sectionSlug) ?? sectionSlug ?? '',
       answers: buildAnswerEntries(answersMap, followUpsMap),
+      includeInBenchmark: true,
     }
   })
 }
@@ -256,6 +260,13 @@ export async function PATCH(request: NextRequest) {
       if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
       const ok = await updateRowAnswers(Number(id), answers ?? {}, followUps ?? {})
       return NextResponse.json({ ok })
+    }
+
+    if (body.type === 'benchmark') {
+      const { name, include } = body as { name: string; include: boolean }
+      if (!name?.trim()) return NextResponse.json({ error: 'Missing name' }, { status: 400 })
+      const updated = await setRespondentBenchmarkInclusion(name, include !== false)
+      return NextResponse.json({ ok: true, updated })
     }
 
     if (body.type === 'duplicate') {

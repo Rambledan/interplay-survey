@@ -96,6 +96,7 @@ export async function ensureTable(): Promise<void> {
     await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_company TEXT NOT NULL DEFAULT ''`)
     await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_sector  TEXT NOT NULL DEFAULT ''`)
     await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS respondent_type    TEXT NOT NULL DEFAULT ''`)
+    await client.query(`ALTER TABLE responses ADD COLUMN IF NOT EXISTS include_in_benchmark BOOLEAN NOT NULL DEFAULT TRUE`)
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_responses_submitted_at
       ON responses (submitted_at DESC)
@@ -165,6 +166,7 @@ export interface DbRow {
   section_slug: string
   answers: Record<string, string>
   follow_ups: Record<string, string>
+  include_in_benchmark: boolean
 }
 
 // ── Queries ───────────────────────────────────────────────────────────────────
@@ -244,6 +246,20 @@ export async function updateRespondentProfile(
     await client.query(
       `UPDATE respondent_tokens SET respondent_name = $1 WHERE LOWER(respondent_name) = LOWER($2)`,
       [profile.name, oldName]
+    )
+    return result.rowCount ?? 0
+  })
+}
+
+export async function setRespondentBenchmarkInclusion(
+  name: string,
+  include: boolean
+): Promise<number> {
+  return withClient(async (client) => {
+    const result = await client.query(
+      `UPDATE responses SET include_in_benchmark = $1
+       WHERE LOWER(respondent_name) = LOWER($2)`,
+      [include, name]
     )
     return result.rowCount ?? 0
   })
@@ -332,7 +348,7 @@ export async function getAllResponses(): Promise<DbRow[]> {
     const result = await client.query<DbRow>(`
       SELECT id, submitted_at, respondent_name, respondent_role,
              respondent_company, respondent_sector, respondent_type,
-             token, section_slug, answers, follow_ups
+             token, section_slug, answers, follow_ups, include_in_benchmark
       FROM responses
       ORDER BY submitted_at DESC
     `)

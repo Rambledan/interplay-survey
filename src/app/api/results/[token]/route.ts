@@ -76,6 +76,7 @@ export async function GET(
   for (const row of allRows) {
     const name = row.respondent_name.toLowerCase()
     if (name === respondentName.toLowerCase()) continue
+    if (row.include_in_benchmark === false) continue  // excluded from benchmark by admin
     if (!othersByName.has(name)) othersByName.set(name, {})
     Object.assign(othersByName.get(name)!, row.answers as Record<string, string>)
   }

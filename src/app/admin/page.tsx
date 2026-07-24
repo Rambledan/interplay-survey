@@ -71,6 +71,7 @@ interface RespondentGroup {
   company: string
   sector: string
   companyType: string
+  includeInBenchmark: boolean
   sections: ResponseEntry[]
 }
 
@@ -88,10 +89,14 @@ function groupByRespondent(responses: ResponseEntry[]): RespondentGroup[] {
         company: r.respondentCompany,
         sector: r.respondentSector,
         companyType: r.respondentType,
+        includeInBenchmark: true,
         sections: [],
       })
     }
-    map.get(key)!.sections.push(r)
+    const group = map.get(key)!
+    group.sections.push(r)
+    // A respondent counts towards the benchmark only if none of their rows are excluded
+    if (r.includeInBenchmark === false) group.includeInBenchmark = false
   }
 
   for (const group of map.values()) {
@@ -1336,6 +1341,29 @@ function RespondentCard({
   const [duplicating, setDuplicating] = useState(false)
   const [editingProfile, setEditingProfile] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
+  const [inBenchmark, setInBenchmark] = useState(group.includeInBenchmark)
+  const [savingBenchmark, setSavingBenchmark] = useState(false)
+
+  useEffect(() => { setInBenchmark(group.includeInBenchmark) }, [group.includeInBenchmark])
+
+  async function handleToggleBenchmark() {
+    const next = !inBenchmark
+    setInBenchmark(next)  // optimistic
+    setSavingBenchmark(true)
+    try {
+      const res = await fetch('/api/admin/responses', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` },
+        body: JSON.stringify({ type: 'benchmark', name: group.name, include: next }),
+      })
+      if (!res.ok) { setInBenchmark(!next); return }  // revert on failure
+      onRefresh()
+    } catch {
+      setInBenchmark(!next)  // revert on failure
+    } finally {
+      setSavingBenchmark(false)
+    }
+  }
   const [profile, setProfile] = useState({
     name: group.name, role: group.role, company: group.company,
     sector: group.sector, companyType: group.companyType,
@@ -1481,6 +1509,26 @@ function RespondentCard({
             </div>
 
             <div className="shrink-0 flex items-center gap-2">
+              {/* Benchmark inclusion toggle */}
+              <button
+                onClick={handleToggleBenchmark}
+                disabled={savingBenchmark}
+                title={inBenchmark
+                  ? 'This respondent counts towards the peer benchmark. Click to exclude.'
+                  : 'This respondent is excluded from the peer benchmark. Click to include.'}
+                className="text-xs font-mono px-3 py-1.5 transition-colors disabled:opacity-40 flex items-center gap-1.5"
+                style={{
+                  border: `1px solid ${inBenchmark ? 'rgba(62,207,110,0.45)' : 'rgba(13,20,16,0.15)'}`,
+                  color: inBenchmark ? '#22a855' : 'rgba(13,20,16,0.4)',
+                  backgroundColor: inBenchmark ? 'rgba(62,207,110,0.06)' : 'transparent',
+                }}>
+                <span aria-hidden style={{
+                  display: 'inline-block', width: 7, height: 7, borderRadius: '50%',
+                  backgroundColor: inBenchmark ? '#22a855' : 'rgba(13,20,16,0.25)',
+                }} />
+                {savingBenchmark ? 'Saving…' : inBenchmark ? 'In benchmark' : 'Excluded'}
+              </button>
+
               {/* Edit profile button */}
               <button onClick={() => setEditingProfile(true)}
                 className="text-xs font-mono px-3 py-1.5 transition-colors"
@@ -1863,13 +1911,24 @@ function QuestionInsightsSection({
 // ── Dashboard Panel ────────────────────────────────────────────────────────
 
 function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]; allSections: SurveySection[] }) {
-  const respondentGroups = useMemo(() => groupByRespondent(responses), [responses])
+  // Respondents toggled off in the Responses tab are dropped from every dashboard
+  // stat, chart, table, and export — they only remain visible in the Responses tab.
+  const respondentGroups = useMemo(
+    () => groupByRespondent(responses).filter(g => g.includeInBenchmark),
+    [responses]
+  )
 
   const respondentData = useMemo(() =>
     respondentGroups.map(group => ({
       group,
       scores: computeAllSectionScores(buildAnswerMap(group.sections)),
     })), [respondentGroups])
+
+  // Section submissions across included respondents only
+  const includedSubmissions = useMemo(
+    () => respondentGroups.reduce((n, g) => n + g.sections.length, 0),
+    [respondentGroups]
+  )
 
   // KPIs
   const totalRespondents = respondentGroups.length
@@ -1959,7 +2018,7 @@ function DashboardPanel({ responses, allSections }: { responses: ResponseEntry[]
       {/* Action bar */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3 no-print">
         <span className="text-xs font-mono uppercase tracking-[0.15em]" style={{ color: 'rgba(13,20,16,0.4)' }}>
-          {totalRespondents} respondent{totalRespondents !== 1 ? 's' : ''} · {responses.length} section submission{responses.length !== 1 ? 's' : ''}
+          {totalRespondents} respondent{totalRespondents !== 1 ? 's' : ''} · {includedSubmissions} section submission{includedSubmissions !== 1 ? 's' : ''}
         </span>
         <div className="flex gap-3">
           <button onClick={handleExportScores}
