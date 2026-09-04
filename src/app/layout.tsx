@@ -3,7 +3,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Interplay Method — Diagnostic Survey',
-  description: 'Discover how your brand, sustainability, and business strategies align. The Interplay Method diagnostic by Interrupt × Like So.',
+  description: 'Discover how your brand, sustainability, and business strategies align. The Interplay Method diagnostic by Interrupt.',
   icons: {
     icon: '/favicon.png',
   },

@@ -2687,7 +2687,7 @@ function LoginScreen({ onSuccess }: { onSuccess: (pw: string) => void }) {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-xs font-mono uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(13,20,16,0.4)' }}>
-            Interrupt × Like So
+            Interrupt
           </p>
           <h1 className="text-xl font-bold" style={{ color: '#0d1410' }}>Admin Access</h1>
           <p className="text-sm mt-1" style={{ color: 'rgba(13,20,16,0.5)' }}>Interplay Method — Response Review</p>
@@ -2847,8 +2847,6 @@ export default function AdminPage() {
           style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(13,20,16,0.08)' }}>
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Interrupt</span>
-            <span style={{ color: 'rgba(13,20,16,0.2)' }}>×</span>
-            <span className="text-xs font-mono uppercase tracking-[0.2em]" style={{ color: 'rgba(13,20,16,0.4)' }}>Like So</span>
             <span className="ml-4 text-xs font-mono uppercase tracking-[0.2em]" style={{ color: '#3ecf6e' }}>Admin</span>
           </div>
           <div className="flex items-center gap-4">

@@ -1232,7 +1232,7 @@ function StepHowWeCanHelp({ data }: { data: ResultsData }) {
       </h2>
       <p className="text-sm leading-relaxed mb-10 max-w-2xl"
         style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Open Sans, sans-serif' }}>
-        Based on your results, here is how Interrupt × Like So can support your organisation across each of the five Interplay pillars.
+        Based on your results, here is how Interrupt can support your organisation across each of the five Interplay pillars.
       </p>
 
       <div className="space-y-10">
@@ -1337,7 +1337,7 @@ function StepWhatsNext({ respondentName, respondentCompany }: { respondentName: 
 
       <p className="text-base leading-relaxed mb-8 max-w-xl"
         style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Open Sans, sans-serif' }}>
-        Your Interplay score gives you the picture. A 30-minute assessment with the Interrupt × Like So team turns it into a plan — with bespoke recommendations, a quantified financial opportunity, and a board-ready report tailored to your organisation.
+        Your Interplay score gives you the picture. A 30-minute assessment with the Interrupt team turns it into a plan — with bespoke recommendations, a quantified financial opportunity, and a board-ready report tailored to your organisation.
       </p>
 
       {/* Value props */}
@@ -1405,20 +1405,11 @@ function StepWhatsNext({ respondentName, respondentCompany }: { respondentName: 
               ninapickup@interrupt-sustainability.com
             </a>
           </p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Open Sans, sans-serif' }}>
-            Dan Harris &nbsp;·&nbsp;
-            <a href="mailto:dan.harris@likeso.studio"
-              style={{ color: 'rgba(250,240,0,0.6)', textDecoration: 'none' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#faf000'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,240,0,0.6)'}>
-              dan.harris@likeso.studio
-            </a>
-          </p>
         </div>
       </div>
 
       <p className="mt-10 text-xs font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>
-        Interrupt × Like So — The Interplay Method®
+        Interrupt — The Interplay Method®
       </p>
     </StepWrap>
   )
@@ -1505,7 +1496,7 @@ export default function ResultsPage({ params }: { params: Promise<{ token: strin
             Link not valid
           </h1>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Open Sans, sans-serif' }}>
-            This results link has expired or been revoked. Contact Interrupt × Like So for a new link.
+            This results link has expired or been revoked. Contact Interrupt for a new link.
           </p>
         </div>
       </div>

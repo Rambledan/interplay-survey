@@ -20,8 +20,6 @@ function NextStepsContent() {
         style={{ borderBottom: '1px solid rgba(250,240,0,0.12)' }}>
         <div className="flex items-center gap-4">
           <img src="/Logo+small.png.webp" alt="Interrupt" style={{ height: '36px', width: 'auto', filter: 'invert(1)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.2)' }}>×</span>
-          <img src="/LS.png" alt="Like So" style={{ height: '31px', width: 'auto', filter: 'invert(1)' }} />
         </div>
         <span className="text-xs uppercase tracking-[0.2em]"
           style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(250,240,0,0.45)' }}>
@@ -52,7 +50,7 @@ function NextStepsContent() {
 
         <p className="text-sm leading-relaxed mb-8 max-w-lg"
           style={{ color: 'rgba(255,255,255,0.6)', letterSpacing: '0.01em' }}>
-          Your Interplay score gives you the picture. A full 30-minute assessment with the Interrupt × Like So team turns it into a plan — with bespoke recommendations, a quantified financial opportunity, and a board-ready report tailored to your organisation.
+          Your Interplay score gives you the picture. A full 30-minute assessment with the Interrupt team turns it into a plan — with bespoke recommendations, a quantified financial opportunity, and a board-ready report tailored to your organisation.
         </p>
 
         {/* Value props */}
@@ -120,15 +118,6 @@ function NextStepsContent() {
                 ninapickup@interrupt-sustainability.com
               </a>
             </p>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Dan Harris &nbsp;·&nbsp;
-              <a href="mailto:dan.harris@likeso.studio"
-                style={{ color: 'rgba(250,240,0,0.6)', textDecoration: 'none' }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#faf000'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,240,0,0.6)'}>
-                dan.harris@likeso.studio
-              </a>
-            </p>
           </div>
         </div>
 
@@ -136,7 +125,7 @@ function NextStepsContent() {
 
       <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.25)' }}>
-          Interrupt × Like So — The Interplay Method®
+          Interrupt — The Interplay Method®
         </p>
       </footer>
     </div>

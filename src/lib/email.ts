@@ -12,7 +12,7 @@
  *   RESEND_FROM_NAME       — display name
  *                           Default: Interplay Assessment Team
  *   RESEND_NOTIFY_EMAILS   — comma-separated list of addresses to BCC on every
- *                           new registration (e.g. Nina and Dan's inboxes)
+ *                           new registration (e.g. the team's inboxes)
  *                           Default: empty
  *   NEXT_PUBLIC_APP_URL    — base URL for magic links (default: interplaymethod.com)
  */
@@ -59,7 +59,7 @@ function buildConfirmationHtml(name: string | null, email: string): string {
           <tr>
             <td style="background:#FFE600;padding:14px 32px;border-bottom:2px solid #303030">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(48,48,48,0.65)">
-                INTERRUPT × LIKE SO · The Interplay Assessment
+                INTERRUPT · The Interplay Assessment
               </p>
             </td>
           </tr>
@@ -114,20 +114,12 @@ function buildConfirmationHtml(name: string | null, email: string): string {
                     <p style="margin:0 0 8px;font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,224,0.35)">
                       Questions? Reach us directly
                     </p>
-                    <p style="margin:0 0 4px;font-size:13px;color:rgba(245,240,224,0.6)">
+                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
                       Nina Pickup
                       &nbsp;·&nbsp;
                       <a href="mailto:ninapickup@interrupt-sustainability.com"
                         style="color:#FFE600;text-decoration:none">
                         ninapickup@interrupt-sustainability.com
-                      </a>
-                    </p>
-                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
-                      Dan Harris
-                      &nbsp;·&nbsp;
-                      <a href="mailto:dan.harris@likeso.studio"
-                        style="color:#FFE600;text-decoration:none">
-                        dan.harris@likeso.studio
                       </a>
                     </p>
                   </td>
@@ -140,7 +132,7 @@ function buildConfirmationHtml(name: string | null, email: string): string {
           <tr>
             <td style="background:#1e1e1e;padding:14px 32px;border-top:1px solid rgba(245,240,224,0.05)">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,240,224,0.22)">
-                INTERRUPT &times; LIKE SO &nbsp;&middot;&nbsp; interrupt-sustainability.com &nbsp;&middot;&nbsp; likeso.studio
+                INTERRUPT &nbsp;&middot;&nbsp; interrupt-sustainability.com
               </p>
             </td>
           </tr>
@@ -212,7 +204,7 @@ function buildSurveyStartHtml(name: string | null, surveyToken: string): string 
           <tr>
             <td style="background:#FFE600;padding:14px 32px;border-bottom:2px solid #303030">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(48,48,48,0.65)">
-                INTERRUPT &times; LIKE SO &middot; The Interplay Assessment
+                INTERRUPT &middot; The Interplay Assessment
               </p>
             </td>
           </tr>
@@ -282,13 +274,9 @@ function buildSurveyStartHtml(name: string | null, surveyToken: string): string 
                     <p style="margin:0 0 8px;font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,224,0.35)">
                       Questions? Reach us directly
                     </p>
-                    <p style="margin:0 0 4px;font-size:13px;color:rgba(245,240,224,0.6)">
+                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
                       Nina Pickup &nbsp;&middot;&nbsp;
                       <a href="mailto:ninapickup@interrupt-sustainability.com" style="color:#FFE600;text-decoration:none">ninapickup@interrupt-sustainability.com</a>
-                    </p>
-                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
-                      Dan Harris &nbsp;&middot;&nbsp;
-                      <a href="mailto:dan.harris@likeso.studio" style="color:#FFE600;text-decoration:none">dan.harris@likeso.studio</a>
                     </p>
                   </td>
                 </tr>
@@ -300,7 +288,7 @@ function buildSurveyStartHtml(name: string | null, surveyToken: string): string 
           <tr>
             <td style="background:#1e1e1e;padding:14px 32px;border-top:1px solid rgba(245,240,224,0.05)">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,240,224,0.22)">
-                INTERRUPT &times; LIKE SO &nbsp;&middot;&nbsp; interrupt-sustainability.com &nbsp;&middot;&nbsp; likeso.studio
+                INTERRUPT &nbsp;&middot;&nbsp; interrupt-sustainability.com
               </p>
             </td>
           </tr>
@@ -343,7 +331,7 @@ function buildNudgeHtml(
           <tr>
             <td style="background:#FFE600;padding:14px 32px;border-bottom:2px solid #303030">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(48,48,48,0.65)">
-                INTERRUPT &times; LIKE SO &middot; The Interplay Assessment
+                INTERRUPT &middot; The Interplay Assessment
               </p>
             </td>
           </tr>
@@ -387,13 +375,9 @@ function buildNudgeHtml(
                     <p style="margin:0 0 8px;font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,224,0.35)">
                       Questions? Reach us directly
                     </p>
-                    <p style="margin:0 0 4px;font-size:13px;color:rgba(245,240,224,0.6)">
+                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
                       Nina Pickup &nbsp;&middot;&nbsp;
                       <a href="mailto:ninapickup@interrupt-sustainability.com" style="color:#FFE600;text-decoration:none">ninapickup@interrupt-sustainability.com</a>
-                    </p>
-                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
-                      Dan Harris &nbsp;&middot;&nbsp;
-                      <a href="mailto:dan.harris@likeso.studio" style="color:#FFE600;text-decoration:none">dan.harris@likeso.studio</a>
                     </p>
                   </td>
                 </tr>
@@ -404,7 +388,7 @@ function buildNudgeHtml(
           <tr>
             <td style="background:#1e1e1e;padding:14px 32px;border-top:1px solid rgba(245,240,224,0.05)">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,240,224,0.22)">
-                INTERRUPT &times; LIKE SO &nbsp;&middot;&nbsp; interrupt-sustainability.com &nbsp;&middot;&nbsp; likeso.studio
+                INTERRUPT &nbsp;&middot;&nbsp; interrupt-sustainability.com
               </p>
             </td>
           </tr>
@@ -437,7 +421,7 @@ function buildResultsHtml(name: string | null, resultsToken: string): string {
           <tr>
             <td style="background:#FFE600;padding:14px 32px;border-bottom:2px solid #303030">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(48,48,48,0.65)">
-                INTERRUPT &times; LIKE SO &middot; The Interplay Assessment
+                INTERRUPT &middot; The Interplay Assessment
               </p>
             </td>
           </tr>
@@ -505,13 +489,9 @@ function buildResultsHtml(name: string | null, resultsToken: string): string {
                     <p style="margin:0 0 8px;font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,224,0.35)">
                       Questions? Reach us directly
                     </p>
-                    <p style="margin:0 0 4px;font-size:13px;color:rgba(245,240,224,0.6)">
+                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
                       Nina Pickup &nbsp;&middot;&nbsp;
                       <a href="mailto:ninapickup@interrupt-sustainability.com" style="color:#FFE600;text-decoration:none">ninapickup@interrupt-sustainability.com</a>
-                    </p>
-                    <p style="margin:0;font-size:13px;color:rgba(245,240,224,0.6)">
-                      Dan Harris &nbsp;&middot;&nbsp;
-                      <a href="mailto:dan.harris@likeso.studio" style="color:#FFE600;text-decoration:none">dan.harris@likeso.studio</a>
                     </p>
                   </td>
                 </tr>
@@ -522,7 +502,7 @@ function buildResultsHtml(name: string | null, resultsToken: string): string {
           <tr>
             <td style="background:#1e1e1e;padding:14px 32px;border-top:1px solid rgba(245,240,224,0.05)">
               <p style="margin:0;font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,240,224,0.22)">
-                INTERRUPT &times; LIKE SO &nbsp;&middot;&nbsp; interrupt-sustainability.com &nbsp;&middot;&nbsp; likeso.studio
+                INTERRUPT &nbsp;&middot;&nbsp; interrupt-sustainability.com
               </p>
             </td>
           </tr>

@@ -222,7 +222,7 @@ function getInsightIdx(pct: number): { insightIdx: 0 | 1 | 2 | 3; actionIdx: 0 |
 function PageFooter({ company }: { company: string }) {
   return (
     <View style={s.pageFooter} fixed>
-      <Text style={s.pageFooterText}>INTERRUPT × LIKE SO — Interplay Method® — {company}</Text>
+      <Text style={s.pageFooterText}>INTERRUPT — Interplay Method® — {company}</Text>
       <View style={s.spacer} />
       <Text style={s.pageFooterText} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
     </View>
@@ -249,7 +249,7 @@ function CoverPage({ data }: { data: ReportData }) {
         {/* Branding */}
         <View style={[s.row, { alignItems: 'center', marginBottom: 64 }]}>
           <Text style={{ fontSize: 11, letterSpacing: 2, color: '#aaaaaa', fontWeight: 700 }}>
-            INTERRUPT × LIKE SO
+            INTERRUPT
           </Text>
         </View>
 
@@ -310,7 +310,7 @@ function CoverPage({ data }: { data: ReportData }) {
           Completed: {completedAt ? formatDate(completedAt) : '—'}
         </Text>
         <Text style={{ fontSize: 7, color: '#555555', marginTop: 4 }}>
-          Confidential — prepared by Interrupt × Like So
+          Confidential — prepared by Interrupt
         </Text>
       </View>
 
@@ -749,10 +749,10 @@ function EvidencePage({ data }: { data: ReportData }) {
         <Text style={[s.label, { marginBottom: 8 }]}>WHAT'S NEXT?</Text>
         <Text style={s.body}>
           To improve your Interplay score and unlock the commercial value of sustainability integration,
-          contact Interrupt × Like So.
+          contact Interrupt.
         </Text>
         <Text style={[s.body, { marginTop: 8, color: C.dimmed }]}>
-          interrupt-sustainability.com  ·  likeso.com
+          interrupt-sustainability.com
         </Text>
       </View>
     </Page>
@@ -765,7 +765,7 @@ export function InterplayReport({ data }: { data: ReportData }) {
   return (
     <Document
       title={`${data.respondent.company} Interplay Assessment Report`}
-      author="Interrupt × Like So"
+      author="Interrupt"
       subject="Interplay Method Diagnostic Report"
     >
       <CoverPage data={data} />

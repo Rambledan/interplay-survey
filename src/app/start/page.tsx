@@ -432,7 +432,7 @@ function StartForm() {
 
       <footer className="px-6 py-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <p className="text-xs" style={{ fontFamily: 'Almarai, sans-serif', color: 'rgba(255,255,255,0.25)' }}>
-          Interrupt × Like So — The Interplay Method®
+          Interrupt — The Interplay Method®
         </p>
       </footer>
     </div>
